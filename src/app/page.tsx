@@ -7,7 +7,7 @@ import { SolutionCarousel } from "@/features/solution-carousel";
 import { SupportSection } from "@/features/support";
 import { ClientMarquee } from "@/features/clients";
 import { DownloadGateModal } from "@/features/cta";
-import { ChatWidget } from "@/features/chat-widget";
+
 import Link from "next/link";
 import { gsap } from "@/lib/gsap-init";
 
@@ -749,8 +749,6 @@ export default function Home() {
         <CtaBanner />
       </div>
 
-      {/* Floating chat widget */}
-      <ChatWidget />
     </div>
   );
 }

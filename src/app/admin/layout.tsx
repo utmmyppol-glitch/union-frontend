@@ -8,7 +8,7 @@ const NAV = [
   { label: '대시보드', href: '/admin/dashboard', icon: '📊' },
   { label: '게시글 관리', href: '/admin/posts', icon: '📝' },
   { label: '문의 관리', href: '/admin/inquiries', icon: '📩' },
-  { label: '실시간 채팅', href: '/admin/chat', icon: '💬' },
+
   { label: '고객사례', href: '/admin/stories', icon: '🏢' },
   { label: '배너 관리', href: '/admin/banners', icon: '🖼️' },
   { label: '다운로드 관리', href: '/admin/downloads', icon: '📥' },

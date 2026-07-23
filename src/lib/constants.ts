@@ -83,6 +83,20 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/insights',
   },
   {
+    label: 'Estimate',
+    href: '/estimate',
+    badge: true,
+  },
+  {
+    label: 'SAM',
+    href: '/license-alert',
+    children: [
+      { label: '라이선스 관리 상담', href: '/license-alert' },
+      { label: '보안 점검', href: '/security-check' },
+      { label: 'IT·보안 용어사전', href: '/glossary' },
+    ],
+  },
+  {
     label: '도입문의',
     href: '/contact',
   },

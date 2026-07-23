@@ -113,6 +113,9 @@ export default function Header() {
                   }}
                 >
                   {item.label}
+                  {item.badge && (
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E4002B', display: 'inline-block', marginLeft: 4, flexShrink: 0 }} />
+                  )}
                 </Link>
 
                 {/* Dropdown */}

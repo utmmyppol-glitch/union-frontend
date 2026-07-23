@@ -64,4 +64,17 @@ export const NAVIGATION: NavNode[] = [
     label: '인사이트',
     href: '/insights',
   },
+  {
+    label: '온라인 견적',
+    href: '/estimate',
+  },
+  {
+    label: 'SAM 서비스',
+    href: '/license-alert',
+    children: [
+      { label: '라이선스 관리 상담', href: '/license-alert' },
+      { label: '보안 점검', href: '/security-check' },
+      { label: 'IT·보안 용어사전', href: '/glossary' },
+    ],
+  },
 ];
