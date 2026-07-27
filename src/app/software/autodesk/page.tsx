@@ -3,15 +3,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
-const IMG = '/images/uploads/2022/06/';
+const CRAWL = '/images/crawl/unionsystems/';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 
 const PRODUCTS = [
-  { name: 'AutoCAD', img: 'software_autodesk_autocad.jpg', desc: '2D/3D CAD 설계의 글로벌 표준' },
-  { name: 'Inventor', img: 'software_autodesk_inventor.jpg', desc: '3D 기계 설계 및 시뮬레이션' },
-  { name: 'Revit', img: 'software_autodesk_revit.jpg', desc: 'BIM 기반 건축 설계' },
-  { name: '3ds Max', img: 'software_autodesk_3ds-max.jpg', desc: '3D 모델링 및 렌더링' },
+  { name: 'AutoCAD', img: 'software_autodesk_autocad_126.jpg', desc: '2D/3D CAD 설계의 글로벌 표준' },
+  { name: 'Inventor', img: 'software_autodesk_inventor_127.jpg', desc: '3D 기계 설계 및 시뮬레이션' },
+  { name: 'Revit', img: 'software_autodesk_revit_128.jpg', desc: 'BIM 기반 건축 설계' },
+  { name: '3ds Max', img: 'software_autodesk_3ds-max_129.jpg', desc: '3D 모델링 및 렌더링' },
 ];
 
 const STRENGTHS = [
@@ -22,19 +22,19 @@ const STRENGTHS = [
 
 const COLLECTIONS = [
   { name: 'AEC Collection', desc: '건축, 엔지니어링, 시공', icons: [
-    { name: 'Revit', img: 'software_autodesk_icon_revit.jpg' }, { name: 'Civil 3D', img: 'software_autodesk_icon_civil.jpg' },
-    { name: 'AutoCAD', img: 'software_autodesk_icon_autocad.jpg' }, { name: 'InfraWorks', img: 'software_autodesk_icon_infraworks.jpg' },
-    { name: 'Navisworks', img: 'software_autodesk_icon_navisworks.jpg' }, { name: 'Docs', img: 'software_autodesk_icon_docs.jpg' },
+    { name: 'Revit', img: 'software_autodesk_icon_revit_133.jpg' }, { name: 'Civil 3D', img: 'software_autodesk_icon_civil_134.jpg' },
+    { name: 'AutoCAD', img: 'software_autodesk_icon_autocad_135.jpg' }, { name: 'InfraWorks', img: 'software_autodesk_icon_infraworks_136.jpg' },
+    { name: 'Navisworks', img: 'software_autodesk_icon_navisworks_137.jpg' }, { name: 'Docs', img: 'software_autodesk_icon_docs_138.jpg' },
   ]},
   { name: 'Product Design', desc: '제품 설계 및 제조', icons: [
-    { name: 'Inventor', img: 'software_autodesk_icon_inventor.jpg' }, { name: 'Fusion 360', img: 'software_autodesk_icon_fusion-360.jpg' },
-    { name: 'AutoCAD', img: 'software_autodesk_icon_autocad.jpg' }, { name: 'Tolerance Analysis', img: 'software_autodesk_icon_inventor-tolerance-analysis.jpg' },
-    { name: 'Nesting', img: 'software_autodesk_icon_inventor-nesting.jpg' },
+    { name: 'Inventor', img: 'software_autodesk_icon_inventor_139.jpg' }, { name: 'Fusion 360', img: 'software_autodesk_icon_fusion-360_140.jpg' },
+    { name: 'AutoCAD', img: 'software_autodesk_icon_autocad_135.jpg' }, { name: 'Tolerance Analysis', img: 'software_autodesk_icon_inventor-tolerance-analysis_141.jpg' },
+    { name: 'Nesting', img: 'software_autodesk_icon_inventor-nesting_142.jpg' },
   ]},
   { name: 'Media & Entertainment', desc: '미디어 및 엔터테인먼트', icons: [
-    { name: 'Maya', img: 'software_autodesk_icon_maya.jpg' }, { name: '3ds Max', img: 'software_autodesk_icon_3ds-max.jpg' },
-    { name: 'Arnold', img: 'software_autodesk_icon_arnold.jpg' }, { name: 'MotionBuilder', img: 'software_autodesk_icon_motionbuilder.jpg' },
-    { name: 'Mudbox', img: 'software_autodesk_icon_mudbox.jpg' },
+    { name: 'Maya', img: 'software_autodesk_icon_maya_143.jpg' }, { name: '3ds Max', img: 'software_autodesk_icon_3ds-max_144.jpg' },
+    { name: 'Arnold', img: 'software_autodesk_icon_arnold_145.jpg' }, { name: 'MotionBuilder', img: 'software_autodesk_icon_motionbuilder_146.jpg' },
+    { name: 'Mudbox', img: 'software_autodesk_icon_mudbox_147.jpg' },
   ]},
 ];
 
@@ -70,7 +70,7 @@ export default function AutodeskPage() {
       }}>
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${IMG}software_autodesk_visual_bg.jpg)`,
+          backgroundImage: `url(${CRAWL}software_autodesk_autocad_126.jpg)`,
           backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.1,
         }} />
         <div aria-hidden="true" style={{
@@ -117,7 +117,7 @@ export default function AutodeskPage() {
             </h1>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
-              maxWidth: 400, margin: '0 0 32px',
+              maxWidth: 600, margin: '0 0 32px',
             }}>
               AutoCAD, Revit, 3ds Max 등 건축·설계·디자인 분야의 글로벌 표준 소프트웨어.
             </p>
@@ -162,7 +162,7 @@ export default function AutodeskPage() {
             >
               {/* Image thumbnail */}
               <div style={{ overflow: 'hidden', border: '1px solid var(--line)' }}>
-                <img src={`${IMG}${p.img}`} alt={p.name} className="ad-prod-img" style={{
+                <img src={`${CRAWL}${p.img}`} alt={p.name} className="ad-prod-img" style={{
                   width: '100%', height: 120, objectFit: 'cover', display: 'block',
                   transition: 'transform .4s',
                 }} />
@@ -331,7 +331,7 @@ export default function AutodeskPage() {
                   background: 'rgba(255,255,255,.02)',
                   transition: 'border-color .2s, transform .2s',
                 }}>
-                  <img src={`${IMG}${ic.img}`} alt={ic.name} style={{
+                  <img src={`${CRAWL}${ic.img}`} alt={ic.name} style={{
                     width: 44, height: 44, objectFit: 'contain',
                     margin: '0 auto 10px', display: 'block',
                   }} />
@@ -376,7 +376,7 @@ export default function AutodeskPage() {
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
             }}>환경에 맞는 라이선스를 선택하세요</h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 480 }}>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
               개인·팀·교육기관까지. 유니온시스템즈가 최적 구성과 견적을 안내합니다.
             </p>
           </div>
@@ -385,9 +385,9 @@ export default function AutodeskPage() {
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20,
           }}>
             {[
-              { name: '단일 제품', img: `${IMG}software_autodesk_visual_bg.jpg`, desc: '특정 제품 하나를 집중 사용하는 개인·소규모 팀', badge: null, apps: 'AutoCAD · Revit · Inventor · 3ds Max 중 1개' },
-              { name: '컬렉션', img: `${IMG}software_autodesk_visual_bg.jpg`, desc: '업무 분야에 최적화된 제품 묶음 — AEC·제품설계·M&E', badge: 'RECOMMENDED', apps: 'AEC · Product Design · M&E Collection' },
-              { name: '교육 기관', img: `${IMG}software_autodesk_visual_bg.jpg`, desc: '학생·교직원 대상 무상/할인 라이선스', badge: null, apps: '전 제품 · 비상업적 사용 · 교육기관 인증' },
+              { name: '단일 제품', img: `${CRAWL}software_autodesk_plan_01_148.jpg`, desc: '특정 제품 하나를 집중 사용하는 개인·소규모 팀', badge: null, apps: 'AutoCAD · Revit · Inventor · 3ds Max 중 1개' },
+              { name: '컬렉션', img: `${CRAWL}software_autodesk_plan_02_149.jpg`, desc: '업무 분야에 최적화된 제품 묶음 — AEC·제품설계·M&E', badge: 'RECOMMENDED', apps: 'AEC · Product Design · M&E Collection' },
+              { name: '교육 기관', img: `${CRAWL}software_autodesk_plan_03_150.jpg`, desc: '학생·교직원 대상 무상/할인 라이선스', badge: null, apps: '전 제품 · 비상업적 사용 · 교육기관 인증' },
             ].map((pl, i) => (
               <div key={pl.name} className="reveal" style={{
                 position: 'relative', overflow: 'hidden',

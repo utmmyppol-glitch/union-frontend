@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 const CRAWL = '/images/crawl/unionsystems/';
-const UP = '/images/uploads/';
 
 type FilterTab = 'all' | 'active' | 'ended';
 
@@ -21,17 +20,17 @@ interface EventItem {
 }
 
 const EVENTS: EventItem[] = [
-  { id: 11, category: '프로모션', title: 'DATAWARE™ 공식 총판 계약 체결 기념 데이터 검진 프로모션', startDate: '2026.07.15', endDate: '2026.09.30', status: 'active', img: `${UP}2026/07/new특성이미지-1.png` },
-  { id: 1, category: '프로모션', title: '5월 한정 어도비 기업용 라이선스 역대급 특가 프로모션', startDate: '2026.05.11', endDate: '2026.05.29', status: 'ended', img: `${UP}%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98_%ED%8A%B9%EC%84%B1%EC%9D%B4%EB%AF%B8%EC%A7%_76.png` },
-  { id: 2, category: '이벤트', title: '2026 오토캐드 설문 & 상담 이벤트', startDate: '2026.03.03', endDate: '2026.05.29', status: 'ended', img: `${UP}%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98_%ED%8A%B9%EC%84%B1%EC%9D%B4%EB%AF%B8%EC%A7%_28.png` },
+  { id: 11, category: '프로모션', title: 'DATAWARE™ 공식 총판 계약 체결 기념 데이터 검진 프로모션', startDate: '2026.07.15', endDate: '2026.09.30', status: 'active', img: `${CRAWL}1-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EC%8D%B8%EB%84%A4%EC%9D%BC-_-DA-008_41.png` },
+  { id: 1, category: '프로모션', title: '5월 한정 어도비 기업용 라이선스 역대급 특가 프로모션', startDate: '2026.05.11', endDate: '2026.05.29', status: 'ended', img: `${CRAWL}%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98_%ED%8A%B9%EC%84%B1%EC%9D%B4%EB%AF%B8%EC%A7%_76.png` },
+  { id: 2, category: '이벤트', title: '2026 오토캐드 설문 & 상담 이벤트', startDate: '2026.03.03', endDate: '2026.05.29', status: 'ended', img: `${CRAWL}%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98_%ED%8A%B9%EC%84%B1%EC%9D%B4%EB%AF%B8%EC%A7%_28.png` },
   { id: 3, category: '프로모션', title: 'Copilot Business 신제품 출시 기념 프로모션', startDate: '2026.01.14', endDate: '2026.06.30', status: 'ended', img: `${CRAWL}2025-%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98-001-2_29.png` },
   { id: 4, category: '프로모션', title: '유니온 케어팩 오픈! 백신 구매 프로모션', startDate: '2025.11.17', endDate: '2025.12.31', status: 'ended', img: `${CRAWL}2025%EC%9C%A0%EB%8B%88%EC%98%A8-%EB%B0%B1%EC%8B%A0-%ED%94%84%EB%A1%9C%EB%AA%A8%E_77.png` },
   { id: 5, category: '캠페인', title: '2025 DA# 조달 캠페인', startDate: '2025.10.03', endDate: '2025.12.31', status: 'ended', img: `${CRAWL}2025-%EC%97%AC%EB%A6%84%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98-DA_7.png` },
-  { id: 6, category: '이벤트', title: 'DA-드리는 DA# 여름 할인 이벤트', startDate: '2025.07.01', endDate: '2025.08.29', status: 'ended', img: `${UP}%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%B0%B0%EB%84%88-966X339-002_32.png` },
-  { id: 7, category: '이벤트', title: '유니온시스템즈 x AutoCAD 여름 프로모션: 오토캐드 Toolset 맞춤 제안', startDate: '2025.06.26', endDate: '2025.08.29', status: 'ended', img: `${UP}2025/06/2025%EC%98%A4%ED%86%A0%EC%BA%90%EB%93%9C%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98-002.png` },
-  { id: 8, category: '프로모션', title: 'Microsoft 365 무상 제공 프로모션', startDate: '2025.06.02', endDate: '2025.06.27', status: 'ended', img: `${UP}2025/03/2025-MS%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98-001.png` },
-  { id: 9, category: '프로모션', title: '2025 을사년 맞이 BBAM! 프로모션', startDate: '2025.02.03', endDate: '2025.03.31', status: 'ended', img: `${UP}2025/02/%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98_%ED%8A%B9%EC%84%B1%EC%9D%B4%EB%AF%B8%EC%A7%80-001.png` },
-  { id: 10, category: '이벤트', title: '홈페이지 리뉴얼 홍랑이를 잡아라 이벤트', startDate: '2022.07.13', endDate: '2022.07.18', status: 'ended', img: `${UP}2022/07/%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%B0%B0%EB%84%882-966X339-004.png` },
+  { id: 6, category: '이벤트', title: 'DA-드리는 DA# 여름 할인 이벤트', startDate: '2025.07.01', endDate: '2025.08.29', status: 'ended', img: `${CRAWL}%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%B0%B0%EB%84%88-966X339-002_32.png` },
+  { id: 7, category: '이벤트', title: '유니온시스템즈 x AutoCAD 여름 프로모션: 오토캐드 Toolset 맞춤 제안', startDate: '2025.06.26', endDate: '2025.08.29', status: 'ended', img: `${CRAWL}software_autodesk_point-01_130.jpg` },
+  { id: 8, category: '프로모션', title: 'Microsoft 365 무상 제공 프로모션', startDate: '2025.06.02', endDate: '2025.06.27', status: 'ended', img: `${CRAWL}1.-%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C%EC%86%8C%ED%94%84%ED%8A%B8-1_56.png` },
+  { id: 9, category: '프로모션', title: '2025 을사년 맞이 BBAM! 프로모션', startDate: '2025.02.03', endDate: '2025.03.31', status: 'ended', img: `${CRAWL}%ED%94%84%EB%A1%9C%EB%AA%A8%EC%85%98_%ED%8A%B9%EC%84%B1%EC%9D%B4%EB%AF%B8%EC%A7%_6.png` },
+  { id: 10, category: '이벤트', title: '홈페이지 리뉴얼 홍랑이를 잡아라 이벤트', startDate: '2022.07.13', endDate: '2022.07.18', status: 'ended', img: `${CRAWL}%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%B0%B0%EB%84%88-966X339-002_32.png` },
 ];
 
 const FILTER_TABS: { key: FilterTab; label: string }[] = [

@@ -69,7 +69,7 @@ export default function SecurityPage() {
           </h1>
           <p style={{
             fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
-            maxWidth: 440, margin: '0 0 24px',
+            maxWidth: 620, margin: '0 0 24px',
           }}>
             기업의 엔드포인트부터 네트워크까지,<br />안전한 IT 환경을 구축합니다.
           </p>

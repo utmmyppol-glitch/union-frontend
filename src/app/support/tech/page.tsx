@@ -5,7 +5,6 @@ import Link from 'next/link';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
-const IMG = '/images/uploads/2022/06/';
 
 const SERVICES = [
   { title: '기술지원', desc: '장애 및 이슈\n기술지원 서비스' },
@@ -127,7 +126,7 @@ export default function TechSupportPage() {
             marginBottom: 20,
           }}>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
-              <img src={`${IMG}support_team_tech.jpg`} alt="기술지원팀" style={{
+              <img src="/images/crawl/unionsystems/customer_header_img-01_5.png" alt="기술지원팀" style={{
                 width: '100%', height: '100%', objectFit: 'cover', display: 'block',
               }} onError={(e) => {
                 const el = e.target as HTMLImageElement;
@@ -158,7 +157,7 @@ export default function TechSupportPage() {
               </p>
             </div>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
-              <img src={`${IMG}support_team_renewal.jpg`} alt="리뉴얼팀" style={{
+              <img src="/images/crawl/unionsystems/customer_header_img-02_99.png" alt="리뉴얼팀" style={{
                 width: '100%', height: '100%', objectFit: 'cover', display: 'block',
               }} onError={(e) => {
                 const el = e.target as HTMLImageElement;
@@ -183,7 +182,7 @@ export default function TechSupportPage() {
 
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${IMG}support_visual_bg.jpg)`,
+          backgroundImage: `url(/images/crawl/unionsystems/customer_header_img-01_5.png)`,
           backgroundSize: 'cover', backgroundPosition: 'center', opacity: .15,
         }} />
         <div aria-hidden="true" style={{

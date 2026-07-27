@@ -108,7 +108,7 @@ export default function GlossaryPage() {
               opacity: 0.7,
               fontSize: 16,
               marginTop: 12,
-              maxWidth: 480,
+              maxWidth: 640,
               fontFamily: "'Pretendard', sans-serif",
             }}
           >

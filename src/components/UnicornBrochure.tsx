@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { apiClient } from '@/lib/api';
+import PrivacyConsent from '@/components/ui/PrivacyConsent';
 
 type Phase = 'idle' | 'throwing' | 'form' | 'success';
 
@@ -10,7 +11,6 @@ export default function UnicornBrochure() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState(false);
   const [consentPrivacy, setConsentPrivacy] = useState(false);
-  const [consentError, setConsentError] = useState(false);
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const throwTimer = useRef<ReturnType<typeof setTimeout>>();
   const successTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -58,7 +58,6 @@ export default function UnicornBrochure() {
       return;
     }
     if (!consentPrivacy) {
-      setConsentError(true);
       return;
     }
     // API 호출
@@ -77,7 +76,6 @@ export default function UnicornBrochure() {
       setEmail('');
       setError(false);
       setConsentPrivacy(false);
-      setConsentError(false);
     }, 3400);
   }, [email, consentPrivacy]);
 
@@ -341,22 +339,10 @@ export default function UnicornBrochure() {
                   <p style={{ margin: '0 0 4px' }}><strong style={{ color: '#111' }}>수집·이용 목적</strong> : 소개서 자료 발송, 상담 안내</p>
                   <p style={{ margin: 0 }}><strong style={{ color: '#111' }}>보유 및 이용기간</strong> : 목적 달성 시 파기. 계약/청약철회 기록 5년, 대금결제/재화공급 기록 5년, 소비자 불만/분쟁처리 기록 3년 보존</p>
                 </div>
-                <label style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  fontSize: 13, color: '#444', cursor: 'pointer', marginTop: 10,
-                }}>
-                  <input
-                    type="checkbox" checked={consentPrivacy}
-                    onChange={(e) => { setConsentPrivacy(e.target.checked); setConsentError(false); }}
-                    style={{ width: 16, height: 16, accentColor: '#E4002B', cursor: 'pointer', flexShrink: 0 }}
+                  <PrivacyConsent
+                    checked={consentPrivacy}
+                    onChange={setConsentPrivacy}
                   />
-                  <span>개인정보 수집 및 이용에 동의합니다. (필수)</span>
-                </label>
-                {consentError && (
-                  <div style={{ fontSize: 12, color: '#E4002B', fontWeight: 600, marginTop: 4, marginLeft: 24 }}>
-                    개인정보 수집에 동의해주세요.
-                  </div>
-                )}
 
                 {/* 포함 내용 */}
                 <div style={{ height: 1, background: '#eef0f3', margin: '24px 0 14px' }} />

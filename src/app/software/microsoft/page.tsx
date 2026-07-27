@@ -3,33 +3,33 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
-const IMG = '/images/uploads/2022/06/';
+const CRAWL = '/images/crawl/unionsystems/';
 
 const PRODUCTS = [
-  { name: 'Word', img: 'software_microsoft_word.jpg', desc: '문서 작성 및 편집' },
-  { name: 'Excel', img: 'software_microsoft_excel.jpg', desc: '스프레드시트 및 데이터 분석' },
-  { name: 'PowerPoint', img: 'software_microsoft_powerpoint.jpg', desc: '프레젠테이션 제작' },
-  { name: 'Outlook', img: 'software_microsoft_outlook.jpg', desc: '이메일 및 일정 관리' },
+  { name: 'Word', img: 'software_microsoft_word_58.jpg', desc: '문서 작성 및 편집' },
+  { name: 'Excel', img: 'software_microsoft_excel_59.jpg', desc: '스프레드시트 및 데이터 분석' },
+  { name: 'PowerPoint', img: 'software_microsoft_powerpoint_60.jpg', desc: '프레젠테이션 제작' },
+  { name: 'Outlook', img: 'software_microsoft_outlook_61.jpg', desc: '이메일 및 일정 관리' },
 ];
 
 const STRENGTHS = [
   {
     num: '01',
-    img: 'software_microsoft_point_office-tool.jpg',
+    img: 'software_microsoft_point_office-tool_62.jpg',
     title: 'Office Tool',
     sub: '어디서나 동일한 환경',
     desc: '한 개의 ID로 최대 15개 디바이스 접속 가능. PC, 태블릿, 스마트폰 어디서나 동일한 환경에서 업무를 이어갈 수 있습니다.',
   },
   {
     num: '02',
-    img: 'software_microsoft_point_smart-work.jpg',
+    img: 'software_microsoft_point_smart-work_63.jpg',
     title: 'Smart Work',
     sub: '실시간 클라우드 협업',
     desc: 'Teams, OneDrive 등 클라우드 협업 도구로 실시간 공동 작업, 화상 회의, 파일 공유가 가능합니다.',
   },
   {
     num: '03',
-    img: 'software_microsoft_point_security.jpg',
+    img: 'software_microsoft_point_security_64.jpg',
     title: 'Security',
     sub: '엔터프라이즈급 보안',
     desc: 'Microsoft Defender, Azure AD 통합 보안으로 기업 데이터를 안전하게 보호합니다.',
@@ -37,20 +37,20 @@ const STRENGTHS = [
 ];
 
 const ICONS = [
-  { name: 'Word', img: 'software_microsoft_icon_01.jpg' },
-  { name: 'Excel', img: 'software_microsoft_icon_02.jpg' },
-  { name: 'PowerPoint', img: 'software_microsoft_icon_03.jpg' },
-  { name: 'Outlook', img: 'software_microsoft_icon_04.jpg' },
-  { name: 'Teams', img: 'software_microsoft_icon_05.jpg' },
-  { name: 'OneDrive', img: 'software_microsoft_icon_06.jpg' },
-  { name: 'SharePoint', img: 'software_microsoft_icon_07.jpg' },
-  { name: 'Exchange', img: 'software_microsoft_icon_08.jpg' },
+  { name: 'Word', img: 'software_microsoft_icon_01_65.jpg' },
+  { name: 'Excel', img: 'software_microsoft_icon_02_66.jpg' },
+  { name: 'PowerPoint', img: 'software_microsoft_icon_03_67.jpg' },
+  { name: 'Outlook', img: 'software_microsoft_icon_04_68.jpg' },
+  { name: 'Teams', img: 'software_microsoft_icon_05_69.jpg' },
+  { name: 'OneDrive', img: 'software_microsoft_icon_06_70.jpg' },
+  { name: 'SharePoint', img: 'software_microsoft_icon_07_71.jpg' },
+  { name: 'Exchange', img: 'software_microsoft_icon_08_72.jpg' },
 ];
 
 const PLANS = [
-  { name: '개인/가족', img: 'software_microsoft_plan_personal-family.jpg', highlight: false, desc: '가정용 Word, Excel, PowerPoint + 1TB OneDrive', apps: 'Office 앱 + OneDrive 1TB', price: '연간 구독' },
-  { name: '비즈니스', img: 'software_microsoft_plan_work.jpg', highlight: true, desc: '팀 협업 + 보안 + 관리 콘솔. 기업 환경에 최적화된 올인원.', apps: '전 앱 + Teams + SharePoint + Exchange', price: '사용자당/월' },
-  { name: '교육', img: 'software_microsoft_plan_education.jpg', highlight: false, desc: '학교·학생 무료 또는 할인 라이선스. A1/A3/A5 플랜.', apps: 'Office 앱 + Teams + Intune for Education', price: '교육기관 인증' },
+  { name: '개인/가족', img: 'software_microsoft_plan_personal-family_73.jpg', highlight: false, desc: '가정용 Word, Excel, PowerPoint + 1TB OneDrive', apps: 'Office 앱 + OneDrive 1TB', price: '연간 구독' },
+  { name: '비즈니스', img: 'software_microsoft_plan_work_74.jpg', highlight: true, desc: '팀 협업 + 보안 + 관리 콘솔. 기업 환경에 최적화된 올인원.', apps: '전 앱 + Teams + SharePoint + Exchange', price: '사용자당/월' },
+  { name: '교육', img: 'software_microsoft_plan_education_75.jpg', highlight: false, desc: '학교·학생 무료 또는 할인 라이선스. A1/A3/A5 플랜.', apps: 'Office 앱 + Teams + Intune for Education', price: '교육기관 인증' },
 ];
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -91,7 +91,7 @@ export default function MicrosoftPage() {
       }}>
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${IMG}software_microsoft_visual_bg.jpg)`,
+          backgroundImage: `url(${CRAWL}software_microsoft_powerpoint_60.jpg)`,
           backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.12,
         }} />
         <div aria-hidden="true" style={{
@@ -128,7 +128,7 @@ export default function MicrosoftPage() {
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 16, lineHeight: 1.7,
-              color: 'rgba(255,255,255,.5)', maxWidth: 420, margin: '0 0 32px',
+              color: 'rgba(255,255,255,.5)', maxWidth: 600, margin: '0 0 32px',
             }}>
               Word, Excel, PowerPoint, Teams 등 업무에 필요한 모든 도구를 클라우드 기반으로 제공합니다.
             </p>
@@ -174,7 +174,7 @@ export default function MicrosoftPage() {
             <div key={`${ic.name}-${idx}`} style={{
               display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0,
             }}>
-              <img src={`${IMG}${ic.img}`} alt={ic.name} style={{
+              <img src={`${CRAWL}${ic.img}`} alt={ic.name} style={{
                 width: 36, height: 36, objectFit: 'contain',
               }} />
               <span style={{
@@ -254,7 +254,7 @@ export default function MicrosoftPage() {
                 transitionDelay: `${i * 0.06}s`,
               }}>
                 <div style={{ overflow: 'hidden' }}>
-                  <img src={`${IMG}${p.img}`} alt={p.name} className="ms-prod-img" style={{
+                  <img src={`${CRAWL}${p.img}`} alt={p.name} className="ms-prod-img" style={{
                     width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block',
                     transition: 'transform .4s',
                   }} />
@@ -352,7 +352,7 @@ export default function MicrosoftPage() {
               border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden',
               position: 'relative',
             }}>
-              <img src={`${IMG}${s.img}`} alt={s.title} style={{
+              <img src={`${CRAWL}${s.img}`} alt={s.title} style={{
                 width: '100%', display: 'block', minHeight: 280, objectFit: 'cover',
               }} />
               {/* Number overlay on image */}
@@ -429,7 +429,7 @@ export default function MicrosoftPage() {
             }}>
               환경에 맞는 플랜을 선택하세요
             </h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 460 }}>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
               개인부터 기업 팀까지. 유니온시스템즈가 최적 견적과 마이그레이션을 지원합니다.
             </p>
           </div>
@@ -460,7 +460,7 @@ export default function MicrosoftPage() {
                   }}>RECOMMENDED</div>
                 )}
                 <div style={{ height: 180, overflow: 'hidden' }}>
-                  <img src={`${IMG}${pl.img}`} alt={pl.name} className="ms-plan-img" style={{
+                  <img src={`${CRAWL}${pl.img}`} alt={pl.name} className="ms-plan-img" style={{
                     width: '100%', height: '100%', objectFit: 'cover', display: 'block',
                     transition: 'transform .5s',
                   }} />

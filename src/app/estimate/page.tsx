@@ -192,7 +192,7 @@ export default function EstimatePage() {
             }}
           >
             회사 규모·관심 분야·문의 유형 3가지만 고르면, 우리 회사에 맞는 제품 구성과 상담
-            요청서를 즉시 만들어 드립니다. 담당 컨설턴트가 1영업일 이내 상세 견적으로
+            요청서를 즉시 만들어 드립니다. 담당 컨설턴트가 당일 내 상세 견적으로
             답합니다.
           </p>
           <div
@@ -206,7 +206,7 @@ export default function EstimatePage() {
             {[
               { num: '3', unit: 'STEP', sub: '약 3분 소요' },
               { num: String(AREA_OPTIONS.length), unit: '분야', sub: '보안·자산·오피스·데이터' },
-              { num: '1', unit: '영업일', sub: '담당자 회신' },
+              { num: '당일', unit: '회신', sub: '회신 보장' },
             ].map((s) => (
               <div key={s.num + s.unit}>
                 <div
@@ -446,7 +446,7 @@ export default function EstimatePage() {
                   fontFamily: "'Pretendard', sans-serif",
                 }}
               >
-                1영업일 이내 담당 컨설턴트가 연락드립니다.
+                당일 내 담당 컨설턴트가 연락드립니다.
               </span>
             </div>
           </div>

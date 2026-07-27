@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Modal, Input, Button } from '@/components/ui';
+import PrivacyConsent from '@/components/ui/PrivacyConsent';
 import { apiClient } from '@/lib/api';
 
 interface DownloadGateModalProps {
@@ -207,24 +208,11 @@ const DownloadGateModal: React.FC<DownloadGateModalProps> = ({
               </p>
             </div>
 
-            {/* Privacy consent */}
-            <label className="flex items-start gap-2.5 cursor-pointer pt-1">
-              <input
-                type="checkbox"
+              <PrivacyConsent
                 checked={form.consentPrivacy}
-                onChange={(e) => updateField('consentPrivacy', e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#111214] focus:ring-[#111214]/20"
+                onChange={(v) => updateField('consentPrivacy', v)}
+                error={errors.consentPrivacy}
               />
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                <span className="text-red-500 mr-0.5">*</span>
-                개인정보 수집 및 이용동의 내용을 확인했으며, 이에 동의합니다.
-              </span>
-            </label>
-            {errors.consentPrivacy && (
-              <p className="text-sm text-red-500 dark:text-red-400 ml-6" role="alert">
-                {errors.consentPrivacy}
-              </p>
-            )}
           </div>
 
           {status === 'error' && (

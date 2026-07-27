@@ -4,29 +4,29 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/ui';
 
-const IMG = '/images/uploads/2022/06/';
+const CRAWL = '/images/crawl/unionsystems/';
 const PRODUCTS = [
-  { name: '알집', img: 'software_estsoft_alzip.jpg', desc: '파일 압축 및 해제' },
-  { name: '알씨', img: 'software_estsoft_alsee.jpg', desc: '이미지 뷰어 및 편집' },
-  { name: '알PDF', img: 'software_estsoft_alpdf.jpg', desc: 'PDF 생성, 편집, 변환' },
-  { name: '알캡처', img: 'software_estsoft_alcapture.jpg', desc: '화면 캡처 도구' },
+  { name: '알집', img: 'software_estsoft_alzip_102.jpg', desc: '파일 압축 및 해제' },
+  { name: '알씨', img: 'software_estsoft_alsee_103.jpg', desc: '이미지 뷰어 및 편집' },
+  { name: '알PDF', img: 'software_estsoft_alpdf_104.jpg', desc: 'PDF 생성, 편집, 변환' },
+  { name: '알캡처', img: 'software_estsoft_alcapture_105.jpg', desc: '화면 캡처 도구' },
 ];
 const STRENGTHS = [
-  { num: '01', img: 'software_estsoft_point_mobile.jpg', title: '모바일 호환', desc: '스마트폰과 PC 어디서나 동일한 환경에서 문서를 확인하고 편집할 수 있습니다.' },
-  { num: '02', img: 'software_estsoft_point_mobile.jpg', title: '20년 이상의 노하우', desc: '1999년 출시 이후 20년 이상 국내 사용자에게 사랑받아 온 검증된 유틸리티입니다.' },
-  { num: '03', img: 'software_estsoft_point_mobile.jpg', title: '3,000만 사용자', desc: '국내 3,000만 이상의 사용자가 선택한 대한민국 대표 유틸리티 소프트웨어입니다.' },
+  { num: '01', img: 'software_estsoft_point_mobile_108.jpg', title: '모바일 호환', desc: '스마트폰과 PC 어디서나 동일한 환경에서 문서를 확인하고 편집할 수 있습니다.' },
+  { num: '02', img: 'software_estsoft_point_mobile_108.jpg', title: '20년 이상의 노하우', desc: '1999년 출시 이후 20년 이상 국내 사용자에게 사랑받아 온 검증된 유틸리티입니다.' },
+  { num: '03', img: 'software_estsoft_point_mobile_108.jpg', title: '3,000만 사용자', desc: '국내 3,000만 이상의 사용자가 선택한 대한민국 대표 유틸리티 소프트웨어입니다.' },
 ];
 const ICONS = [
-  { name: '알집', img: 'software_estsoft_icon_alzip.jpg' }, { name: '알씨', img: 'software_estsoft_icon_alsee.jpg' },
-  { name: '알PDF', img: 'software_estsoft_icon_alpdf.jpg' }, { name: '알캡처', img: 'software_estsoft_icon_alcapture.jpg' },
-  { name: '알드라이브', img: 'software_estsoft_icon_aldrive.jpg' }, { name: '알키퍼', img: 'software_estsoft_icon_alkeeper.jpg' },
-  { name: '알마인드', img: 'software_estsoft_icon_almind.jpg' }, { name: '알송', img: 'software_estsoft_icon_alsong.jpg' },
-  { name: '알툴바', img: 'software_estsoft_icon_altoolbar.jpg' }, { name: 'PaintShop', img: 'software_estsoft_icon_paintshop.jpg' },
+  { name: '알집', img: 'software_estsoft_icon_alzip_109.jpg' }, { name: '알씨', img: 'software_estsoft_icon_alsee_110.jpg' },
+  { name: '알PDF', img: 'software_estsoft_icon_alpdf_111.jpg' }, { name: '알캡처', img: 'software_estsoft_icon_alcapture_112.jpg' },
+  { name: '알드라이브', img: 'software_estsoft_icon_aldrive_115.jpg' }, { name: '알키퍼', img: 'software_estsoft_icon_alkeeper_116.jpg' },
+  { name: '알마인드', img: 'software_estsoft_icon_almind_117.jpg' }, { name: '알송', img: 'software_estsoft_icon_alsong_114.jpg' },
+  { name: '알툴바', img: 'software_estsoft_icon_altoolbar_113.jpg' }, { name: 'PaintShop', img: 'software_estsoft_icon_paintshop_118.jpg' },
 ];
 const PLANS = [
-  { name: '알툴즈', img: 'software_estsoft_package_altools.jpg', desc: '개인·소규모 사업자를 위한 핵심 유틸리티 패키지', badge: null, apps: '알집 · 알PDF · 알캡처 · 알씨 · 알드라이브' },
-  { name: '알스위트', img: 'software_estsoft_package_alsuite.jpg', desc: '기업 전체를 위한 올인원 패키지 — 중앙 관리 콘솔 + 전 제품 포함', badge: 'RECOMMENDED', apps: '전 제품 + 중앙관리 콘솔 + 라이선스 모니터링' },
-  { name: '교육기관', img: 'software_estsoft_package_altools.jpg', desc: '학교·교육기관 전용 볼륨 라이선스 — 학생·교직원 대상 특별가', badge: null, apps: '알집 · 알PDF · 알캡처 · 알씨 · 기관 인증 필요' },
+  { name: '알툴즈', img: 'software_estsoft_package_altools_121.jpg', desc: '개인·소규모 사업자를 위한 핵심 유틸리티 패키지', badge: null, apps: '알집 · 알PDF · 알캡처 · 알씨 · 알드라이브' },
+  { name: '알스위트', img: 'software_estsoft_package_alsuite_122.jpg', desc: '기업 전체를 위한 올인원 패키지 — 중앙 관리 콘솔 + 전 제품 포함', badge: 'RECOMMENDED', apps: '전 제품 + 중앙관리 콘솔 + 라이선스 모니터링' },
+  { name: '교육기관', img: 'software_estsoft_package_altools_121.jpg', desc: '학교·교육기관 전용 볼륨 라이선스 — 학생·교직원 대상 특별가', badge: null, apps: '알집 · 알PDF · 알캡처 · 알씨 · 기관 인증 필요' },
 ];
 
 const STATS = [
@@ -235,7 +235,7 @@ export default function EstsoftPage() {
               >
                 <div style={{ overflow: 'hidden' }}>
                   <img
-                    src={`${IMG}${p.img}`} alt={p.name}
+                    src={`${CRAWL}${p.img}`} alt={p.name}
                     style={{
                       width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block',
                       transition: 'transform .4s ease',
@@ -329,7 +329,7 @@ export default function EstsoftPage() {
                     position: 'relative',
                   }}>
                     <img
-                      src={`${IMG}${s.img}`} alt={s.title}
+                      src={`${CRAWL}${s.img}`} alt={s.title}
                       style={{ width: '100%', display: 'block', transition: 'transform .5s ease' }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
@@ -434,7 +434,7 @@ export default function EstsoftPage() {
                 }}
               >
                 <img
-                  src={`${IMG}${ic.img}`} alt={ic.name}
+                  src={`${CRAWL}${ic.img}`} alt={ic.name}
                   style={{
                     width: 56, height: 56, objectFit: 'contain',
                     margin: '0 auto 12px', display: 'block',
@@ -488,7 +488,7 @@ export default function EstsoftPage() {
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
             }}>환경에 맞는 패키지를 선택하세요</h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 480 }}>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
               개인부터 기업·교육기관까지. 유니온시스템즈가 최적 볼륨 라이선스를 안내합니다.
             </p>
           </div>
@@ -513,7 +513,7 @@ export default function EstsoftPage() {
                   }}>{pl.badge}</div>
                 )}
                 <div style={{ height: 180, overflow: 'hidden' }}>
-                  <img src={`${IMG}${pl.img}`} alt={pl.name} className="es-plan-img" style={{
+                  <img src={`${CRAWL}${pl.img}`} alt={pl.name} className="es-plan-img" style={{
                     width: '100%', height: '100%', objectFit: 'cover', display: 'block',
                     transition: 'transform .5s',
                   }} />
@@ -605,7 +605,7 @@ export default function EstsoftPage() {
             </h2>
             <p style={{
               fontSize: 16, color: 'rgba(255,255,255,.45)', marginBottom: 32,
-              lineHeight: 1.7, maxWidth: 440, marginLeft: 'auto', marginRight: 'auto',
+              lineHeight: 1.7, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto',
             }}>
               유니온시스템즈가 볼륨 라이선스와<br />중앙 관리 환경을 안내해 드립니다.
             </p>

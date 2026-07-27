@@ -85,7 +85,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     label: 'Estimate',
     href: '/estimate',
-    badge: true,
+    badge: false,
   },
   {
     label: 'SAM',

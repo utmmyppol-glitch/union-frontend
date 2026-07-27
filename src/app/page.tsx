@@ -149,7 +149,7 @@ function StatsSection() {
             fontWeight: 400,
             fontSize: 16,
             color: "rgba(255,255,255,.4)",
-            maxWidth: 420,
+            maxWidth: 600,
             margin: "0 auto",
           }}
         >
@@ -253,6 +253,7 @@ function StatsSection() {
 function CtaBanner() {
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
 
   /* ── Floating particles animation ── */
   useEffect(() => {
@@ -489,7 +490,7 @@ function CtaBanner() {
               fontSize: 17,
               lineHeight: 1.65,
               color: "rgba(255,255,255,.45)",
-              maxWidth: 480,
+              maxWidth: 640,
               margin: "0 auto 40px",
             }}
           >

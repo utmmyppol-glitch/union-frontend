@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import type { Solution } from '@/data/molecular-data';
 import { apiClient } from '@/lib/api';
+import PrivacyConsent from '@/components/ui/PrivacyConsent';
 
 const MolecularU = dynamic(() => import('@/components/MolecularU'), {
   ssr: false,
@@ -528,18 +529,11 @@ function DetailPanel({ solution, onClose, onExplorer }: {
                 <p style={{ margin: '0 0 4px' }}><strong style={{ color: 'var(--ink)' }}>수집·이용 목적</strong> : 문의 사항에 대한 답변 전달, 상담, 이벤트 안내 등</p>
                 <p style={{ margin: 0 }}><strong style={{ color: 'var(--ink)' }}>보유 및 이용기간</strong> : 목적 달성 시 파기. 법률 규정에 따라 계약/청약철회 기록 5년, 대금결제/재화공급 기록 5년, 소비자 불만/분쟁처리 기록 3년 보존</p>
               </div>
-              <label style={{
-                display: 'flex', alignItems: 'flex-start', gap: 8,
-                fontSize: 13, color: '#8a8f98', cursor: 'pointer', marginTop: 10,
-              }}>
-                <input
-                  type="checkbox" checked={consent}
-                  onChange={(e) => { setConsent(e.target.checked); setErrors((p) => ({ ...p, consent: '' })); }}
-                  style={{ width: 16, height: 16, accentColor: 'var(--accent)', cursor: 'pointer', marginTop: 1 }}
+                <PrivacyConsent
+                  checked={consent}
+                  onChange={setConsent}
+                  error={errors.consent}
                 />
-                개인정보 수집 및 이용동의 내용을 확인했으며, 이에 동의합니다.
-              </label>
-              {errors.consent && <div style={errorStyle}>{errors.consent}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
                 <button
                   onClick={() => setStep(1)}
@@ -671,7 +665,7 @@ function DetailPanel({ solution, onClose, onExplorer }: {
                 상담 요청이 접수되었습니다
               </div>
               <div style={{ fontSize: 15, color: 'var(--ink2)', marginTop: 8, lineHeight: 1.6 }}>
-                담당자가 영업일 기준 1일 이내 연락드립니다.
+                담당자가 당일 내 연락드립니다.
               </div>
               {purpose && (
                 <div style={{
@@ -741,18 +735,11 @@ function DetailPanel({ solution, onClose, onExplorer }: {
                 <p style={{ margin: '0 0 4px' }}><strong style={{ color: 'var(--ink)' }}>수집·이용 목적</strong> : 소개서 자료 발송</p>
                 <p style={{ margin: 0 }}><strong style={{ color: 'var(--ink)' }}>보유 및 이용기간</strong> : 목적 달성 시 파기. 법률 규정에 따라 계약/청약철회 기록 5년, 대금결제/재화공급 기록 5년, 소비자 불만/분쟁처리 기록 3년 보존</p>
               </div>
-              <label style={{
-                display: 'flex', alignItems: 'flex-start', gap: 8,
-                fontSize: 13, color: '#8a8f98', cursor: 'pointer', marginTop: 10,
-              }}>
-                <input
-                  type="checkbox" checked={brochureConsent}
-                  onChange={(e) => { setBrochureConsent(e.target.checked); setErrors((p) => ({ ...p, brochureConsent: '' })); }}
-                  style={{ width: 16, height: 16, accentColor: 'var(--accent)', cursor: 'pointer', marginTop: 1 }}
+                <PrivacyConsent
+                  checked={brochureConsent}
+                  onChange={setBrochureConsent}
+                  error={errors.brochureConsent}
                 />
-                개인정보 수집 및 이용동의 내용을 확인했으며, 이에 동의합니다.
-              </label>
-              {errors.brochureConsent && <div style={errorStyle}>{errors.brochureConsent}</div>}
               {submitError && <div style={{ ...errorStyle, marginTop: 12 }}>{submitError}</div>}
               <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
                 <button
@@ -1074,7 +1061,7 @@ export default function HeroSection() {
                 </h2>
                 <p style={{
                   fontWeight: 400, fontSize: 'clamp(15px, 1.4vw, 17px)',
-                  lineHeight: 1.75, color: 'var(--ink2)', maxWidth: 460,
+                  lineHeight: 1.75, color: 'var(--ink2)', maxWidth: 640,
                   margin: '0 0 24px', textAlign: 'left', whiteSpace: 'pre-line',
                 }}>{p.sub}</p>
 
@@ -1103,7 +1090,11 @@ export default function HeroSection() {
                   }}>
                     {p.cta}<span style={{ fontSize: 15, transition: 'transform .2s' }}>&rarr;</span>
                   </a>
-                  <a href="#" className="hero-cta-secondary" style={{
+                  <a
+                    href={p.id === 'ceo' ? '/unionsystems-brochure.pdf' : p.id === 'it' ? '/support/cases' : '/calculator'}
+                    {...(p.id === 'ceo' ? { download: '유니온시스템즈 - 회사소개서.pdf', target: '_blank' as const } : {})}
+                    className="hero-cta-secondary"
+                    style={{
                     display: 'inline-flex', alignItems: 'center', padding: '18px 36px',
                     border: '1.5px solid var(--line)', background: 'transparent',
                     color: 'var(--ink)', fontWeight: 700, fontSize: 15, textDecoration: 'none',

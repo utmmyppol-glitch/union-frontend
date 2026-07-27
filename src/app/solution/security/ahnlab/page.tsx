@@ -3,20 +3,20 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 
-const IMG = '/images/uploads/2022/06';
+const CRAWL = '/images/crawl/unionsystems';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 
 const PRODUCTS = [
-  { name: 'V3 / EPP', desc: '안티바이러스, 네트워크 보안, 행위 기반 탐지를 통합하여 PC와 서버를 보호합니다.', img: `${IMG}/solution_ahnlab_epp.jpg`, accent: false },
-  { name: 'EDR', desc: '실시간 행위 분석과 포렌식 정보를 제공하여 알려지지 않은 위협까지 대응합니다.', img: `${IMG}/solution_ahnlab_edr.jpg`, accent: true },
-  { name: 'MDS', desc: '샌드박스 기반 동적 분석으로 APT 공격, 랜섬웨어, 제로데이 위협을 사전 차단합니다.', img: `${IMG}/solution_ahnlab_mds.jpg`, accent: false },
+  { name: 'V3 / EPP', desc: '안티바이러스, 네트워크 보안, 행위 기반 탐지를 통합하여 PC와 서버를 보호합니다.', img: `${CRAWL}/solution_ahnlab_epp_201.jpg`, accent: false },
+  { name: 'EDR', desc: '실시간 행위 분석과 포렌식 정보를 제공하여 알려지지 않은 위협까지 대응합니다.', img: `${CRAWL}/solution_ahnlab_edr_202.jpg`, accent: true },
+  { name: 'MDS', desc: '샌드박스 기반 동적 분석으로 APT 공격, 랜섬웨어, 제로데이 위협을 사전 차단합니다.', img: `${CRAWL}/solution_ahnlab_mds_200.jpg`, accent: false },
 ];
 
 const POINTS = [
-  { title: '국내 1위 엔드포인트 보안', desc: '30년 이상 축적된 악성코드 분석 기술과 국내 최대 위협 인텔리전스 DB를 기반으로 정확한 탐지를 제공합니다.', img: `${IMG}/solution_ahnlab_point-01.jpg` },
-  { title: '통합 보안 관리', desc: 'AhnLab ESA 중앙 관리 콘솔로 EPP, EDR, MDS를 하나의 화면에서 관리합니다.', img: `${IMG}/solution_ahnlab_point-02.jpg` },
-  { title: '공공/금융 레퍼런스', desc: '공공기관, 금융권, 대기업 등 국내 보안 규제 환경에 최적화된 인증과 레퍼런스를 보유하고 있습니다.', img: `${IMG}/solution_ahnlab_point-03.jpg` },
+  { title: '국내 1위 엔드포인트 보안', desc: '30년 이상 축적된 악성코드 분석 기술과 국내 최대 위협 인텔리전스 DB를 기반으로 정확한 탐지를 제공합니다.', img: `${CRAWL}/solution_ahnlab_point-01_203.jpg` },
+  { title: '통합 보안 관리', desc: 'AhnLab ESA 중앙 관리 콘솔로 EPP, EDR, MDS를 하나의 화면에서 관리합니다.', img: `${CRAWL}/solution_ahnlab_point-02_204.jpg` },
+  { title: '공공/금융 레퍼런스', desc: '공공기관, 금융권, 대기업 등 국내 보안 규제 환경에 최적화된 인증과 레퍼런스를 보유하고 있습니다.', img: `${CRAWL}/solution_ahnlab_point-03_205.jpg` },
 ];
 
 const ICONS = [
@@ -51,7 +51,7 @@ export default function AhnLabPage() {
 
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${IMG}/solution_ahnlab_visual_bg.jpg)`,
+          backgroundImage: `url(${CRAWL}/solution_ahnlab_visual_198.png)`,
           backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.1,
         }} />
         <div aria-hidden="true" style={{

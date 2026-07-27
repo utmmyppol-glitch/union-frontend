@@ -92,7 +92,7 @@ export default function LicenseConsultPage() {
         <div style={{ position: 'relative' }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>&#10003;</div>
           <h1 style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 'clamp(28px,4.5vw,42px)', lineHeight: 1.2, marginBottom: 12 }}>상담 신청이 완료되었습니다</h1>
-          <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 16, opacity: .85 }}>담당 컨설턴트가 1영업일 이내에 {email}로 연락드리겠습니다.</p>
+          <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 16, opacity: .85 }}>담당 컨설턴트가 당일 내 {email}로 연락드리겠습니다.</p>
         </div>
       </section>
       <section style={{ padding: 'clamp(32px,4vw,48px) clamp(20px,4vw,52px) clamp(60px,8vw,100px)', background: 'var(--bg)' }}>
@@ -143,7 +143,7 @@ export default function LicenseConsultPage() {
         <div style={{ display: 'flex', gap: 'clamp(28px,5vw,48px)', marginTop: 28, justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
             { num: String(PRODUCTS.length - 1), unit: '개', sub: '취급 제품' },
-            { num: '1', unit: '영업일', sub: '컨설턴트 회신' },
+            { num: '당일', unit: '', sub: '회신 보장' },
             { num: '200+', unit: '', sub: '기업 고객' },
           ].map(s => (
             <div key={s.sub}>
@@ -231,14 +231,7 @@ export default function LicenseConsultPage() {
           </div>
 
           {/* Consent + Submit */}
-          <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 20, cursor: 'pointer' }}>
-            <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
-              style={{ marginTop: 2, accentColor: 'var(--accent)' }} />
-            <span style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 14, color: 'var(--ink2)', lineHeight: 1.5 }}>
-              개인정보 수집 및 이용에 동의합니다. (라이선스 관리 상담 및 안내 목적)
-            </span>
-          </label>
-          {errors.consent && <p style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginBottom: 12 }}>{errors.consent}</p>}
+          <PrivacyConsent checked={consent} onChange={setConsent} error={errors.consent} />
 
           <button onClick={handleSubmit} disabled={submitting}
             style={{ width: '100%', padding: '16px', background: submitting ? 'var(--ink2)' : 'var(--accent)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, border: 'none', cursor: submitting ? 'default' : 'pointer' }}>

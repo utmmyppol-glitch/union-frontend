@@ -8,6 +8,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -30,6 +31,7 @@ export default function Header() {
   const handleDropdownEnter = (label: string) => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
     setOpenDropdown(label);
+    setHoveredGroup(null);
   };
 
   const handleDropdownLeave = () => {
@@ -96,20 +98,16 @@ export default function Header() {
               >
                 <Link
                   href={item.href}
+                  className={`header-nav-link${isOpen ? ' nav-active' : ''}`}
                   style={{
                     fontWeight: 600,
                     fontSize: 16,
                     color: isOpen ? 'var(--ink)' : 'var(--ink2)',
                     textDecoration: 'none',
-                    transition: 'color .2s',
                     padding: '8px 18px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4,
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--ink)')}
-                  onMouseLeave={(e) => {
-                    if (!isOpen) e.currentTarget.style.color = 'var(--ink2)';
                   }}
                 >
                   {item.label}
@@ -132,77 +130,119 @@ export default function Header() {
                       }}
                     >
                       <div
+                        className="header-dropdown"
                         style={{
                           background: 'var(--surface)',
                           border: '1px solid var(--line)',
                           boxShadow: '0 8px 32px rgba(17,18,20,.08)',
-                          padding: hasGroups ? '12px 8px' : '8px 6px',
-                          minWidth: hasGroups ? 220 : 180,
-                          display: hasGroups ? 'flex' : 'block',
-                          gap: hasGroups ? 0 : undefined,
-                          flexDirection: hasGroups ? 'column' : undefined,
+                          padding: hasGroups ? 0 : '8px 6px',
+                          minWidth: hasGroups ? undefined : 180,
+                          overflow: 'visible',
                         }}
                       >
                         {hasGroups
-                          ? item.children!.map((group, gi) => (
-                              <div key={group.label}>
-                                {gi > 0 && (
-                                  <div style={{ height: 1, background: 'var(--line)', margin: '6px 12px' }} />
-                                )}
-                                <div
-                                  style={{
-                                    padding: '6px 16px 2px',
-                                    fontWeight: 700,
-                                    fontSize: 12,
-                                    color: 'var(--ink2)',
-                                    opacity: 0.5,
-                                    letterSpacing: '.06em',
-                                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-                                    textTransform: 'uppercase',
-                                  }}
-                                >
-                                  {group.label}
-                                </div>
-                                {group.children!.map((child) => {
-                                  const isExternal = child.href.startsWith('http');
-                                  const Comp = isExternal ? 'a' : Link;
-                                  const extraProps = isExternal
-                                    ? { target: '_blank', rel: 'noopener noreferrer' }
-                                    : {};
-                                  return (
-                                    <Comp
-                                      key={child.label}
-                                      href={child.href}
-                                      {...extraProps}
+                          ? (() => {
+                              const activeGroup = hoveredGroup || null;
+                              const activeChildren = activeGroup
+                                ? item.children!.find(g => g.label === activeGroup)?.children || []
+                                : [];
+                              const activeIdx = activeGroup
+                                ? item.children!.findIndex(g => g.label === activeGroup)
+                                : -1;
+                              return (
+                                <div style={{ position: 'relative' }}>
+                                  {/* Left: group list */}
+                                  <div style={{ minWidth: 160, padding: '6px 0' }}>
+                                    {item.children!.map((group, gi) => {
+                                      const isActive = group.label === activeGroup;
+                                      return (
+                                        <div
+                                          key={group.label}
+                                          className="header-dropdown-item"
+                                          onMouseEnter={() => setHoveredGroup(group.label)}
+                                          onMouseLeave={() => {}}
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '12px 20px',
+                                            fontWeight: isActive ? 700 : 500,
+                                            fontSize: 15,
+                                            color: isActive ? '#fff' : 'var(--ink2)',
+                                            background: isActive ? 'var(--accent)' : 'transparent',
+                                            cursor: 'pointer',
+                                            transition: 'all .15s',
+                                            whiteSpace: 'nowrap',
+                                            animationDelay: `${gi * 0.04}s`,
+                                          }}
+                                        >
+                                          {group.label}
+                                          <span style={{
+                                            fontSize: 13,
+                                            color: isActive ? '#fff' : 'var(--ink2)',
+                                            opacity: isActive ? 1 : 0.35,
+                                            marginLeft: 12,
+                                          }}>&rsaquo;</span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  {/* Right: sub items — absolutely positioned, sized to content */}
+                                  {activeGroup && activeChildren.length > 0 && (
+                                    <div
+                                      className="header-sub-panel"
+                                      onMouseEnter={() => setHoveredGroup(activeGroup)}
                                       style={{
-                                        display: 'block',
-                                        padding: '8px 16px 8px 24px',
-                                        fontWeight: 500,
-                                        fontSize: 16,
-                                        color: 'var(--ink2)',
-                                        textDecoration: 'none',
-                                        transition: 'color .15s, background .15s',
-                                        whiteSpace: 'nowrap',
-                                      }}
-                                      onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
-                                        e.currentTarget.style.color = 'var(--ink)';
-                                        e.currentTarget.style.background = 'var(--soft)';
-                                      }}
-                                      onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
-                                        e.currentTarget.style.color = 'var(--ink2)';
-                                        e.currentTarget.style.background = 'transparent';
+                                        position: 'absolute',
+                                        left: '100%',
+                                        top: activeIdx * 46 + 6,
+                                        background: 'var(--surface)',
+                                        border: '1px solid var(--line)',
+                                        boxShadow: '0 8px 32px rgba(17,18,20,.08)',
+                                        padding: '6px 0',
+                                        minWidth: 160,
                                       }}
                                     >
-                                      {child.label}
-                                      {isExternal && (
-                                        <span style={{ marginLeft: 4, fontSize: 14, opacity: 0.4 }}>&#x2197;</span>
-                                      )}
-                                    </Comp>
-                                  );
-                                })}
-                              </div>
-                            ))
-                          : item.children!.map((child) => {
+                                      {activeChildren.map((child) => {
+                                        const isExternal = child.href.startsWith('http');
+                                        const Comp = isExternal ? 'a' : Link;
+                                        const extraProps = isExternal
+                                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                                          : {};
+                                        return (
+                                          <Comp
+                                            key={child.label}
+                                            href={child.href}
+                                            {...extraProps}
+                                            style={{
+                                              display: 'block',
+                                              padding: '10px 20px',
+                                              fontWeight: 500,
+                                              fontSize: 15,
+                                              color: 'var(--ink2)',
+                                              textDecoration: 'none',
+                                              transition: 'color .15s, background .15s',
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                            onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
+                                              e.currentTarget.style.color = 'var(--ink)';
+                                              e.currentTarget.style.background = 'var(--soft)';
+                                            }}
+                                            onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
+                                              e.currentTarget.style.color = 'var(--ink2)';
+                                              e.currentTarget.style.background = 'transparent';
+                                            }}
+                                          >
+                                            {child.label}
+                                          </Comp>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()
+                          : item.children!.map((child, ci) => {
                               const isExternal = child.href.startsWith('http');
                               const Comp = isExternal ? 'a' : Link;
                               const extraProps = isExternal
@@ -212,6 +252,7 @@ export default function Header() {
                                 <Comp
                                   key={child.label}
                                   href={child.href}
+                                  className="header-dropdown-item"
                                   {...extraProps}
                                   style={{
                                     display: 'block',
@@ -220,16 +261,19 @@ export default function Header() {
                                     fontSize: 16,
                                     color: 'var(--ink2)',
                                     textDecoration: 'none',
-                                    transition: 'color .15s, background .15s',
+                                    transition: 'color .15s, background .15s, transform .2s cubic-bezier(.34,1.4,.5,1)',
                                     whiteSpace: 'nowrap',
+                                    animationDelay: `${ci * 0.04}s`,
                                   }}
                                   onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
                                     e.currentTarget.style.color = 'var(--ink)';
                                     e.currentTarget.style.background = 'var(--soft)';
+                                    e.currentTarget.style.transform = 'translateX(4px)';
                                   }}
                                   onMouseLeave={(e: React.MouseEvent<HTMLElement>) => {
                                     e.currentTarget.style.color = 'var(--ink2)';
                                     e.currentTarget.style.background = 'transparent';
+                                    e.currentTarget.style.transform = 'translateX(0)';
                                   }}
                                 >
                                   {child.label}
@@ -250,8 +294,9 @@ export default function Header() {
 
         {/* Right side — CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Link
-            href="#"
+          <a
+            href="/unionsystems-brochure.pdf"
+            download="유니온시스템즈 - 회사소개서.pdf"
             className="header-download"
             style={{
               padding: '11px 24px',
@@ -267,7 +312,7 @@ export default function Header() {
             }}
           >
             소개서다운
-          </Link>
+          </a>
           <Link
             href="/contact"
             style={{
@@ -565,8 +610,68 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* Responsive styles */}
+      {/* Responsive styles + animations */}
       <style jsx global>{`
+        @keyframes dropIn {
+          from { opacity: 0; transform: translateY(-8px) scale(.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes popIn {
+          0% { opacity: 0; transform: translateY(6px) scale(.92); }
+          60% { transform: translateY(-2px) scale(1.02); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes subSlideIn {
+          from { opacity: 0; transform: translateX(-6px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .header-dropdown {
+          animation: dropIn .25s cubic-bezier(.34,1.4,.5,1) both;
+          border: none !important;
+          border-radius: 12px;
+          box-shadow: 0 12px 40px rgba(17,18,20,.10), 0 0 0 1px rgba(0,0,0,.04) !important;
+          backdrop-filter: blur(16px) saturate(1.3);
+          -webkit-backdrop-filter: blur(16px) saturate(1.3);
+          background: rgba(255,255,255,.92) !important;
+        }
+        .header-dropdown-item {
+          opacity: 0;
+          animation: popIn .3s cubic-bezier(.34,1.4,.5,1) both;
+          border-radius: 6px;
+          margin: 2px 6px;
+        }
+        .header-sub-panel {
+          animation: subSlideIn .2s cubic-bezier(.34,1.4,.5,1) both;
+          border: none !important;
+          border-radius: 12px;
+          box-shadow: 0 12px 40px rgba(17,18,20,.10), 0 0 0 1px rgba(0,0,0,.04) !important;
+          backdrop-filter: blur(16px) saturate(1.3);
+          -webkit-backdrop-filter: blur(16px) saturate(1.3);
+          background: rgba(255,255,255,.92) !important;
+        }
+        .header-nav-link {
+          position: relative;
+          transition: color .2s, transform .2s cubic-bezier(.34,1.4,.5,1);
+        }
+        .header-nav-link:hover {
+          transform: translateY(-2px);
+        }
+        .header-nav-link::after {
+          content: '';
+          position: absolute;
+          bottom: 2px;
+          left: 18px;
+          right: 18px;
+          height: 2px;
+          background: var(--accent);
+          transform: scaleX(0);
+          transform-origin: center;
+          transition: transform .25s cubic-bezier(.34,1.4,.5,1);
+        }
+        .header-nav-link:hover::after,
+        .header-nav-link.nav-active::after {
+          transform: scaleX(1);
+        }
         @media (max-width: 960px) {
           .header-nav { display: none !important; }
           .header-hamburger { display: flex !important; }

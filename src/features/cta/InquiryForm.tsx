@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Input } from '@/components/ui';
 import { apiClient } from '@/lib/api';
+import PrivacyConsent from '@/components/ui/PrivacyConsent';
 
 const SERIF = "'Newsreader', Georgia, serif";
 
@@ -293,17 +294,11 @@ const InquiryForm: React.FC = () => {
 
         {/* 동의 */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
-          <div>
-            <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: '0 0 8px' }}>
-              개인정보 수집 및 이용동의 내용을 확인했으며, 이에 동의합니다. (필수)<span style={{ color: 'var(--accent)' }}>*</span>
-            </p>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-              <input type="radio" name="privacy" checked={form.consentPrivacy} onChange={() => set('consentPrivacy', true)}
-                style={{ width: 16, height: 16, accentColor: 'var(--accent)' }} />
-              <span style={{ fontSize: 15, color: 'var(--ink)' }}>동의합니다.</span>
-            </label>
-            {errors.consentPrivacy && <p style={{ fontSize: 14, color: 'var(--accent)', marginTop: 4, fontWeight: 600 }}>{errors.consentPrivacy}</p>}
-          </div>
+          <PrivacyConsent
+                checked={form.consentPrivacy}
+                onChange={(v) => set('consentPrivacy', v)}
+                error={errors.consentPrivacy}
+              />
 
           <div>
             <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: '0 0 8px' }}>

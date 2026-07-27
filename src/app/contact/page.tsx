@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { CtaSection } from '@/features/cta';
 
 const BENEFITS = [
-  { num: '01', title: '빠른 응답', desc: '영업일 기준 24시간 이내에 담당자가 연락드립니다.' },
+  { num: '01', title: '빠른 응답', desc: '당일 내 담당자가 연락드립니다.' },
   { num: '02', title: '맞춤 제안서', desc: '귀사 환경에 맞는 맞춤형 솔루션 제안서를 제공합니다.' },
   { num: '03', title: '전문 컨설팅', desc: '20년 경험의 전문 컨설턴트가 최적의 솔루션을 안내합니다.' },
 ];
@@ -69,7 +69,7 @@ export default function ContactPage() {
           </h1>
           <p style={{
             fontWeight: 400, fontSize: 18, lineHeight: 1.7,
-            color: 'rgba(255,255,255,.5)', maxWidth: 480, margin: '0 auto',
+            color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: '0 auto',
           }}>
             귀사의 IT 환경에 최적화된 솔루션을<br />
             전문 컨설턴트가 제안해 드립니다.

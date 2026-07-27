@@ -42,7 +42,7 @@ const WhyUnionSection: React.FC = () => {
               소수정예 4개 팀,<br />
               하나의 창구.
             </h2>
-            <p style={{ fontWeight: 400, fontSize: 16, lineHeight: 1.8, color: 'var(--ink2)', marginTop: 24, maxWidth: 400 }}>
+            <p style={{ fontWeight: 400, fontSize: 16, lineHeight: 1.8, color: 'var(--ink2)', marginTop: 24, maxWidth: 600 }}>
               비교견적부터 구축, 유지보수까지 — 담당자 한 명이 끝까지 책임집니다.
             </p>
             <a href="/contact" style={{

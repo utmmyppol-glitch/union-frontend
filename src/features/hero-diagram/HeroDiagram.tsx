@@ -17,6 +17,7 @@
 import { useEffect, useRef, useState, useCallback, type FormEvent } from 'react';
 import { HERO_NODES, PLATFORM_CORE, type HeroNode } from '@/data/solutions';
 import { apiClient } from '@/lib/api';
+import PrivacyConsent from '@/components/ui/PrivacyConsent';
 
 // ─── 스테이지 상수 ──────────────────────────────────────
 const SW = 1120;
@@ -251,18 +252,11 @@ function DetailCard({ node, onClose }: { node: HeroNode; onClose: () => void }) 
               <p style={{ margin: '0 0 4px' }}><strong style={{ color: '#2C2C2C' }}>수집·이용 목적</strong> : 문의 사항에 대한 답변 전달, 상담, 이벤트 안내 등</p>
               <p style={{ margin: 0 }}><strong style={{ color: '#2C2C2C' }}>보유 및 이용기간</strong> : 목적 달성 시 파기. 계약/청약철회 기록 5년, 대금결제/재화공급 기록 5년, 소비자 불만/분쟁처리 기록 3년 보존</p>
             </div>
-            <label style={{
-              display: 'flex', alignItems: 'flex-start', gap: 8,
-              fontSize: 13, color: '#6E6E6E', cursor: 'pointer', marginBottom: 14,
-            }}>
-              <input
-                type="checkbox" checked={consentPrivacy}
-                onChange={(e) => { setConsentPrivacy(e.target.checked); setConsentError(''); }}
-                style={{ width: 16, height: 16, accentColor: node.colors.sc, cursor: 'pointer', marginTop: 1, flexShrink: 0 }}
+              <PrivacyConsent
+                checked={consentPrivacy}
+                onChange={setConsentPrivacy}
+                error={consentError}
               />
-              <span>개인정보 수집 및 이용동의 내용을 확인했으며, 이에 동의합니다. (필수)</span>
-            </label>
-            {consentError && <div style={{ fontSize: 13, color: '#c0392f', marginBottom: 10 }}>{consentError}</div>}
             <button type="submit" className="hd-dgo" disabled={submitting}>{submitting ? '접수 중...' : '문의 접수하기'}</button>
           </form>
         )}
@@ -272,7 +266,7 @@ function DetailCard({ node, onClose }: { node: HeroNode; onClose: () => void }) 
               <svg width="24" height="24" fill="none" stroke={node.colors.sc} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5 5L20 7" /></svg>
             </div>
             <h3 style={{ fontWeight: 800, fontSize: 18, color: '#2C2C2C', marginBottom: 8 }}>신청이 접수되었습니다</h3>
-            <p style={{ fontSize: 18.5, color: '#6E6E6E', marginBottom: 24, lineHeight: 1.6 }}>담당 컨설턴트가 1영업일 이내에 연락드리겠습니다.</p>
+            <p style={{ fontSize: 18.5, color: '#6E6E6E', marginBottom: 24, lineHeight: 1.6 }}>담당 컨설턴트가 당일 내 연락드리겠습니다.</p>
             <button className="hd-dgo" onClick={onClose}>닫기</button>
           </div>
         )}

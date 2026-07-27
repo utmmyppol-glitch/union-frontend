@@ -3,32 +3,32 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
-const IMG = '/images/uploads/2022/06';
+const CRAWL = '/images/crawl/unionsystems';
 
 const MODULES = [
   {
     num: '01',
     name: 'DMS (Desktop Management System)',
     desc: 'PC 자산의 하드웨어/소프트웨어 정보를 자동 수집하고 관리합니다. 설치 소프트웨어 현황 파악, 라이선스 관리, 원격 배포를 지원합니다.',
-    img: `${IMG}/solution_netclient_function_dms.jpg`,
+    img: `${CRAWL}/solution_netclient_function_dms_10.jpg`,
   },
   {
     num: '02',
     name: 'PMS (Patch Management System)',
     desc: 'Windows 보안 패치와 소프트웨어 업데이트를 중앙에서 관리합니다. 자동 패치 적용으로 보안 취약점을 사전에 차단합니다.',
-    img: `${IMG}/solution_netclient_function_pms.jpg`,
+    img: `${CRAWL}/solution_netclient_function_pms_11.jpg`,
   },
   {
     num: '03',
     name: 'PC-OFF (근로시간 관리)',
     desc: '주 52시간 근로시간제에 맞춘 PC 사용시간 기반 근무 관리. 업무 종료 후 미사용 PC를 자동 종료하여 전력 비용을 절감합니다.',
-    img: `${IMG}/solution_netclient_function_pcoff.jpg`,
+    img: `${CRAWL}/solution_netclient_function_pcoff_12.jpg`,
   },
   {
     num: '04',
     name: 'HSM (PC 보안 관리)',
     desc: '내부 정보 외부 유출 방지, 불법 소프트웨어 통제, PC 보안 점검 및 미디어 보안 관리를 지원합니다.',
-    img: `${IMG}/solution_netclient_function_dms.jpg`,
+    img: `${CRAWL}/solution_netclient_function_dms_10.jpg`,
   },
 ];
 
@@ -74,7 +74,7 @@ export default function NetClientPage() {
         {/* Background image */}
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${IMG}/solution_netclient_visual.png)`,
+          backgroundImage: `url(${CRAWL}/solution_netclient_visual_8.png)`,
           backgroundSize: 'contain', backgroundPosition: 'right center',
           backgroundRepeat: 'no-repeat', opacity: 0.08,
         }} />
@@ -113,7 +113,7 @@ export default function NetClientPage() {
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 16, lineHeight: 1.7,
-              color: 'rgba(255,255,255,.5)', maxWidth: 440, margin: '0 0 12px',
+              color: 'rgba(255,255,255,.5)', maxWidth: 620, margin: '0 0 12px',
             }}>
               PC 자산 관리(DMS), 패치 관리(PMS), 근로시간 관리(PC-OFF),<br />
               보안 관리(HSM)를 하나의 에이전트로 통합 운영합니다.

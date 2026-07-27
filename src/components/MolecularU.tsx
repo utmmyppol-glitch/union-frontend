@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Solution, SOLUTIONS } from '@/data/molecular-data';
-import UnicornBrochure from '@/components/UnicornBrochure';
 
 
 const IMG_NAT_W = 1269;
@@ -19,18 +18,17 @@ interface Props {
   zoomedSolution: Solution | null;
 }
 
-/* ═══ Micro Structure (zoomed) — DC reference radial layout ═══ */
+/* ═══ Micro Structure (zoomed) — 핸드오프 다이어그램 + 기존 콘텐츠 유지 ═══ */
 function MicroStructure({ solution, onClose, onBrochure }: {
   solution: Solution;
   onClose: () => void;
   onBrochure: () => void;
 }) {
-  const [entered, setEntered] = useState(false);
+  const [play, setPlay] = useState(false);
   const [hovIdx, setHovIdx] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dims, setDims] = useState({ w: 0, h: 0 });
 
-  // ResizeObserver for container dimensions
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -43,91 +41,39 @@ function MicroStructure({ solution, onClose, onBrochure }: {
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setEntered(true));
+      requestAnimationFrame(() => setPlay(true));
     });
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Deterministic ambient particles
-  const particles = useMemo(() => {
-    const seed = solution.id;
-    const arr: { x: number; y: number; size: number; delay: number }[] = [];
-    for (let i = 0; i < 26; i++) {
-      // deterministic pseudo-random based on index + seed char codes
-      const s = seed.charCodeAt(i % seed.length) || 42;
-      const a = ((i * 137 + s * 31) % 360) * (Math.PI / 180);
-      const dist = 0.15 + ((i * 73 + s) % 100) / 200; // 0.15 to 0.65 of half-container
-      arr.push({
-        x: 0.5 + Math.cos(a) * dist,
-        y: 0.5 + Math.sin(a) * dist,
-        size: 2 + ((i * 17 + s) % 3),
-        delay: i * 0.04,
-      });
-    }
-    return arr;
-  }, [solution.id]);
-
   const feats = solution.feats;
   const N = feats.length;
-  const isMobile = dims.w > 0 && dims.w < 768;
+  const isMobile = dims.w > 0 && dims.w < 480;
 
-  // Container-relative coordinates
-  const W = dims.w;
-  const H = dims.h;
-  const cx = W * 0.58;
-  const cy = H * 0.5;
-  const minDim = Math.min(W, H);
-  const coreSize = minDim * 0.28;
-  const orbitR = minDim * 0.4;
-  const beadSize = minDim * 0.115;
-  const subAtomSize = minDim * 0.032;
-  const subAtomDist = minDim * 0.11;
+  const VB = 720;
+  const CX = VB / 2;
+  const CY = VB / 2;
+  const ORBIT = 230;
+  const NODE_R = VB * 0.116;
+  const CORE_R = 86;
 
-  const accent = '#F5333F';
+  const nodePositions = useMemo(() => {
+    return feats.map((_, k) => {
+      const angle = (-90 + k * (360 / N)) * (Math.PI / 180);
+      return { x: CX + Math.cos(angle) * ORBIT, y: CY + Math.sin(angle) * ORBIT };
+    });
+  }, [N, feats]);
 
-  // 솔루션별 제품 사진 여러 장 — 배경 콜라주용
-  const bgImagesMap: Record<string, string[]> = {
-    ms: [
-      '/images/uploads/2022/06/software_microsoft_excel.jpg',
-      '/images/uploads/2022/06/software_microsoft_outlook.jpg',
-      '/images/uploads/2022/06/software_microsoft_word.jpg',
-      '/images/uploads/2022/06/software_microsoft_powerpoint.jpg',
-    ],
-    encora: [
-      '/images/uploads/2022/06/main_solution_encore.jpg',
-    ],
-    ahn: [
-      '/images/uploads/2022/06/solution_ahnlab_epp.jpg',
-      '/images/uploads/2022/06/solution_ahnlab_edr.jpg',
-      '/images/uploads/2022/06/solution_ahnlab_mds.jpg',
-      '/images/uploads/2022/06/main_solution_ahnlab.jpg',
-    ],
-    adobe: [
-      '/images/uploads/2022/06/software_adobe_photoshop.jpg',
-      '/images/uploads/2022/06/software_adobe_illustrator.jpg',
-      '/images/uploads/2022/06/software_adobe_premiere-pro.jpg',
-      '/images/uploads/2022/06/software_adobe_after-effects.jpg',
-    ],
-    est: [
-      '/images/uploads/2022/06/software_estsoft_alzip.jpg',
-      '/images/uploads/2022/06/software_estsoft_alsee.jpg',
-      '/images/uploads/2022/06/software_estsoft_alpdf.jpg',
-      '/images/uploads/2022/06/software_estsoft_alcapture.jpg',
-    ],
-    auto: [
-      '/images/uploads/2022/06/software_autodesk_autocad.jpg',
-      '/images/uploads/2022/06/software_autodesk_revit.jpg',
-      '/images/uploads/2022/06/software_autodesk_inventor.jpg',
-      '/images/uploads/2022/06/software_autodesk_3ds-max.jpg',
-    ],
-    doctor: [
-      '/images/uploads/2022/06/main_solution_netclient.jpg',
-    ],
-  };
-  const bgImages = bgImagesMap[solution.id] || [];
+  const arcPaths = useMemo(() => {
+    return nodePositions.map((pos, k) => {
+      const next = nodePositions[(k + 1) % N];
+      return `M ${pos.x.toFixed(1)} ${pos.y.toFixed(1)} A ${ORBIT} ${ORBIT} 0 0 1 ${next.x.toFixed(1)} ${next.y.toFixed(1)}`;
+    });
+  }, [nodePositions, N]);
+
+  const accent = '#E4002B';
 
   if (isMobile) {
-    // Mobile: core card + vertical feature list
     return (
       <div
         ref={containerRef}
@@ -146,8 +92,8 @@ function MicroStructure({ solution, onClose, onBrochure }: {
           background: 'radial-gradient(circle at 50% 30%, rgba(245,51,63,.06) 0%, rgba(255,255,255,.95) 60%)',
           border: '1px solid rgba(255,255,255,.95)',
           boxShadow: '0 32px 80px rgba(60,70,90,.13), inset 0 1px 0 rgba(255,255,255,.9)',
-          textAlign: 'center', marginBottom: 28,
-          opacity: entered ? 1 : 0, transform: entered ? 'scale(1)' : 'scale(.6)',
+          textAlign: 'center', marginBottom: 28, borderRadius: 16,
+          opacity: play ? 1 : 0, transform: play ? 'scale(1)' : 'scale(.6)',
           transition: 'all .6s cubic-bezier(.34,1.4,.5,1)',
         }}>
           <div style={{ fontSize: 22, fontWeight: 800, color: '#1a1c22' }}>{solution.area}</div>
@@ -157,12 +103,11 @@ function MicroStructure({ solution, onClose, onBrochure }: {
           </div>
         </div>
 
-        {/* Feature list */}
         {feats.map((f, k) => (
           <div key={k} style={{
             width: '100%', maxWidth: 340, padding: '14px 18px',
             background: '#fff', border: '1px solid #E7E2D8', marginBottom: 10,
-            opacity: entered ? 1 : 0, transform: entered ? 'translateY(0)' : 'translateY(20px)',
+            opacity: play ? 1 : 0, transform: play ? 'translateY(0)' : 'translateY(20px)',
             transition: `all .45s ease ${0.3 + k * 0.08}s`,
           }}>
             <div style={{ fontSize: 17, fontWeight: 800, color: '#1a1c22' }}>{f.n}</div>
@@ -170,7 +115,6 @@ function MicroStructure({ solution, onClose, onBrochure }: {
           </div>
         ))}
 
-        {/* Teaser pill */}
         <div
           onClick={onBrochure}
           style={{
@@ -178,7 +122,7 @@ function MicroStructure({ solution, onClose, onBrochure }: {
             background: 'rgba(255,255,255,.7)', backdropFilter: 'blur(12px)',
             border: '1px solid rgba(200,200,210,.4)',
             fontSize: 13, color: '#4a4e5a', cursor: 'pointer',
-            opacity: entered ? 1 : 0, transition: 'opacity .5s ease .9s',
+            opacity: play ? 1 : 0, transition: 'opacity .5s ease .9s',
           }}
         >
           도입 사례 · ROI 수치 · 전체 기능 명세 → 소개서에서 열기
@@ -194,303 +138,212 @@ function MicroStructure({ solution, onClose, onBrochure }: {
       style={{
         position: 'absolute', inset: 0, zIndex: 12,
         cursor: 'default', overflow: 'visible',
+        background: '#FBFAF7',
+        display: 'grid', placeItems: 'center',
       }}
     >
-      {/* Background: 제품 사진 콜라주 + 마스킹 */}
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-        {/* 제품 사진 콜라주 — 2x2 그리드로 배치 */}
-        {bgImages.length > 0 && (
+      <div style={{ width: '100%', maxWidth: 800, padding: '0 16px' }}>
+        {/* 헤더 */}
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{
-            position: 'absolute', inset: 0,
-            display: 'grid',
-            gridTemplateColumns: bgImages.length >= 4 ? '1fr 1fr' : '1fr',
-            gridTemplateRows: bgImages.length >= 4 ? '1fr 1fr' : '1fr',
-            gap: 0, pointerEvents: 'none',
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            fontSize: 12, fontWeight: 800, letterSpacing: '.16em',
+            color: accent, textTransform: 'uppercase' as const,
           }}>
-            {bgImages.map((src, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={i} src={src} alt="" draggable={false}
-                style={{
-                  width: '100%', height: '100%',
-                  objectFit: 'cover', objectPosition: 'center',
-                  opacity: 0.35, filter: 'grayscale(.08) contrast(1.1)',
-                  userSelect: 'none',
-                }}
-              />
-            ))}
+            <span style={{ width: 22, height: 2, background: accent, display: 'inline-block' }} />
+            {solution.vendor}
           </div>
-        )}
-        {/* 중앙 비네팅 — 분자 구조 영역만 살짝 밝게 */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'radial-gradient(ellipse 50% 45% at 62% 52%, rgba(251,250,247,.88) 0%, rgba(251,250,247,.4) 55%, transparent 100%)',
-          pointerEvents: 'none',
-        }} />
-        {/* 가장자리 좌우 페이드 */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to right, rgba(251,250,247,.9) 0%, transparent 15%, transparent 85%, rgba(251,250,247,.9) 100%)',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '18%',
-          background: 'linear-gradient(to bottom, #FBFAF7, transparent)',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '14%',
-          background: 'linear-gradient(to top, #FBFAF7, transparent)',
-          pointerEvents: 'none',
-        }} />
-      </div>
+          <h2 style={{
+            fontSize: 'clamp(24px, 3.6vw, 32px)', fontWeight: 900,
+            color: '#171d29', letterSpacing: '-0.03em',
+            marginTop: 12, lineHeight: 1.2,
+          }}>
+            {solution.area} 구성도
+          </h2>
+          <p style={{
+            fontSize: 15, color: '#6b7482', marginTop: 10,
+            lineHeight: 1.6, letterSpacing: '-0.01em',
+            maxWidth: 460, margin: '10px auto 0',
+          }}>{solution.desc}</p>
+        </div>
 
-      {/* Ambient particles */}
-      {dims.w > 0 && particles.map((p, i) => (
-        <div key={`p-${i}`} style={{
-          position: 'absolute',
-          left: p.x * W, top: p.y * H,
-          width: p.size, height: p.size, borderRadius: '50%',
-          background: 'rgba(150,160,175,.35)',
-          opacity: entered ? 1 : 0,
-          transition: `opacity .6s ease ${p.delay}s`,
-          animation: entered ? `flU 6s ease-in-out infinite ${p.delay}s` : 'none',
-          pointerEvents: 'none',
-        }} />
-      ))}
+        {/* 다이어그램 스테이지 */}
+        <div className={play ? 'dg-play' : ''} style={{ position: 'relative', width: 'min(700px, 88vw)', aspectRatio: '1/1', margin: '0 auto' }}>
 
-      {dims.w > 0 && (
-        <>
-          {/* SVG: 궤도 링 + 본드 + sub-atom 라인 */}
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }}>
-            {/* 궤도 타원 링 — 정돈된 원자 모델 느낌 */}
-            <ellipse
-              cx={cx} cy={cy}
-              rx={orbitR} ry={orbitR * 0.88}
-              fill="none"
-              stroke="#E7E2D8"
-              strokeWidth={1}
-              strokeDasharray="6 8"
-              opacity={entered ? 0.5 : 0}
-              style={{ transition: 'opacity 1.2s ease .3s' }}
-            />
-            {/* 코어 → 기능 본드 (hover 시 레드 강조) */}
-            {feats.map((_, k) => {
-              const angle = (-90 + k * (360 / N)) * (Math.PI / 180);
-              const fx = cx + Math.cos(angle) * orbitR;
-              const fy = cy + Math.sin(angle) * orbitR;
-              const edgeX = cx + Math.cos(angle) * (coreSize / 2);
-              const edgeY = cy + Math.sin(angle) * (coreSize / 2);
-              const lineLen = Math.sqrt((fx - edgeX) ** 2 + (fy - edgeY) ** 2);
-              const isHov = hovIdx === k;
-              return (
-                <line
-                  key={`bond-${k}`}
-                  x1={edgeX} y1={edgeY}
-                  x2={fx} y2={fy}
-                  stroke={isHov ? 'rgba(245,51,63,.45)' : 'rgba(150,160,175,.4)'}
-                  strokeWidth={isHov ? 1.8 : 1.2}
-                  strokeDasharray={lineLen}
-                  strokeDashoffset={entered ? 0 : lineLen}
-                  style={{ transition: `stroke-dashoffset .9s cubic-bezier(.25,.46,.45,.94) ${0.3 + k * 0.1}s, stroke .25s, stroke-width .25s` }}
-                />
-              );
-            })}
-            {/* 기능 → sub-atom 라인 */}
-            {feats.map((_, k) => {
-              const angle = (-90 + k * (360 / N)) * (Math.PI / 180);
-              const fx = cx + Math.cos(angle) * orbitR;
-              const fy = cy + Math.sin(angle) * orbitR;
-              const sx = cx + Math.cos(angle) * (orbitR + subAtomDist);
-              const sy = cy + Math.sin(angle) * (orbitR + subAtomDist);
-              return (
-                <line
-                  key={`sub-bond-${k}`}
-                  x1={fx} y1={fy}
-                  x2={sx} y2={sy}
-                  stroke="rgba(160,168,180,.3)"
-                  strokeWidth={1}
-                  strokeDasharray={subAtomDist}
-                  strokeDashoffset={entered ? 0 : subAtomDist}
-                  style={{ transition: `stroke-dashoffset .7s cubic-bezier(.25,.46,.45,.94) ${0.6 + k * 0.12}s` }}
-                />
-              );
-            })}
+          <svg viewBox={`0 0 ${VB} ${VB}`} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }} aria-hidden="true">
+            <defs>
+              <radialGradient id="dgHexFill" cx="42%" cy="34%" r="72%">
+                <stop offset="0%" stopColor="#fff4f5" />
+                <stop offset="55%" stopColor="#fbdadd" />
+                <stop offset="100%" stopColor="#f6c6cb" />
+              </radialGradient>
+              <filter id="dgSoft" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#1e2c42" floodOpacity="0.12" />
+              </filter>
+              <linearGradient id="dgArcGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#f7b8bf" />
+                <stop offset="100%" stopColor={accent} />
+              </linearGradient>
+            </defs>
+
+            {arcPaths.map((d, k) => (
+              <path key={`arc-${k}`} className="dg-arc" style={{ animationDelay: `${0.18 + k * 0.09}s` }}
+                d={d} fill="none" stroke="url(#dgArcGrad)" strokeWidth="5" strokeLinecap="round" pathLength={1} />
+            ))}
+
+            <g stroke="#b9c3ce" strokeWidth="2.4" strokeDasharray="2 7" strokeLinecap="round">
+              {nodePositions.map((pos, k) => {
+                const dx = pos.x - CX; const dy = pos.y - CY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const sx = CX + (dx / dist) * CORE_R; const sy = CY + (dy / dist) * CORE_R;
+                const ex = pos.x - (dx / dist) * NODE_R; const ey = pos.y - (dy / dist) * NODE_R;
+                return <line key={`ln-${k}`} className="dg-line" style={{ animationDelay: `${0.6 + k * 0.06}s` }}
+                  x1={sx} y1={sy} x2={ex} y2={ey} pathLength={1} />;
+              })}
+            </g>
+            <g fill="#8a9bb0">
+              {nodePositions.map((pos, k) => {
+                const dx = pos.x - CX; const dy = pos.y - CY; const dist = Math.sqrt(dx * dx + dy * dy);
+                return <circle key={`dot-${k}`} className="dg-dot" style={{ animationDelay: `${0.6 + k * 0.06}s` }}
+                  cx={pos.x - (dx / dist) * NODE_R} cy={pos.y - (dy / dist) * NODE_R} r="5.5" />;
+              })}
+            </g>
+
+            <g className="dg-hex-g">
+              <circle cx={CX} cy={CY} r={CORE_R} fill="url(#dgHexFill)" stroke="#f0bcc1" strokeWidth="2.4" filter="url(#dgSoft)" />
+            </g>
           </svg>
 
-          {/* 코어 글로우 링 */}
-          <div style={{
-            position: 'absolute',
-            left: cx - coreSize * 0.7, top: cy - coreSize * 0.7,
-            width: coreSize * 1.4, height: coreSize * 1.4, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(245,51,63,.06) 0%, transparent 70%)',
-            opacity: entered ? 1 : 0,
-            transition: 'opacity .8s ease .3s',
-            pointerEvents: 'none', zIndex: 4,
-            animation: entered ? 'coreGlow 4s ease-in-out infinite' : 'none',
-          }} />
-
-          {/* Central glass core */}
-          <div style={{
-            position: 'absolute',
-            left: cx - coreSize / 2, top: cy - coreSize / 2,
-            width: coreSize, height: coreSize, borderRadius: '50%',
-            background: 'radial-gradient(circle at 37% 28%, #fff 0%, #f4f5f8 44%, rgba(245,51,63,.12) 80%, rgba(245,51,63,.24) 100%)',
-            border: '1px solid rgba(255,255,255,.95)',
-            boxShadow: '0 36px 80px rgba(60,70,90,.24), 0 10px 24px rgba(60,70,90,.12), inset 0 14px 36px rgba(255,255,255,.95), inset 0 -20px 40px rgba(245,51,63,.18)',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            zIndex: 5,
-            animation: entered ? 'budIn .8s cubic-bezier(.25,.46,.45,.94) both' : 'none',
+          {/* 중앙 레이블 */}
+          <div className="dg-center" style={{
+            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
+            textAlign: 'center', pointerEvents: 'none',
+            width: 160,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           }}>
-            {/* Specular highlight */}
             <div style={{
-              position: 'absolute', top: coreSize * 0.12, left: coreSize * 0.2,
-              width: coreSize * 0.22, height: coreSize * 0.12, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(255,255,255,.95), transparent 70%)',
-              pointerEvents: 'none',
-            }} />
+              fontSize: 'clamp(20px, 3.5vw, 27px)', fontWeight: 900,
+              color: '#1a2130', letterSpacing: '-0.02em', lineHeight: 1.15,
+              wordBreak: 'keep-all',
+            }}>{solution.area}</div>
             <div style={{
-              fontSize: Math.max(24, coreSize * 0.12), fontWeight: 800,
-              color: '#111214', textAlign: 'center', lineHeight: 1.15,
-              letterSpacing: '-0.03em', padding: '0 14px',
-            }}>
-              {solution.area}
-            </div>
-            <div style={{ fontSize: Math.max(15, coreSize * 0.075), fontWeight: 700, color: accent, marginTop: 7 }}>
-              {solution.vendor}
-            </div>
-            <div style={{ fontSize: Math.max(12, coreSize * 0.055), color: '#7a8090', marginTop: 8 }}>
-              기능 {feats.length} · 도입효과 {solution.gain.length}
-            </div>
+              fontSize: 'clamp(12px, 2vw, 15px)', fontWeight: 800,
+              color: accent, marginTop: 5,
+              letterSpacing: '-0.01em',
+            }}>{solution.vendor}</div>
+            <div style={{
+              fontSize: 'clamp(10px, 1.4vw, 13px)', color: '#7a828d',
+              marginTop: 5, letterSpacing: '-0.01em',
+            }}>기능 {feats.length} · 도입효과 {solution.gain.length}</div>
           </div>
 
-          {/* Info pill below core */}
-          <div style={{
-            position: 'absolute',
-            left: cx, top: cy + coreSize / 2 + 24,
-            transform: 'translateX(-50%)',
-            padding: '9px 22px',
-            background: 'rgba(255,255,255,.7)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(200,200,210,.4)',
-            fontSize: 13, color: '#4a4e5a',
-            whiteSpace: 'nowrap', zIndex: 6,
-            opacity: entered ? 1 : 0,
-            transition: 'opacity .5s ease .9s',
-            pointerEvents: 'none',
-          }}>
-            각 기능을 클릭해 상세 정보를 확인하세요
-          </div>
-
-          {/* Feature atoms — bead+label 통합 hover 영역 */}
-          {feats.map((f, k) => {
-            const angle = (-90 + k * (360 / N)) * (Math.PI / 180);
-            const fx = cx + Math.cos(angle) * orbitR;
-            const fy = cy + Math.sin(angle) * orbitR;
+          {/* 기능 노드 */}
+          {nodePositions.map((pos, k) => {
+            const pctX = ((pos.x / VB) * 100).toFixed(1);
+            const pctY = ((pos.y / VB) * 100).toFixed(1);
             const isHov = hovIdx === k;
-            const isLeft = Math.cos(angle) < -0.1;
-            const delay = 0.32 + k * 0.12;
-
-            const sx = cx + Math.cos(angle) * (orbitR + subAtomDist);
-            const sy = cy + Math.sin(angle) * (orbitR + subAtomDist);
-
             const isDimmed = hovIdx !== null && !isHov;
             return (
-              <div key={k}>
-                {/* bead + label 통합 wrapper */}
-                <div
-                  onMouseEnter={() => setHovIdx(k)}
-                  onMouseLeave={() => setHovIdx(null)}
-                  style={{
-                    position: 'absolute',
-                    left: entered ? fx : cx,
-                    top: entered ? fy : cy,
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 8, cursor: 'default', pointerEvents: 'auto',
-                    display: 'flex',
-                    flexDirection: isLeft ? 'row-reverse' : 'row',
-                    alignItems: 'center', gap: 11,
-                    opacity: isDimmed ? 0.35 : 1,
-                    transition: `left .8s cubic-bezier(.25,.46,.45,.94) ${delay}s, top .8s cubic-bezier(.25,.46,.45,.94) ${delay}s, opacity .3s ease`,
-                  }}
-                >
-                  {/* Pearl bead */}
-                  <span style={{
-                    position: 'relative',
-                    width: beadSize, height: beadSize, borderRadius: '50%', flex: 'none',
-                    background: 'radial-gradient(circle at 34% 28%, #ffffff 0%, #eceef2 50%, #b8bcc6 100%)',
-                    boxShadow: isHov
-                      ? '0 18px 40px rgba(245,51,63,.24), 0 6px 16px rgba(60,70,90,.15), inset 0 6px 14px rgba(255,255,255,.95), inset 0 -4px 8px rgba(100,110,130,.08)'
-                      : '0 14px 32px rgba(60,70,90,.25), 0 4px 12px rgba(60,70,90,.1), inset 0 6px 14px rgba(255,255,255,.95), inset 0 -4px 8px rgba(100,110,130,.06)',
-                    transform: isHov ? 'scale(1.2)' : 'scale(1)',
-                    transition: 'transform .28s cubic-bezier(.34,1.4,.6,1), box-shadow .25s',
-                    display: 'block',
-                  }}>
-                    <span style={{
-                      position: 'absolute', top: beadSize * 0.18, left: beadSize * 0.28,
-                      width: beadSize * 0.26, height: beadSize * 0.15, borderRadius: '50%',
-                      background: 'radial-gradient(circle, rgba(255,255,255,.95), transparent 70%)',
-                    }} />
-                  </span>
-
-                  {/* Label — 배경 pill로 가독성 확보 */}
-                  <span style={{
-                    textAlign: isLeft ? 'right' : 'left',
-                    background: 'rgba(255,255,255,.8)', backdropFilter: 'blur(10px)',
-                    padding: '8px 14px',
-                    boxShadow: '0 4px 16px rgba(60,70,90,.08)',
-                    border: '1px solid rgba(231,226,216,.4)',
-                    minWidth: 'max-content',
-                  }}>
-                    <span style={{
-                      display: 'block',
-                      fontSize: Math.max(16, beadSize * 0.2), fontWeight: 800,
-                      color: '#111214', whiteSpace: 'nowrap',
-                      letterSpacing: '-0.02em',
-                    }}>{f.n}</span>
-                    <span style={{
-                      display: 'block',
-                      fontSize: Math.max(13, beadSize * 0.14), color: '#4a4f57',
-                      whiteSpace: 'nowrap', marginTop: 3,
-                    }}>{f.e}</span>
-                    {/* hover 시 상세 안내 */}
-                    <span style={{
-                      display: 'block', fontSize: 12, color: accent,
-                      fontWeight: 700, marginTop: 5,
-                      maxHeight: isHov ? 24 : 0,
-                      opacity: isHov ? 1 : 0, overflow: 'hidden',
-                      transition: 'all .25s ease',
-                    }}>← 좌측에서 상담·소개서 요청</span>
-                  </span>
-                </div>
-
-                {/* Sub-atom */}
+              <div key={k} className="dg-node"
+                onMouseEnter={() => setHovIdx(k)} onMouseLeave={() => setHovIdx(null)}
+                style={{
+                  // @ts-expect-error CSS custom properties
+                  '--fx': `${pctX}%`, '--fy': `${pctY}%`,
+                  animationDelay: `${0.38 + k * 0.09}s`,
+                  position: 'absolute', width: '23.3%', aspectRatio: '1',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle at 38% 30%, #ffffff, #eef1f5)',
+                  boxShadow: isHov
+                    ? '0 22px 48px rgba(30,44,66,.22), 0 0 0 6px rgba(228,0,43,.08)'
+                    : '0 16px 34px rgba(30,44,66,.16), inset 0 0 0 1px rgba(255,255,255,.9)',
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center',
+                  textAlign: 'center',
+                  padding: '12px 10px', cursor: 'pointer',
+                  opacity: isDimmed ? 0.4 : 1,
+                  transition: 'box-shadow .25s, opacity .25s',
+                  zIndex: isHov ? 5 : 3,
+                }}
+              >
+                {/* 기능명 */}
                 <div style={{
-                  position: 'absolute',
-                  left: entered ? sx - subAtomSize / 2 : cx - subAtomSize / 2,
-                  top: entered ? sy - subAtomSize / 2 : cy - subAtomSize / 2,
-                  width: subAtomSize, height: subAtomSize, borderRadius: '50%',
-                  background: 'radial-gradient(circle at 34% 28%, #fff 0%, #dddfe4 55%, #b0b4be 100%)',
-                  boxShadow: '0 6px 18px rgba(60,70,90,.24), inset 0 2px 5px rgba(255,255,255,.85)',
-                  zIndex: 7,
-                  transition: `left .9s cubic-bezier(.25,.46,.45,.94) ${delay + 0.15}s, top .9s cubic-bezier(.25,.46,.45,.94) ${delay + 0.15}s`,
-                  pointerEvents: 'none',
-                }} />
+                  fontSize: 'clamp(13px, 1.8vw, 17px)',
+                  fontWeight: 900,
+                  color: '#1c2431',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                }}>{feats[k].n}</div>
+                {/* 설명 */}
+                <div style={{
+                  fontSize: 'clamp(9px, 1.2vw, 12px)',
+                  color: '#6b7482',
+                  marginTop: 4,
+                  lineHeight: 1.4,
+                  whiteSpace: 'nowrap',
+                }}>{feats[k].e}</div>
+                {/* hover 안내 문구 */}
+                <div style={{
+                  fontSize: 'clamp(8px, 1vw, 11px)',
+                  fontWeight: 700,
+                  color: accent,
+                  marginTop: 6,
+                  lineHeight: 1.2,
+                  maxHeight: isHov ? 30 : 0,
+                  opacity: isHov ? 1 : 0,
+                  overflow: 'hidden',
+                  transition: 'max-height .25s ease, opacity .2s ease',
+                }}>자세한 내용은 소개서에서 →</div>
               </div>
             );
           })}
-        </>
-      )}
+        </div>
+
+        {/* 하단 안내 + 소개서 요청 */}
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <p style={{ fontSize: 13, color: '#9aa2ad', margin: '0 0 12px' }}>
+            자세한 구성 · 도입 사례 · ROI 수치는 소개서에서 확인하세요
+          </p>
+          <div
+            onClick={onBrochure}
+            style={{
+              display: 'inline-block', padding: '10px 28px',
+              background: 'rgba(255,255,255,.7)', backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(200,200,210,.4)',
+              fontSize: 13, fontWeight: 700, color: '#4a4e5a', cursor: 'pointer',
+              opacity: play ? 1 : 0, transition: 'opacity .5s ease .9s',
+            }}
+          >
+            도입 사례 · 전체 기능 명세 → 소개서 요청하기
+          </div>
+        </div>
+      </div>
 
       <style jsx>{`
-        @keyframes budIn {
-          0% { transform: scale(.85); opacity: 0; }
-          100% { transform: scale(1); opacity: 1; }
+        .dg-node { opacity: 0; }
+        .dg-arc, .dg-line { stroke-dasharray: 1; stroke-dashoffset: 1; }
+        .dg-dot { opacity: 0; }
+        .dg-hex-g { opacity: 0; transform-box: fill-box; transform-origin: center; }
+        .dg-center { opacity: 0; }
+
+        .dg-play .dg-node { animation: dgSpread .62s cubic-bezier(.22,1,.36,1) both; }
+        .dg-play .dg-hex-g { animation: dgHex .55s cubic-bezier(.34,1.4,.5,1) .05s both; }
+        .dg-play .dg-arc { animation: dgDraw .5s cubic-bezier(.4,0,.2,1) both; }
+        .dg-play .dg-line { animation: dgDraw .4s ease both; }
+        .dg-play .dg-dot { animation: dgFade .3s ease both; }
+        .dg-play .dg-center { animation: dgFade .4s ease .3s both; }
+
+        .dg-node { transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s; }
+        .dg-play .dg-node:hover { transform: translate(-50%,-50%) scale(1.05) !important; z-index: 5; }
+
+        @keyframes dgSpread {
+          0% { left: 50%; top: 50%; transform: translate(-50%,-50%) scale(.22); opacity: 0; }
+          55% { opacity: 1; }
+          100% { left: var(--fx); top: var(--fy); transform: translate(-50%,-50%) scale(1); opacity: 1; }
         }
-        @keyframes coreGlow {
-          0%, 100% { opacity: .6; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.06); }
-        }
+        @keyframes dgDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+        @keyframes dgHex { 0% { transform: scale(.4); opacity: 0; } 60% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes dgFade { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
     </div>
   );
@@ -781,7 +634,6 @@ export default function MolecularU({ onZoom, onClose, onBrochure, zoomedSolution
       {phase === 'zoomed' && zoomedSolution && (
         <>
           <MicroStructure solution={zoomedSolution} onClose={doClose} onBrochure={onBrochure} />
-          <UnicornBrochure />
         </>
       )}
 

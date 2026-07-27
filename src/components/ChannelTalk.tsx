@@ -46,8 +46,7 @@ function bootChannelTalk() {
     window.ChannelIOInitialized = true;
     window.ChannelIO?.('boot', {
       pluginKey: PLUGIN_KEY,
-      customLauncherSelector: '#channel-talk-btn',
-      hideChannelButtonOnBoot: true, // 기본 버튼 숨기고 커스텀 버튼 사용
+      hideChannelButtonOnBoot: false, // 기본 플로팅 버튼 표시
     });
   };
 }

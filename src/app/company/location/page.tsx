@@ -71,7 +71,7 @@ export default function LocationPage() {
           </h1>
           <p style={{
             fontWeight: 400, fontSize: 18, lineHeight: 1.7,
-            color: 'rgba(255,255,255,.5)', maxWidth: 440, margin: 0,
+            color: 'rgba(255,255,255,.5)', maxWidth: 620, margin: 0,
           }}>
             서울 성수동에서 여러분을 기다리고 있습니다.
           </p>

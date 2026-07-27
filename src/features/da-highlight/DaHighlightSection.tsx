@@ -80,7 +80,7 @@ const DaHighlightSection: React.FC = () => {
                 fontSize: 'clamp(14px, 1.5vw, 16px)',
                 lineHeight: 1.7,
                 color: 'var(--ink2)',
-                maxWidth: 440,
+                maxWidth: 620,
                 marginBottom: 24,
               }}
             >

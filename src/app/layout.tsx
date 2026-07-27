@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ScrollReveal from "@/components/layout/ScrollReveal";
 import ChannelTalk from "@/components/ChannelTalk";
+import UniMascot from "@/components/UniMascot";
 
 
 export const metadata: Metadata = {
@@ -28,6 +29,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 1280,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,6 +49,7 @@ export default function RootLayout({
         <Footer />
         <ScrollReveal />
         <ChannelTalk />
+        <UniMascot />
       </body>
     </html>
   );

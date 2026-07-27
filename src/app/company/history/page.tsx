@@ -4,8 +4,6 @@ import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const IMG_BASE = '/images/uploads/2022/06/';
-
 const COMPANY_TABS = [
   { label: '기업소개', href: '/company' },
   { label: '주요연혁', href: '/company/history' },
@@ -137,7 +135,7 @@ export default function HistoryPage() {
 
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${IMG_BASE}about_visual_bg.jpg)`,
+          backgroundImage: `url(/images/crawl/unionsystems/customer_header_img-01_5.png)`,
           backgroundSize: 'cover', backgroundPosition: 'center',
           opacity: 0.1,
         }} />
@@ -178,7 +176,7 @@ export default function HistoryPage() {
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 18, lineHeight: 1.7,
-              color: 'rgba(255,255,255,.5)', maxWidth: 480, margin: 0,
+              color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0,
             }}>
               10여년간 축적한 기술 노하우로 200여개 이상의 기업들이<br />
               유니온시스템즈와 함께하고 있습니다.

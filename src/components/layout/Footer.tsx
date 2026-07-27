@@ -107,7 +107,7 @@ export default function Footer() {
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,.55)'; }}
               >
-                개인정보취급방침
+                개인정보처리방침
               </Link>
             </div>
           </div>
@@ -199,40 +199,52 @@ export default function Footer() {
             &copy; Copyright 2015 UNION SYSTEMS. All rights reserved.
           </span>
 
-          {/* SNS links */}
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          {/* SNS icons */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <a
-              href="https://blog.naver.com/union_systems"
+              href="https://blog.naver.com/unionsystems_"
               target="_blank"
               rel="noopener noreferrer"
+              title="블로그 바로가기"
               style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,.35)',
-                textDecoration: 'none',
-                transition: 'color .2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,.12)',
+                transition: 'background .2s',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,.35)'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.3)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.12)'; }}
             >
-              블로그 바로가기
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M4 4h16v16H4V4z" fill="none"/>
+                <text x="12" y="17" textAnchor="middle" fontSize="15" fontWeight="700" fill="#fff" fontFamily="Arial, sans-serif">B</text>
+              </svg>
             </a>
-            <span style={{ color: 'rgba(255,255,255,.12)' }}>|</span>
             <a
-              href="https://www.facebook.com/unionsystems"
+              href="https://www.facebook.com/%EC%9C%A0%EB%8B%88%EC%98%A8%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%A6%88-407065599829009/"
               target="_blank"
               rel="noopener noreferrer"
+              title="페이스북 바로가기"
               style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,.35)',
-                textDecoration: 'none',
-                transition: 'color .2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,.12)',
+                transition: 'background .2s',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,.35)'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.3)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.12)'; }}
             >
-              페이스북 바로가기
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+                <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+              </svg>
             </a>
           </div>
         </div>

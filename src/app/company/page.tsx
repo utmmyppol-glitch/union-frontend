@@ -19,10 +19,10 @@ const CORE_VALUES = [
 ];
 
 const STRENGTHS = [
-  { img: `${IMG}sub_unionsystems_point_01.jpg`, title: '보안', desc: '안랩, 이스트소프트, 오피스키퍼 등 기업용 PC 통합보안 전문 솔루션을 구축, 운영합니다.' },
-  { img: `${IMG}sub_unionsystems_point_02.jpg`, title: '자산관리', desc: '넷클라이언트 등 기업 IT환경에 적합한 SW, HW 자산관리를 지원합니다.' },
-  { img: `${IMG}sub_unionsystems_point_03.jpg`, title: '데이터', desc: '엔코아의 DA# 공인총판으로 데이터모델링 툴의 유통, 기술지원, 교육을 지원합니다.' },
-  { img: `${IMG}sub_unionsystems_point_04.jpg`, title: '글로벌 파트너십', desc: 'Microsoft, Adobe, Autodesk 등 글로벌 소프트웨어 공식 파트너로서 정품 라이선스를 공급합니다.' },
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_01_24.jpg', title: '보안', desc: '안랩, 이스트소프트, 오피스키퍼 등 기업용 PC 통합보안 전문 솔루션을 구축, 운영합니다.' },
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_02_25.jpg', title: '자산관리', desc: '넷클라이언트 등 기업 IT환경에 적합한 SW, HW 자산관리를 지원합니다.' },
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_03_26.jpg', title: '데이터', desc: '엔코아의 DA# 공인총판으로 데이터모델링 툴의 유통, 기술지원, 교육을 지원합니다.' },
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_04_27.jpg', title: '글로벌 파트너십', desc: 'Microsoft, Adobe, Autodesk 등 글로벌 소프트웨어 공식 파트너로서 정품 라이선스를 공급합니다.' },
 ];
 
 const STATS = [
@@ -67,7 +67,7 @@ export default function CompanyPage() {
 
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url(${IMG}about_visual_bg.jpg)`,
+          backgroundImage: `url(/images/crawl/unionsystems/customer_header_img-01_5.png)`,
           backgroundSize: 'cover', backgroundPosition: 'center',
           opacity: 0.12,
         }} />
@@ -109,7 +109,7 @@ export default function CompanyPage() {
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 16, lineHeight: 1.7,
-              color: 'rgba(255,255,255,.5)', maxWidth: 480, margin: 0,
+              color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0,
             }}>
               열정과 전문성을 바탕으로 소프트웨어 유통은 물론, 보안 및 데이터 사업까지 확대하며 제2의 도약을 실현해 가고 있습니다.
             </p>
@@ -341,7 +341,7 @@ export default function CompanyPage() {
             border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 32,
           }}>
             <img
-              src="/images/uploads/about_organization_chart_30.jpg"
+              src="/images/crawl/unionsystems/about_organization_chart_30.jpg"
               alt="유니온시스템즈 조직도"
               style={{ width: '100%', height: 'auto' }}
               onError={(e) => { (e.target as HTMLImageElement).src = `${IMG}about_organization_chart.jpg`; }}
@@ -403,7 +403,7 @@ export default function CompanyPage() {
             background: '#fff', padding: 'clamp(24px, 4vw, 48px)',
           }}>
             <img
-              src="/images/uploads/about_ci_31.jpg"
+              src="/images/crawl/unionsystems/about_ci_31.jpg"
               alt="유니온시스템즈 CI"
               style={{ maxWidth: 480, width: '100%', height: 'auto' }}
               onError={(e) => { (e.target as HTMLImageElement).src = `${IMG}about_ci.jpg`; }}

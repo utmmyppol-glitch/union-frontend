@@ -23,7 +23,7 @@ const CARDS: CardData[] = [
     tag: '보안',
     desc: '매체·네트워크·출력물까지 모든 유출 경로를 차단하는 정보유출방지(DLP) 솔루션',
     chips: ['DLP', '매체 제어', '출력 보안'],
-    img: '/images/uploads/solution_list_officekeeper.jpg',
+    img: '/images/crawl/unionsystems/solution_list_officekeeper_179.jpg',
     logo: '/images/uploads/logo_officekeeper_w_84.png',
     href: '/solution/security/officekeeper',
   },

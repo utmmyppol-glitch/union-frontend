@@ -174,7 +174,7 @@ export default function SoftwarePage() {
                 position: 'absolute', right: 40, top: '50%', transform: 'translateY(-55%)',
                 opacity: .12,
               }}>
-                <img src="/images/uploads/2022/06/main_software_microsoft.png" alt="" style={{
+                <img src="/images/crawl/unionsystems/main_software_microsoft_80.png" alt="" style={{
                   height: 300, objectFit: 'contain',
                 }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               </div>

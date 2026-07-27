@@ -124,7 +124,7 @@ export default function SolutionsPage() {
           </h1>
           <p style={{
             fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
-            maxWidth: 440, margin: '0 0 32px',
+            maxWidth: 620, margin: '0 0 32px',
           }}>
             데이터 · 자산관리 · 보안 — 기업 IT 환경에 필요한<br />
             모든 솔루션을 원스톱으로 제공합니다.

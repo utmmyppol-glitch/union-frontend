@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 
-const IMG = '/images/uploads/2022/06';
+const CRAWL = '/images/crawl/unionsystems';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 
@@ -84,7 +84,7 @@ export default function OfficeKeeperPage() {
         minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden',
       }}>
         {/* BG image */}
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${IMG}/solution_officekeeper_visual_bg.jpg)`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.08 }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${CRAWL}/solution_list_officekeeper_179.jpg)`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.08 }} />
         {/* Ambient glows */}
         <div aria-hidden="true" style={{ position: 'absolute', top: '10%', right: '5%', width: 500, height: 500, background: 'radial-gradient(circle, rgba(245,51,63,.06) 0%, transparent 60%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
         <div aria-hidden="true" style={{ position: 'absolute', bottom: '15%', left: '8%', width: 400, height: 400, background: 'radial-gradient(circle, rgba(26,86,219,.04) 0%, transparent 60%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
@@ -140,7 +140,7 @@ export default function OfficeKeeperPage() {
                 background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)',
                 position: 'relative', overflow: 'hidden',
               }}>
-                <img src={`${IMG}/solution_list_officekeeper.jpg`} alt="OfficeKeeper Dashboard" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: .6 }} />
+                <img src={`${CRAWL}/solution_list_officekeeper_179.jpg`} alt="OfficeKeeper Dashboard" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: .6 }} />
                 {/* Floating panel */}
                 <div style={{
                   position: 'absolute', bottom: 20, right: -20,
