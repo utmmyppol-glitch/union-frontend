@@ -1,0 +1,58 @@
+# =============================================
+# Union Frontend - GitLab CI/CD Pipeline
+# =============================================
+
+stages:
+  - build
+  - docker
+  - deploy
+
+variables:
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+# --- Node 캐시 ---
+.node-cache: &node-cache
+  cache:
+    key: node-${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - .next/cache/
+
+# ---- Build ----
+build:
+  stage: build
+  image: node:18-alpine
+  <<: *node-cache
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 hour
+
+# ---- Docker Image ----
+docker:
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  only:
+    - main
+    - tags
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE .
+    - docker tag $DOCKER_IMAGE $CI_REGISTRY_IMAGE:latest
+    - docker push $DOCKER_IMAGE
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+# ---- Deploy ----
+deploy:
+  stage: deploy
+  only:
+    - main
+  when: manual
+  script:
+    - echo "배포 스크립트를 여기에 추가하세요"
+    - echo "앱 포트: 3000"
