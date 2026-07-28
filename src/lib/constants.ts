@@ -20,6 +20,8 @@ export const COLORS = {
   green: '#059669',
 } as const;
 
+const DATAWARE_URL = process.env.NEXT_PUBLIC_DATAWARE_URL || 'http://localhost:3001';
+
 export const NAV_ITEMS: NavItem[] = [
   {
     label: 'Company',
@@ -47,7 +49,7 @@ export const NAV_ITEMS: NavItem[] = [
         label: '데이터',
         href: '/solution/data',
         children: [
-          { label: 'DA#', href: '/solution/data/da' },
+          { label: 'DATAWARE', href: `${DATAWARE_URL}` },
         ],
       },
       {

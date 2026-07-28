@@ -97,7 +97,7 @@ export const HERO_NODES: HeroNode[] = [
     },
     ci: '#007379',
     sats: [['데이터 분류', -12, -108], ['접근 통제', 106, -56], ['문서 보안', 116, 22]],
-    href: '/solution/data/da',
+    href: process.env.NEXT_PUBLIC_DATAWARE_URL || 'http://localhost:3001',
     pitch: '전사 데이터 흐름과 접근 권한을 실시간으로 가시화합니다.',
     cta: '데이터 거버넌스 도입 상담하기',
     more: ['개인정보·중요정보 관리', 'DB 암호화'],
@@ -229,12 +229,12 @@ export interface SolutionCard {
 
 export const SOLUTION_CARDS: SolutionCard[] = [
   {
-    id: 'da',
+    id: 'dataware',
     category: 'Data Governance',
-    name: 'DA#',
-    desc: '데이터 모델링 및 설계의 표준. 기업 데이터 거버넌스의 시작입니다.',
-    tags: ['Design', 'Standardization'],
-    href: '/solution/data/da',
+    name: 'DATAWARE',
+    desc: '데이터 모델링·메타·품질·영향도 분석까지, 데이터 거버넌스 All-in-One.',
+    tags: ['Governance', 'All-in-One'],
+    href: process.env.NEXT_PUBLIC_DATAWARE_URL || 'http://localhost:3001',
     colorGroup: 'protect',
   },
   {

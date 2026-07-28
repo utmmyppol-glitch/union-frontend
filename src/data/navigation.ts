@@ -31,7 +31,7 @@ export const NAVIGATION: NavNode[] = [
       {
         label: '데이터',
         children: [
-          { label: 'DA#', href: '/solution/data/da' },
+          { label: 'DATAWARE', href: process.env.NEXT_PUBLIC_DATAWARE_URL || 'http://localhost:3001' },
         ],
       },
       {

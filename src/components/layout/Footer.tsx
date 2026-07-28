@@ -22,7 +22,7 @@ const footerNav = [
   {
     title: '솔루션',
     items: [
-      { label: 'DA#', href: '/solution/data/da' },
+      { label: 'DATAWARE', href: process.env.NEXT_PUBLIC_DATAWARE_URL || 'http://localhost:3001' },
       { label: 'NetClient', href: '/solution/asset-management/netclient' },
       { label: 'AhnLab', href: '/solution/security/ahnlab' },
       { label: 'ESTsecurity', href: '/solution/security/estsecurity' },
