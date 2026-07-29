@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import DOMPurify from 'dompurify';
 import { Container } from '@/components/ui';
 
 interface PostData {
@@ -63,7 +64,7 @@ export default function InsightDetailClient({ post }: { post: PostData | null })
                 </div>
               )}
 
-              <div className="prose prose-neutral max-w-none" style={{ color: 'var(--ink)' }} dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div className="prose prose-neutral max-w-none" style={{ color: 'var(--ink)' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
 
               <div style={{ marginTop: 64, paddingTop: 32, borderTop: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
                 <button onClick={() => router.push('/insights')} style={{ padding: '12px 24px', border: '1px solid var(--line)', background: 'transparent', fontWeight: 600, fontSize: 18, color: 'var(--ink)', cursor: 'pointer' }}>목록으로 돌아가기</button>

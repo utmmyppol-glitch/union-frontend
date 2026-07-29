@@ -1,50 +1,39 @@
 'use client';
 
 import Link from 'next/link';
+import { NAV_ITEMS } from '@/lib/constants';
+import type { NavItem } from '@/types';
 
-const footerNav = [
-  {
-    title: '회사소개',
-    items: [
-      { label: '기업소개', href: '/company/about' },
-      { label: '주요연혁', href: '/company/history' },
-    ],
-  },
-  {
-    title: '소프트웨어',
-    items: [
-      { label: 'Microsoft 365', href: '/software/microsoft' },
-      { label: 'ESTsoft', href: '/software/estsoft' },
-      { label: 'Autodesk', href: '/software/autodesk' },
-      { label: 'Adobe', href: '/software/adobe' },
-    ],
-  },
-  {
-    title: '솔루션',
-    items: [
-      { label: 'DATAWARE', href: process.env.NEXT_PUBLIC_DATAWARE_URL || 'http://localhost:3001' },
-      { label: 'NetClient', href: '/solution/asset-management/netclient' },
-      { label: 'AhnLab', href: '/solution/security/ahnlab' },
-      { label: 'ESTsecurity', href: '/solution/security/estsecurity' },
-      { label: 'OfficeKeeper', href: '/solution/security/officekeeper' },
-    ],
-  },
-  {
-    title: '고객지원',
-    items: [
-      { label: '공지사항', href: '/support/notices' },
-      { label: '1:1 문의', href: '/support/inquiry' },
-      { label: '기술지원', href: '/support/tech' },
-      { label: '이벤트', href: '/support/events' },
-    ],
-  },
-  {
-    title: '인사이트',
-    items: [
-      { label: '블로그/칼럼', href: '/insights' },
-    ],
-  },
-];
+/** NAV_ITEMS에서 Footer용 평탄화된 링크 목록을 생성 */
+function flattenChildren(item: NavItem): { label: string; href: string }[] {
+  if (!item.children?.length) {
+    return [{ label: item.label, href: item.href }];
+  }
+  return item.children.flatMap((child) =>
+    child.children?.length
+      ? child.children.map((gc) => ({ label: gc.label, href: gc.href }))
+      : [{ label: child.label, href: child.href }]
+  );
+}
+
+/** Footer에 표시할 메뉴 라벨 매핑 (영어 → 한글) */
+const FOOTER_LABELS: Record<string, string> = {
+  Company: '회사소개',
+  Software: '소프트웨어',
+  Solution: '솔루션',
+  Customer: '고객지원',
+  Insights: '인사이트',
+};
+
+/** Footer에 표시할 메뉴만 필터링 */
+const FOOTER_KEYS = ['Company', 'Software', 'Solution', 'Customer', 'Insights'];
+
+const footerNav = NAV_ITEMS
+  .filter((item) => FOOTER_KEYS.includes(item.label))
+  .map((item) => ({
+    title: FOOTER_LABELS[item.label] || item.label,
+    items: flattenChildren(item),
+  }));
 
 export default function Footer() {
   return (

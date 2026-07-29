@@ -15,6 +15,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback, type FormEvent } from 'react';
+import DOMPurify from 'dompurify';
 import { HERO_NODES, PLATFORM_CORE, type HeroNode } from '@/data/solutions';
 import { apiClient } from '@/lib/api';
 import PrivacyConsent from '@/components/ui/PrivacyConsent';
@@ -465,7 +466,7 @@ export default function HeroDiagram() {
                 >
                   <div className="hd-hface"><div className="hd-hbevel" /></div>
                   <div className="hd-hcont">
-                    <div className="hd-ic" dangerouslySetInnerHTML={{ __html: IC[n.ic] || '' }} />
+                    <div className="hd-ic" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(IC[n.ic] || '') }} />
                     <div className="hd-nm">{n.cat}</div>
                     <div className="hd-br">{n.co}</div>
                   </div>
