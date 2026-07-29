@@ -1,8 +1,27 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { NAV_ITEMS } from '@/lib/constants';
+import type { NavItem } from '@/types';
+
+interface MenuApiItem {
+  name: string;
+  url: string;
+  menuType: string;
+  isExposed: boolean;
+  children?: MenuApiItem[];
+}
+
+function apiToNavItems(items: MenuApiItem[]): NavItem[] {
+  return items.map((m) => ({
+    label: m.name,
+    href: m.url,
+    children: m.children?.length ? apiToNavItems(m.children) : undefined,
+  }));
+}
+
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union').replace('/api/union', '');
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -11,6 +30,17 @@ export default function Header() {
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [navItems, setNavItems] = useState<NavItem[]>(NAV_ITEMS);
+
+  // 메뉴 API에서 가져오기 (실패 시 하드코딩 폴백 유지)
+  useEffect(() => {
+    fetch(`${API_BASE}/api/union/menu`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data: MenuApiItem[] | null) => {
+        if (data && data.length > 0) setNavItems(apiToNavItems(data));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -24,7 +54,7 @@ export default function Header() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
-  const mainNavItems = NAV_ITEMS.filter(
+  const mainNavItems = navItems.filter(
     (item) => item.label !== '도입문의'
   );
 
