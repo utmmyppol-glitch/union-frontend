@@ -3,7 +3,9 @@ set -eu
 NETWORK="union-net"
 ALIAS="union-frontend-active"
 IMAGE="${DOCKER_IMAGE:?DOCKER_IMAGE not set}"
-CURL_IMAGE="curlimages/curl:8.10.1"
+
+# 네트워크 없으면 최초 1회 생성
+docker network create "$NETWORK" >/dev/null 2>&1 || true
 
 if docker ps --format '{{.Names}}' | grep -qx union-frontend-blue; then
   CURRENT=union-frontend-blue
@@ -13,20 +15,22 @@ else
   NEW=union-frontend-blue
 fi
 
-echo "==> Pulling $IMAGE"
-docker pull "$IMAGE"
+echo "==> Using locally built image $IMAGE"
+docker image inspect "$IMAGE" >/dev/null 2>&1 || {
+  echo "ERROR: 이미지 $IMAGE 가 로컬에 없습니다. docker stage가 먼저 빌드했는지 확인하세요."
+  exit 1
+}
 
 docker rm -f "$NEW" >/dev/null 2>&1 || true
 
-echo "==> Starting $NEW (not yet receiving traffic)"
-docker run -d --name "$NEW" --restart unless-stopped "$IMAGE"
+echo "==> Starting $NEW on $NETWORK (not yet receiving traffic via $ALIAS)"
+docker run -d --name "$NEW" --network "$NETWORK" --restart unless-stopped "$IMAGE"
 
 echo "==> Health checking $NEW"
-NEW_IP=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' "$NEW")
 OK=0
 i=0
-while [ "$i" -lt 10 ]; do
-  if docker run --rm "$CURL_IMAGE" -sf "http://$NEW_IP:3000/" >/dev/null 2>&1; then
+while [ "$i" -lt 15 ]; do
+  if docker run --rm --network "$NETWORK" curlimages/curl:8.10.1 -sf "http://$NEW:3000/" >/dev/null 2>&1; then
     OK=1
     break
   fi
@@ -40,10 +44,9 @@ if [ "$OK" -ne 1 ]; then
   exit 1
 fi
 
-echo "==> Switching traffic: attaching $NEW to $ALIAS"
+echo "==> Switching traffic: attaching $NEW alias $ALIAS"
 docker network connect --alias "$ALIAS" "$NETWORK" "$NEW"
 
-# Let in-flight connections drain / DNS caches settle before removing the old one.
 sleep 2
 
 if docker ps -a --format '{{.Names}}' | grep -qx "$CURRENT"; then
