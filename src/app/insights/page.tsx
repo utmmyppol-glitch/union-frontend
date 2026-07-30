@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import InsightsPageClient from './InsightsPageClient';
+import { fetchPageLayout, CmsPageRender } from '@/lib/cms-page';
 
 export const metadata: Metadata = {
   title: '인사이트',
@@ -37,6 +38,9 @@ async function getInsights() {
 }
 
 export default async function InsightsPage() {
+  const cmsData = await fetchPageLayout('insights');
+  if (cmsData) return <CmsPageRender data={cmsData} />;
+
   const data = await getInsights();
   return <InsightsPageClient initialData={data} />;
 }
