@@ -1,6 +1,5 @@
 import type { CustomerStory } from '@/types';
 import CasesPageClient from './CasesPageClient';
-import { fetchPageLayout, CmsPageRender } from '@/lib/cms-page';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 
@@ -26,9 +25,6 @@ async function getCustomerStories() {
 }
 
 export default async function CasesPage() {
-  const cmsData = await fetchPageLayout('support-cases');
-  if (cmsData) return <CmsPageRender data={cmsData} />;
-
   const data = await getCustomerStories();
   return <CasesPageClient initialData={data} />;
 }

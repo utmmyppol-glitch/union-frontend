@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import NoticesPageClient from './NoticesPageClient';
-import { fetchPageLayout, CmsPageRender } from '@/lib/cms-page';
 
 export const metadata: Metadata = {
   title: '공지사항',
@@ -46,9 +45,6 @@ async function getNotices() {
 }
 
 export default async function NoticesPage() {
-  const cmsData = await fetchPageLayout('support-notices');
-  if (cmsData) return <CmsPageRender data={cmsData} />;
-
   const data = await getNotices();
   return <NoticesPageClient initialData={data} />;
 }
