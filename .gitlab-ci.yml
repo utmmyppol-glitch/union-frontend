@@ -1,35 +1,31 @@
-# =============================================
-# Union Frontend - GitLab CI/CD Pipeline
-# =============================================
-
 stages:
   - build
   - docker
   - deploy
+  - notify
 
 variables:
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-
-# --- Node 캐시 ---
-.node-cache: &node-cache
-  cache:
-    key: node-${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-      - .next/cache/
 
 # ---- Build ----
 build:
   stage: build
   image: node:18-alpine
-  <<: *node-cache
+  cache:
+    key:
+      files: [package-lock.json]
+    paths: [node_modules/]
   script:
     - npm ci
+    - npm run lint --if-present
     - npm run build
   artifacts:
     paths:
       - .next/
     expire_in: 1 hour
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # ---- Docker Image ----
 docker:
@@ -37,9 +33,9 @@ docker:
   image: docker:latest
   services:
     - docker:dind
-  only:
-    - main
-    - tags
+  needs: ["build"]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $DOCKER_IMAGE .
@@ -50,9 +46,63 @@ docker:
 # ---- Deploy ----
 deploy:
   stage: deploy
-  only:
-    - main
-  when: manual
+  image: alpine:latest
+  needs: ["docker"]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
   script:
-    - echo "배포 스크립트를 여기에 추가하세요"
-    - echo "앱 포트: 3000"
+    - scp deploy/deploy.sh $DEPLOY_USER@$DEPLOY_HOST:/tmp/union-frontend-deploy.sh
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY" <<< "$CI_REGISTRY_PASSWORD"
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "chmod +x /tmp/union-frontend-deploy.sh && DOCKER_IMAGE=$DOCKER_IMAGE /tmp/union-frontend-deploy.sh"
+
+# ---- Notify (Teams) ----
+notify:success:
+  stage: notify
+  image: alpine:latest
+  needs: ["deploy"]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $TEAMS_WEBHOOK_URL'
+      when: on_success
+  before_script: [apk add --no-cache curl]
+  script:
+    - |
+      curl -sS -X POST "$TEAMS_WEBHOOK_URL" -H "Content-Type: application/json" -d @- <<'JSON'
+      {"type":"message","attachments":[{"contentType":"application/vnd.microsoft.card.adaptive","content":{
+        "type":"AdaptiveCard","$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.4",
+        "body":[
+          {"type":"TextBlock","size":"Large","weight":"Bolder","color":"Good","text":"🚀 배포 완료: '"$CI_PROJECT_NAME"'"},
+          {"type":"FactSet","facts":[
+            {"title":"프로젝트","value":"'"$CI_PROJECT_PATH"'"},
+            {"title":"작업자","value":"'"$GITLAB_USER_NAME"'"},
+            {"title":"커밋","value":"'"$CI_COMMIT_SHORT_SHA"'"}
+          ]}
+        ]}}]}
+      JSON
+
+notify:failure:
+  stage: notify
+  image: alpine:latest
+  needs: ["deploy"]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $TEAMS_WEBHOOK_URL'
+      when: on_failure
+  before_script: [apk add --no-cache curl]
+  script:
+    - |
+      curl -sS -X POST "$TEAMS_WEBHOOK_URL" -H "Content-Type: application/json" -d @- <<'JSON'
+      {"type":"message","attachments":[{"contentType":"application/vnd.microsoft.card.adaptive","content":{
+        "type":"AdaptiveCard","$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.4",
+        "body":[
+          {"type":"TextBlock","size":"Large","weight":"Bolder","color":"Attention","text":"❌ 배포 실패: '"$CI_PROJECT_NAME"'"},
+          {"type":"FactSet","facts":[
+            {"title":"프로젝트","value":"'"$CI_PROJECT_PATH"'"},
+            {"title":"파이프라인","value":"'"$CI_PIPELINE_URL"'"}
+          ]}
+        ]}}]}
+      JSON
