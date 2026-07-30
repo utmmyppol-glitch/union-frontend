@@ -75,7 +75,7 @@ notify:success:
                 { "type": "FactSet", "facts": [
                   { "title": "프로젝트", "value": "$CI_PROJECT_PATH" },
                   { "title": "작업자", "value": "$GITLAB_USER_NAME" },
-                  { "title": "커밋", "value": "$CI_COMMIT_SHORT_SHA" }
+                  { "title": "커밋", "value": "[$CI_COMMIT_SHORT_SHA]($CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA)" }
                 ]}
               ]
             }
