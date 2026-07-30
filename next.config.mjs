@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  images: {
+    remotePatterns: [
+      { protocol: 'http', hostname: 'localhost', port: '8080' },
+      { protocol: 'https', hostname: '*.unionsystems.co.kr' },
+    ],
+  },
   async headers() {
     return [
       {
