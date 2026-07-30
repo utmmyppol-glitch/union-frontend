@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const IMG = '/images/uploads/2022/06/';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 
 const COMPANY_TABS = [
   { label: '기업소개', href: '/company' },
@@ -12,36 +13,98 @@ const COMPANY_TABS = [
   { label: '오시는 길', href: '/company/location' },
 ];
 
-const CORE_VALUES = [
-  { num: '01', title: '신뢰', desc: '2010년부터 축적된 경험과 200여 개 고객사의 검증된 파트너십으로 변함없는 신뢰를 드립니다.' },
-  { num: '02', title: '전문성', desc: '소프트웨어, 보안, 데이터, 자산관리 각 분야 전문가로 구성된 소수정예 팀이 최적의 솔루션을 제공합니다.' },
-  { num: '03', title: '파트너십', desc: '단순 공급이 아닌 도입부터 운영, 유지보수까지 전 과정을 함께하는 진정한 IT 파트너가 되겠습니다.' },
-];
-
-const STRENGTHS = [
-  { img: '/images/crawl/unionsystems/sub_unionsystems_point_01_24.jpg', title: '보안', desc: '안랩, 이스트소프트, 오피스키퍼 등 기업용 PC 통합보안 전문 솔루션을 구축, 운영합니다.' },
-  { img: '/images/crawl/unionsystems/sub_unionsystems_point_02_25.jpg', title: '자산관리', desc: '넷클라이언트 등 기업 IT환경에 적합한 SW, HW 자산관리를 지원합니다.' },
-  { img: '/images/crawl/unionsystems/sub_unionsystems_point_03_26.jpg', title: '데이터', desc: '엔코아의 DA# 공인총판으로 데이터모델링 툴의 유통, 기술지원, 교육을 지원합니다.' },
-  { img: '/images/crawl/unionsystems/sub_unionsystems_point_04_27.jpg', title: '글로벌 파트너십', desc: 'Microsoft, Adobe, Autodesk 등 글로벌 소프트웨어 공식 파트너로서 정품 라이선스를 공급합니다.' },
-];
-
-const STATS = [
+/* ── 기본값 (DB에 값 없으면 이대로 표시) ── */
+const DEFAULT_HERO = {
+  title: '복잡한 기업 IT를',
+  accent: '하나로 연결',
+  desc: '열정과 전문성을 바탕으로 소프트웨어 유통은 물론, 보안 및 데이터 사업까지 확대하며 제2의 도약을 실현해 가고 있습니다.',
+};
+const DEFAULT_OVERVIEW = {
+  title: 'IT Solution & Consulting 전문기업',
+  text: '주식회사 유니온시스템즈는 2010년 4월 유니온소프트를 시작으로 기업·공공기관을 대상으로 고객의 IT 환경에 필요한 SW, 솔루션을 공급하여 최적의 IT 인프라를 만들어 온 IT Solution & Consulting 전문기업입니다.',
+};
+const DEFAULT_STATS = [
   { num: '16', label: '년 업력' },
   { num: '200+', label: '고객사' },
   { num: '4', label: '전문 사업부' },
   { num: '50+', label: '파트너사' },
 ];
-
-const DEPTS = [
+const DEFAULT_STRENGTHS = [
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_01_24.jpg', title: '보안', desc: '안랩, 이스트소프트, 오피스키퍼 등 기업용 PC 통합보안 전문 솔루션을 구축, 운영합니다.' },
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_02_25.jpg', title: '자산관리', desc: '넷클라이언트 등 기업 IT환경에 적합한 SW, HW 자산관리를 지원합니다.' },
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_03_26.jpg', title: '데이터', desc: '엔코아의 DA# 공인총판으로 데이터모델링 툴의 유통, 기술지원, 교육을 지원합니다.' },
+  { img: '/images/crawl/unionsystems/sub_unionsystems_point_04_27.jpg', title: '글로벌 파트너십', desc: 'Microsoft, Adobe, Autodesk 등 글로벌 소프트웨어 공식 파트너로서 정품 라이선스를 공급합니다.' },
+];
+const DEFAULT_VALUES = [
+  { num: '01', title: '신뢰', desc: '2010년부터 축적된 경험과 200여 개 고객사의 검증된 파트너십으로 변함없는 신뢰를 드립니다.' },
+  { num: '02', title: '전문성', desc: '소프트웨어, 보안, 데이터, 자산관리 각 분야 전문가로 구성된 소수정예 팀이 최적의 솔루션을 제공합니다.' },
+  { num: '03', title: '파트너십', desc: '단순 공급이 아닌 도입부터 운영, 유지보수까지 전 과정을 함께하는 진정한 IT 파트너가 되겠습니다.' },
+];
+const DEFAULT_DEPTS = [
   { name: '솔루션사업부', desc: 'DATA / SW / SI 사업팀' },
   { name: '영업부', desc: '공공영업 / 기업영업 / 교육영업' },
   { name: '서비스사업부', desc: '기술지원 팀' },
   { name: '사업지원부', desc: '리뉴얼 / 마케팅 / 영업지원' },
 ];
+const DEFAULT_ORG = {
+  img: '/images/crawl/unionsystems/about_organization_chart_30.jpg',
+  title: '소수정예 전문가 조직',
+  text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.',
+};
+const DEFAULT_CI = {
+  img: '/images/crawl/unionsystems/about_ci_31.jpg',
+  title: '기업 아이덴티티',
+  subtitle: 'UNION RED는 고객을 향한 열정을 담고 있습니다',
+  quote: '고객과 신뢰로 만들어진 유니온시스템즈,\n함께 구축하겠다는 열정을 담고 있습니다.',
+  ceo: 'CEO 홍민석',
+};
+const DEFAULT_CTA = {
+  title: '유니온시스템즈와 함께 시작하세요',
+  desc: '귀사의 IT 환경에 최적화된 솔루션을 제안해 드립니다.',
+};
+
+const CONTENT_KEYS = [
+  'company_hero', 'company_overview', 'company_stats', 'company_strengths',
+  'company_values', 'company_depts', 'company_org', 'company_ci', 'company_cta',
+];
+
+function safeParse<T>(json: string | undefined, fallback: T): T {
+  if (!json) return fallback;
+  try { return JSON.parse(json); } catch { return fallback; }
+}
 
 export default function CompanyPage() {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+
+  const [hero, setHero] = useState(DEFAULT_HERO);
+  const [overview, setOverview] = useState(DEFAULT_OVERVIEW);
+  const [stats, setStats] = useState(DEFAULT_STATS);
+  const [strengths, setStrengths] = useState(DEFAULT_STRENGTHS);
+  const [values, setValues] = useState(DEFAULT_VALUES);
+  const [depts, setDepts] = useState(DEFAULT_DEPTS);
+  const [org, setOrg] = useState(DEFAULT_ORG);
+  const [ci, setCi] = useState(DEFAULT_CI);
+  const [cta, setCta] = useState(DEFAULT_CTA);
+
+  useEffect(() => {
+    const base = API_URL.replace(/\/api\/union\/?$/, '');
+    fetch(`${base}/api/union/content?keys=${CONTENT_KEYS.join(',')}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data: Record<string, string> | null) => {
+        if (!data) return;
+        if (data.company_hero) setHero(safeParse(data.company_hero, DEFAULT_HERO));
+        if (data.company_overview) setOverview(safeParse(data.company_overview, DEFAULT_OVERVIEW));
+        if (data.company_stats) setStats(safeParse(data.company_stats, DEFAULT_STATS));
+        if (data.company_strengths) setStrengths(safeParse(data.company_strengths, DEFAULT_STRENGTHS));
+        if (data.company_values) setValues(safeParse(data.company_values, DEFAULT_VALUES));
+        if (data.company_depts) setDepts(safeParse(data.company_depts, DEFAULT_DEPTS));
+        if (data.company_org) setOrg(safeParse(data.company_org, DEFAULT_ORG));
+        if (data.company_ci) setCi(safeParse(data.company_ci, DEFAULT_CI));
+        if (data.company_cta) setCta(safeParse(data.company_cta, DEFAULT_CTA));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const els = pageRef.current?.querySelectorAll('.reveal');
@@ -104,14 +167,14 @@ export default function CompanyPage() {
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 20px',
             }}>
-              복잡한 기업 IT를<br />
-              <span style={{ color: 'var(--accent)' }}>하나로 연결</span>합니다
+              {hero.title}<br />
+              <span style={{ color: 'var(--accent)' }}>{hero.accent}</span>합니다
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 16, lineHeight: 1.7,
               color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0,
             }}>
-              열정과 전문성을 바탕으로 소프트웨어 유통은 물론, 보안 및 데이터 사업까지 확대하며 제2의 도약을 실현해 가고 있습니다.
+              {hero.desc}
             </p>
 
             {/* Inline tab nav */}
@@ -157,12 +220,10 @@ export default function CompanyPage() {
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 16px',
             }}>
-              IT Solution &amp; Consulting 전문기업
+              {overview.title}
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 680, margin: 0 }}>
-              주식회사 유니온시스템즈는 2010년 4월 유니온소프트를 시작으로 기업·공공기관을 대상으로
-              고객의 IT 환경에 필요한 SW, 솔루션을 공급하여 최적의 IT 인프라를 만들어 온
-              IT Solution &amp; Consulting 전문기업입니다.
+              {overview.text}
             </p>
           </div>
 
@@ -170,7 +231,7 @@ export default function CompanyPage() {
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24,
             borderTop: '1px solid var(--line)', paddingTop: 40,
           }}>
-            {STATS.map((s) => (
+            {stats.map((s) => (
               <div key={s.label} style={{ textAlign: 'center' }}>
                 <p style={{
                   fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic',
@@ -215,7 +276,7 @@ export default function CompanyPage() {
           <div className="about-strengths" style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24,
           }}>
-            {STRENGTHS.map((item, idx) => (
+            {strengths.map((item, idx) => (
               <div
                 key={item.title}
                 className="reveal about-str-card"
@@ -285,7 +346,7 @@ export default function CompanyPage() {
           <div className="about-values" style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20,
           }}>
-            {CORE_VALUES.map((v, idx) => (
+            {values.map((v, idx) => (
               <div
                 key={v.title}
                 className="reveal about-val-card"
@@ -329,10 +390,10 @@ export default function CompanyPage() {
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px',
             }}>
-              소수정예 전문가 조직
+              {org.title}
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}>
-              각 분야의 전문가들이 고객의 IT 환경을 책임집니다.
+              {org.text}
             </p>
           </div>
 
@@ -341,7 +402,7 @@ export default function CompanyPage() {
             border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 32,
           }}>
             <img
-              src="/images/crawl/unionsystems/about_organization_chart_30.jpg"
+              src={org.img}
               alt="유니온시스템즈 조직도"
               style={{ width: '100%', height: 'auto' }}
               onError={(e) => { (e.target as HTMLImageElement).src = `${IMG}about_organization_chart.jpg`; }}
@@ -352,7 +413,7 @@ export default function CompanyPage() {
           <div className="about-depts" style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16,
           }}>
-            {DEPTS.map((d, idx) => (
+            {depts.map((d, idx) => (
               <div
                 key={d.name}
                 className="reveal"
@@ -391,10 +452,10 @@ export default function CompanyPage() {
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px',
             }}>
-              기업 아이덴티티
+              {ci.title}
             </h2>
             <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '0 0 40px' }}>
-              UNION RED는 고객을 향한 열정을 담고 있습니다
+              {ci.subtitle}
             </p>
           </div>
 
@@ -403,7 +464,7 @@ export default function CompanyPage() {
             background: '#fff', padding: 'clamp(24px, 4vw, 48px)',
           }}>
             <img
-              src="/images/crawl/unionsystems/about_ci_31.jpg"
+              src={ci.img}
               alt="유니온시스템즈 CI"
               style={{ maxWidth: 480, width: '100%', height: 'auto' }}
               onError={(e) => { (e.target as HTMLImageElement).src = `${IMG}about_ci.jpg`; }}
@@ -417,14 +478,16 @@ export default function CompanyPage() {
               fontSize: 'clamp(18px, 2.5vw, 24px)', fontWeight: 400,
               lineHeight: 1.5, color: 'var(--ink)', margin: '0 0 16px',
             }}>
-              &ldquo;고객과 신뢰로 만들어진 유니온시스템즈,<br />함께 구축하겠다는 열정을 담고 있습니다.&rdquo;
+              &ldquo;{ci.quote.split('\n').map((line, i) => (
+                <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
+              ))}&rdquo;
             </blockquote>
             <p style={{
               fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
               fontSize: 12, fontWeight: 500, letterSpacing: '.1em',
               color: 'var(--ink2)', margin: 0,
             }}>
-              CEO 홍민석
+              {ci.ceo}
             </p>
           </div>
         </div>
@@ -451,12 +514,12 @@ export default function CompanyPage() {
             fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
             lineHeight: 1.1, color: '#fff', margin: '0 0 12px', letterSpacing: '-.04em',
           }}>
-            유니온시스템즈와 함께 시작하세요
+            {cta.title}
           </h2>
           <p className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.5)', margin: '0 0 32px',
           }}>
-            귀사의 IT 환경에 최적화된 솔루션을 제안해 드립니다.
+            {cta.desc}
           </p>
           <Link
             href="/contact"
