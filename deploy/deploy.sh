@@ -45,7 +45,8 @@ if [ "$OK" -ne 1 ]; then
 fi
 
 echo "==> Switching traffic: attaching $NEW alias $ALIAS"
-docker network connect --alias "$ALIAS" "$NETWORK" "$NEW"
+docker network disconnect "$NETWORK" "$NEW"
+docker network connect --alias "$ALIAS" --alias "$NEW" "$NETWORK" "$NEW"
 
 sleep 2
 
