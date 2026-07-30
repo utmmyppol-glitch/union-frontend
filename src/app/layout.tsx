@@ -5,6 +5,40 @@ import Footer from "@/components/layout/Footer";
 import ScrollReveal from "@/components/layout/ScrollReveal";
 import ChannelTalk from "@/components/ChannelTalk";
 import UniMascot from "@/components/UniMascot";
+import type { NavItem } from "@/types";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/union";
+
+interface MenuApiItem {
+  name: string;
+  url: string;
+  menuType: string;
+  isExposed: boolean;
+  children?: MenuApiItem[];
+}
+
+function apiToNavItems(items: MenuApiItem[]): NavItem[] {
+  return items
+    .filter((m) => m.isExposed)
+    .map((m) => ({
+      label: m.name,
+      href: m.url,
+      children: m.children?.length ? apiToNavItems(m.children) : undefined,
+    }));
+}
+
+async function getMenu(): Promise<NavItem[] | null> {
+  try {
+    const base = API_URL.replace(/\/api\/union\/?$/, "");
+    const res = await fetch(`${base}/api/union/menu`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    const data: MenuApiItem[] = await res.json();
+    if (!data || data.length === 0) return null;
+    return apiToNavItems(data);
+  } catch {
+    return null;
+  }
+}
 
 
 export const metadata: Metadata = {
@@ -34,18 +68,19 @@ export const viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const ssrMenu = await getMenu();
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `if('scrollRestoration' in history) history.scrollRestoration='manual'; window.scrollTo(0,0);` }} />
       </head>
       <body className="antialiased">
-        <Header />
+        <Header ssrMenu={ssrMenu} />
         <main>{children}</main>
         <Footer />
         <ScrollReveal />

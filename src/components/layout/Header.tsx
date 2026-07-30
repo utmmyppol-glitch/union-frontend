@@ -5,42 +5,16 @@ import Link from 'next/link';
 import { NAV_ITEMS } from '@/lib/constants';
 import type { NavItem } from '@/types';
 
-interface MenuApiItem {
-  name: string;
-  url: string;
-  menuType: string;
-  isExposed: boolean;
-  children?: MenuApiItem[];
-}
-
-function apiToNavItems(items: MenuApiItem[]): NavItem[] {
-  return items.map((m) => ({
-    label: m.name,
-    href: m.url,
-    children: m.children?.length ? apiToNavItems(m.children) : undefined,
-  }));
-}
-
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union').replace('/api/union', '');
-
-export default function Header() {
+export default function Header({ ssrMenu }: { ssrMenu?: NavItem[] | null }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [navItems, setNavItems] = useState<NavItem[]>(NAV_ITEMS);
 
-  // 메뉴 API에서 가져오기 (실패 시 하드코딩 폴백 유지)
-  useEffect(() => {
-    fetch(`${API_BASE}/api/union/menu`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((data: MenuApiItem[] | null) => {
-        if (data && data.length > 0) setNavItems(apiToNavItems(data));
-      })
-      .catch(() => {});
-  }, []);
+  // SSR에서 받은 메뉴 사용, 없으면 하드코딩 fallback
+  const navItems: NavItem[] = ssrMenu && ssrMenu.length > 0 ? ssrMenu : NAV_ITEMS;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
