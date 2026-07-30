@@ -43,7 +43,7 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
     }, { threshold: 0.08 });
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [notices]);
+  }, [data]);
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);

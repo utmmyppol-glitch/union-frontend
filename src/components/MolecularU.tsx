@@ -62,7 +62,7 @@ function MicroStructure({ solution, onClose, onBrochure }: {
       const angle = (-90 + k * (360 / N)) * (Math.PI / 180);
       return { x: CX + Math.cos(angle) * ORBIT, y: CY + Math.sin(angle) * ORBIT };
     });
-  }, [N, feats]);
+  }, [N, feats, CX, CY]);
 
   const arcPaths = useMemo(() => {
     return nodePositions.map((pos, k) => {
