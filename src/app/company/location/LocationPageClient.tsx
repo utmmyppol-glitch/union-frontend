@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SITE } from '@/lib/constants';
-import { E, safeParse, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const COMPANY_TABS = [
   { label: '기업소개', href: '/company' },
@@ -38,7 +38,7 @@ const DEFAULT_CTA = { text: '방문 전 사전 연락을 부탁드립니다.' };
 export default function LocationPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const [editMode, setEditMode] = useState(false);
+  const editMode = useEditMode();
 
   // SSR에서 받은 데이터로 초기화
   const [hero, setHero] = useState(() => safeParse(ssrContent.location_hero, DEFAULT_HERO));
@@ -49,14 +49,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
   const [parking, setParking] = useState(() => safeParse(ssrContent.location_parking, DEFAULT_PARKING));
   const [cta, setCta] = useState(() => safeParse(ssrContent.location_cta, DEFAULT_CTA));
 
-  // 편집모드 감지
-  useEffect(() => {
-    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('_edit') === '1') {
-      setEditMode(true);
-    }
-  }, []);
-
-  // 편집모드 매니페스트 전송
+  // 편집모드 매니페스트 전송 (pathname 변화마다 재전송)
   useEditableManifest(editMode);
 
   // postMessage 수신 (편집모드에서만)

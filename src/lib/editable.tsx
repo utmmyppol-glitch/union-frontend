@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 /* ── JSON 안전 파싱 ── */
 export function safeParse<T>(json: string | undefined, fallback: T): T {
@@ -9,8 +10,28 @@ export function safeParse<T>(json: string | undefined, fallback: T): T {
   try { return JSON.parse(json); } catch { return fallback; }
 }
 
-/* ── 편집모드 매니페스트 전송 훅 ── */
+/* ── 편집모드 감지 훅 (sessionStorage로 클라이언트 네비게이션 시에도 유지) ── */
+const EDIT_STORAGE_KEY = '__cms_edit';
+
+export function useEditMode(): boolean {
+  const [editMode, setEditMode] = useState(false);
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('_edit') === '1';
+    const inIframe = window.self !== window.top;
+    if (fromUrl) {
+      if (inIframe) sessionStorage.setItem(EDIT_STORAGE_KEY, '1');
+      setEditMode(true);
+    } else if (inIframe && sessionStorage.getItem(EDIT_STORAGE_KEY) === '1') {
+      setEditMode(true);
+    }
+  }, []);
+  return editMode;
+}
+
+/* ── 편집모드 매니페스트 전송 훅 (pathname 변화마다 재전송) ── */
 export function useEditableManifest(editMode: boolean) {
+  const pathname = usePathname();
+
   useEffect(() => {
     if (!editMode) return;
 
@@ -22,28 +43,16 @@ export function useEditableManifest(editMode: boolean) {
           ? (el as HTMLImageElement).src
           : el.textContent || '',
       }));
+      console.log('[manifest]', pathname, fields.length);
       window.parent.postMessage({
         type: 'editable-manifest',
         fields,
-        path: window.location.pathname,
+        path: pathname,
       }, '*');
     };
 
-    // 내부 링크 클릭 시 ?_edit=1 보존
-    const interceptLinks = (e: MouseEvent) => {
-      const anchor = (e.target as HTMLElement).closest('a[href]') as HTMLAnchorElement | null;
-      if (!anchor) return;
-      const href = anchor.getAttribute('href');
-      if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
-      // 내부 링크 — ?_edit=1 붙여서 이동
-      e.preventDefault();
-      const url = new URL(href, window.location.origin);
-      url.searchParams.set('_edit', '1');
-      window.location.href = url.toString();
-    };
-    document.addEventListener('click', interceptLinks, true);
-
-    const timer = setTimeout(sendManifest, 500);
+    // DOM이 안정화된 후 전송 (페이지 전환 직후 렌더링 대기)
+    const timer = setTimeout(sendManifest, 400);
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'request-manifest') sendManifest();
     };
@@ -51,9 +60,8 @@ export function useEditableManifest(editMode: boolean) {
     return () => {
       clearTimeout(timer);
       window.removeEventListener('message', handler);
-      document.removeEventListener('click', interceptLinks, true);
     };
-  }, [editMode]);
+  }, [editMode, pathname]); // ← pathname 변화마다 재전송
 }
 
 /* ── EditableText ── */

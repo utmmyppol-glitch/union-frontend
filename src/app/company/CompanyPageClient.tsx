@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { E, OptImg, safeParse, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, OptImg, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 // fallback 이미지 경로 (onError 시 사용하지 않음 — next/image가 대체)
 
@@ -42,7 +42,7 @@ const DEFAULT_CTA = { title: '유니온시스템즈와 함께 시작하세요', 
 export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const [editMode, setEditMode] = useState(false);
+  const editMode = useEditMode();
 
   // SSR에서 받은 데이터로 초기화 (hydration 즉시)
   const [hero, setHero] = useState(() => safeParse(ssrContent.company_hero, DEFAULT_HERO));
@@ -55,14 +55,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
   const [ci, setCi] = useState(() => safeParse(ssrContent.company_ci, DEFAULT_CI));
   const [cta, setCta] = useState(() => safeParse(ssrContent.company_cta, DEFAULT_CTA));
 
-  // 편집모드 감지
-  useEffect(() => {
-    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('_edit') === '1') {
-      setEditMode(true);
-    }
-  }, []);
-
-  // 편집모드 매니페스트 전송
+  // 편집모드 매니페스트 전송 (pathname 변화마다 재전송)
   useEditableManifest(editMode);
 
   // postMessage 수신 (편집모드에서만)
