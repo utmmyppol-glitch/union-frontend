@@ -13,6 +13,7 @@ export function safeParse<T>(json: string | undefined, fallback: T): T {
 export function useEditableManifest(editMode: boolean) {
   useEffect(() => {
     if (!editMode) return;
+
     const sendManifest = () => {
       const fields = Array.from(document.querySelectorAll('[data-editable]')).map(el => ({
         id: el.getAttribute('data-editable')!,
@@ -21,14 +22,37 @@ export function useEditableManifest(editMode: boolean) {
           ? (el as HTMLImageElement).src
           : el.textContent || '',
       }));
-      window.parent.postMessage({ type: 'editable-manifest', fields }, '*');
+      window.parent.postMessage({
+        type: 'editable-manifest',
+        fields,
+        path: window.location.pathname,
+      }, '*');
     };
+
+    // 내부 링크 클릭 시 ?_edit=1 보존
+    const interceptLinks = (e: MouseEvent) => {
+      const anchor = (e.target as HTMLElement).closest('a[href]') as HTMLAnchorElement | null;
+      if (!anchor) return;
+      const href = anchor.getAttribute('href');
+      if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+      // 내부 링크 — ?_edit=1 붙여서 이동
+      e.preventDefault();
+      const url = new URL(href, window.location.origin);
+      url.searchParams.set('_edit', '1');
+      window.location.href = url.toString();
+    };
+    document.addEventListener('click', interceptLinks, true);
+
     const timer = setTimeout(sendManifest, 500);
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'request-manifest') sendManifest();
     };
     window.addEventListener('message', handler);
-    return () => { clearTimeout(timer); window.removeEventListener('message', handler); };
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('message', handler);
+      document.removeEventListener('click', interceptLinks, true);
+    };
   }, [editMode]);
 }
 
