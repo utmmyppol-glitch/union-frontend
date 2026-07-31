@@ -19,7 +19,6 @@ interface MenuApiItem {
 
 function apiToNavItems(items: MenuApiItem[]): NavItem[] {
   return items
-    .filter((m) => m.isExposed)
     .map((m) => ({
       label: m.name,
       href: m.url,
@@ -30,7 +29,7 @@ function apiToNavItems(items: MenuApiItem[]): NavItem[] {
 async function getMenu(): Promise<NavItem[] | null> {
   try {
     const base = API_URL.replace(/\/api\/union\/?$/, "");
-    const res = await fetch(`${base}/api/union/menu`, { next: { revalidate: 60 } });
+    const res = await fetch(`${base}/api/union/menus`, { next: { revalidate: 60 } });
     if (!res.ok) return null;
     const data: MenuApiItem[] = await res.json();
     if (!data || data.length === 0) return null;
