@@ -1,7 +1,7 @@
 import LocationPageClient from './LocationPageClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['location_hero','location_address','location_contact','location_transport','location_cta'];
+const CONTENT_KEYS = ['location_hero','location_address','location_contact','location_subway','location_bus','location_parking','location_cta'];
 
 async function getLocationContent(): Promise<Record<string, string>> {
   try {

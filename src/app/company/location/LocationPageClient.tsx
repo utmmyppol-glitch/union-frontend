@@ -23,17 +23,15 @@ const DEFAULT_CONTACT = {
   emailSales: SITE.emailSales, emailGeneral: SITE.emailGeneral,
   hours: '09:00 – 18:00', hoursNote: '평일 운영 · 점심 12:00–13:00 · 주말/공휴일 휴무',
 };
-const DEFAULT_TRANSPORT = {
-  subway: [
-    { line: '2호선 성수역', desc: '3번 출구 도보 5분' },
-    { line: '수인분당선 서울숲역', desc: '4번 출구 도보 10분' },
-  ],
-  bus: [
-    { type: '간선버스', routes: '141, 148, 302, 421' },
-    { type: '지선버스', routes: '2016, 2224, 2413' },
-  ],
-  parking: { title: '건물 내 지하주차장', desc: '방문 시 안내데스크 문의' },
-};
+const DEFAULT_SUBWAY = [
+  { line: '2호선 성수역', desc: '3번 출구 도보 5분' },
+  { line: '수인분당선 서울숲역', desc: '4번 출구 도보 10분' },
+];
+const DEFAULT_BUS = [
+  { type: '간선버스', routes: '141, 148, 302, 421' },
+  { type: '지선버스', routes: '2016, 2224, 2413' },
+];
+const DEFAULT_PARKING = { title: '건물 내 지하주차장', desc: '방문 시 안내데스크 문의' };
 const DEFAULT_CTA = { text: '방문 전 사전 연락을 부탁드립니다.' };
 
 function safeParse<T>(json: string | undefined, fallback: T): T {
@@ -62,7 +60,9 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
   const [hero, setHero] = useState(() => safeParse(ssrContent.location_hero, DEFAULT_HERO));
   const [address, setAddress] = useState(() => safeParse(ssrContent.location_address, DEFAULT_ADDRESS));
   const [contact, setContact] = useState(() => safeParse(ssrContent.location_contact, DEFAULT_CONTACT));
-  const [transport, setTransport] = useState(() => safeParse(ssrContent.location_transport, DEFAULT_TRANSPORT));
+  const [subway, setSubway] = useState(() => safeParse(ssrContent.location_subway, DEFAULT_SUBWAY));
+  const [bus, setBus] = useState(() => safeParse(ssrContent.location_bus, DEFAULT_BUS));
+  const [parking, setParking] = useState(() => safeParse(ssrContent.location_parking, DEFAULT_PARKING));
   const [cta, setCta] = useState(() => safeParse(ssrContent.location_cta, DEFAULT_CTA));
 
   // 편집모드 감지
@@ -79,7 +79,9 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
       location_hero: setHero as (v: unknown) => void,
       location_address: setAddress as (v: unknown) => void,
       location_contact: setContact as (v: unknown) => void,
-      location_transport: setTransport as (v: unknown) => void,
+      location_subway: setSubway as (v: unknown) => void,
+      location_bus: setBus as (v: unknown) => void,
+      location_parking: setParking as (v: unknown) => void,
       location_cta: setCta as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
@@ -325,18 +327,18 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                   <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>지하철</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {transport.subway.map((item: { line: string; desc: string }, idx: number) => (
+                  {subway.map((item: { line: string; desc: string }, idx: number) => (
                     <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                       <span style={{ width: 16, height: 1, background: idx === 0 ? '#33A23D' : '#F5A623', flexShrink: 0, marginTop: 10 }} />
                       <div>
                         <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', margin: '0 0 2px' }}>
-                          <E id={`location_transport.subway.${idx}.line`} editMode={editMode}>{item.line}</E>
+                          <E id={`location_subway.${idx}.line`} editMode={editMode}>{item.line}</E>
                         </p>
                         <p style={{
                           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                           fontSize: 18, color: 'var(--ink2)', margin: 0, letterSpacing: '.02em',
                         }}>
-                          <E id={`location_transport.subway.${idx}.desc`} editMode={editMode}>{item.desc}</E>
+                          <E id={`location_subway.${idx}.desc`} editMode={editMode}>{item.desc}</E>
                         </p>
                       </div>
                     </div>
@@ -370,18 +372,18 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                   <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>버스</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {transport.bus.map((item: { type: string; routes: string }, idx: number) => (
+                  {bus.map((item: { type: string; routes: string }, idx: number) => (
                     <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                       <span style={{ width: 16, height: 1, background: idx === 0 ? '#3B82F6' : '#33A23D', flexShrink: 0, marginTop: 10 }} />
                       <div>
                         <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', margin: '0 0 2px' }}>
-                          <E id={`location_transport.bus.${idx}.type`} editMode={editMode}>{item.type}</E>
+                          <E id={`location_bus.${idx}.type`} editMode={editMode}>{item.type}</E>
                         </p>
                         <p style={{
                           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                           fontSize: 18, color: 'var(--ink2)', margin: 0,
                         }}>
-                          <E id={`location_transport.bus.${idx}.routes`} editMode={editMode}>{item.routes}</E>
+                          <E id={`location_bus.${idx}.routes`} editMode={editMode}>{item.routes}</E>
                         </p>
                       </div>
                     </div>
@@ -418,13 +420,13 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                   <span style={{ width: 16, height: 1, background: 'var(--graphite)', flexShrink: 0, marginTop: 10 }} />
                   <div>
                     <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', margin: '0 0 2px' }}>
-                      <E id="location_transport.parking.title" editMode={editMode}>{transport.parking.title}</E>
+                      <E id="location_parking.title" editMode={editMode}>{parking.title}</E>
                     </p>
                     <p style={{
                       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                       fontSize: 18, color: 'var(--ink2)', margin: 0,
                     }}>
-                      <E id="location_transport.parking.desc" editMode={editMode}>{transport.parking.desc}</E>
+                      <E id="location_parking.desc" editMode={editMode}>{parking.desc}</E>
                     </p>
                   </div>
                 </div>
