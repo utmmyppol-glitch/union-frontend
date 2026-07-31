@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { E, OptImg, safeParse, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 // fallback 이미지 경로 (onError 시 사용하지 않음 — next/image가 대체)
 
@@ -39,48 +39,6 @@ const DEFAULT_ORG = { img: '/images/crawl/unionsystems/about_organization_chart_
 const DEFAULT_CI = { img: '/images/crawl/unionsystems/about_ci_31.jpg', title: '기업 아이덴티티', subtitle: 'UNION RED는 고객을 향한 열정을 담고 있습니다', quote: '고객과 신뢰로 만들어진 유니온시스템즈,\n함께 구축하겠다는 열정을 담고 있습니다.', ceo: 'CEO 홍민석' };
 const DEFAULT_CTA = { title: '유니온시스템즈와 함께 시작하세요', desc: '귀사의 IT 환경에 최적화된 솔루션을 제안해 드립니다.' };
 
-function safeParse<T>(json: string | undefined, fallback: T): T {
-  if (!json) return fallback;
-  try { return JSON.parse(json); } catch { return fallback; }
-}
-
-/* ── 편집모드 컴포넌트 (editMode=false면 zero overhead) ── */
-function E({ id, editMode, children }: { id: string; editMode: boolean; children: React.ReactNode }) {
-  if (!editMode) return <>{children}</>;
-  return (
-    <span data-editable={id} className="editable-field" style={{ cursor: 'pointer', position: 'relative' }}
-      onClick={(e) => { e.stopPropagation(); window.parent.postMessage({ type: 'field-click', id }, '*'); }}>
-      {children}
-    </span>
-  );
-}
-
-/* ── 최적화된 이미지 컴포넌트: next/image(로컬) or img(외부/편집모드) ── */
-function OptImg({ id, editMode, src, alt, width, height, fill, className, style, priority }: {
-  id?: string; editMode: boolean; src: string; alt: string;
-  width?: number; height?: number; fill?: boolean; className?: string;
-  style?: React.CSSProperties; priority?: boolean;
-}) {
-  const isLocal = src.startsWith('/');
-  const editProps = editMode && id ? {
-    'data-editable': id,
-    className: `${className || ''} editable-field editable-image`.trim(),
-    onClick: (e: React.MouseEvent) => { e.stopPropagation(); window.parent.postMessage({ type: 'field-click', id }, '*'); },
-  } : { className };
-
-  if (isLocal && !editMode) {
-    // 로컬 이미지 + 방문자 모드 → next/image 최적화
-    return fill ? (
-      <Image src={src} alt={alt} fill sizes="(max-width: 920px) 100vw, 50vw" style={style} priority={priority} {...editProps} />
-    ) : (
-      <Image src={src} alt={alt} width={width || 800} height={height || 500} style={style} priority={priority} {...editProps} />
-    );
-  }
-
-  // 외부 URL or 편집모드 → 일반 img (편집모드에서 src가 즉시 바뀌어야 하므로)
-  return <img src={src} alt={alt} style={style} {...editProps} />;
-}
-
 export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -103,6 +61,9 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
       setEditMode(true);
     }
   }, []);
+
+  // 편집모드 매니페스트 전송
+  useEditableManifest(editMode);
 
   // postMessage 수신 (편집모드에서만)
   useEffect(() => {
@@ -327,12 +288,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         </div>
       </section>
 
-      {editMode && <style>{`
-        .editable-field { transition: outline .15s, outline-offset .15s; outline: 2px solid transparent; outline-offset: 2px; border-radius: 2px; }
-        .editable-field:hover { outline: 2px dashed #36c88a !important; outline-offset: 4px; }
-        .editable-image { display: block; cursor: pointer; }
-        .editable-image:hover { outline-offset: -2px; }
-      `}</style>}
+      {editMode && <style>{EDITABLE_STYLES}</style>}
 
       <style>{`
         .about-str-card:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 40px rgba(0,0,0,.07) !important; }

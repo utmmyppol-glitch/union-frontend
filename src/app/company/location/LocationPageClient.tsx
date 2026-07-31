@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SITE } from '@/lib/constants';
+import { E, safeParse, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const COMPANY_TABS = [
   { label: '기업소개', href: '/company' },
@@ -34,23 +35,6 @@ const DEFAULT_BUS = [
 const DEFAULT_PARKING = { title: '건물 내 지하주차장', desc: '방문 시 안내데스크 문의' };
 const DEFAULT_CTA = { text: '방문 전 사전 연락을 부탁드립니다.' };
 
-function safeParse<T>(json: string | undefined, fallback: T): T {
-  if (!json) return fallback;
-  try { return JSON.parse(json); } catch { return fallback; }
-}
-
-/* ── 편집모드 컴포넌트 (editMode=false면 zero overhead) ── */
-function E({ id, editMode, children }: { id: string; editMode: boolean; children: React.ReactNode }) {
-  if (!editMode) return <>{children}</>;
-  return (
-    <span data-editable={id} className="editable-field" style={{ cursor: 'pointer', position: 'relative' }}
-      onClick={(e) => { e.stopPropagation(); window.parent.postMessage({ type: 'field-click', id }, '*'); }}>
-      {children}
-    </span>
-  );
-}
-
-
 export default function LocationPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -71,6 +55,9 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
       setEditMode(true);
     }
   }, []);
+
+  // 편집모드 매니페스트 전송
+  useEditableManifest(editMode);
 
   // postMessage 수신 (편집모드에서만)
   useEffect(() => {
@@ -550,12 +537,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
         </div>
       </section>
 
-      {editMode && <style>{`
-        .editable-field { transition: outline .15s, outline-offset .15s; outline: 2px solid transparent; outline-offset: 2px; border-radius: 2px; }
-        .editable-field:hover { outline: 2px dashed #36c88a !important; outline-offset: 4px; }
-        .editable-image { display: block; cursor: pointer; }
-        .editable-image:hover { outline-offset: -2px; }
-      `}</style>}
+      {editMode && <style>{EDITABLE_STYLES}</style>}
 
       <style>{`
         .loc-t-card:hover {
