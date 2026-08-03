@@ -1,7 +1,7 @@
 import HistoryPageClient from "./HistoryPageClient";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['history_hero', 'history_cta'];
+const CONTENT_KEYS = ['history_hero', 'history_items', 'history_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

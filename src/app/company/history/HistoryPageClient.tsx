@@ -93,6 +93,7 @@ const MILESTONES: Milestone[] = [
 ];
 
 const DEFAULT_HERO = { eyebrow: 'HISTORY', title: '주요연혁', desc: '10여년간 축적한 기술 노하우로 200여개 이상의 기업들이\n유니온시스템즈와 함께하고 있습니다.' };
+const DEFAULT_ITEMS = MILESTONES.map(m => ({ year: m.year, title: m.title, events: m.events }));
 const DEFAULT_CTA = { eyebrow: 'SINCE 2010', title: '앞으로도 함께하겠습니다', desc: '유니온시스템즈와 함께 IT 환경을 혁신하세요.', btn: '도입문의 하기 →' };
 
 export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
@@ -102,12 +103,14 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
   useEditableManifest(editMode);
 
   const [hero, setHero] = useState(() => safeParse(ssrContent.history_hero, DEFAULT_HERO));
+  const [items, setItems] = useState(() => safeParse(ssrContent.history_items, DEFAULT_ITEMS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.history_cta, DEFAULT_CTA));
 
   useEffect(() => {
     if (!editMode) return;
     const setters: Record<string, (v: unknown) => void> = {
       history_hero: setHero as (v: unknown) => void,
+      history_items: setItems as (v: unknown) => void,
       history_cta: setCta as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
@@ -339,7 +342,7 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
                         fontSize: 32, fontWeight: 400, lineHeight: 1,
                         color: m.accent ? 'var(--accent)' : 'var(--ink)',
                       }}>
-                        {m.year}
+                        <E id={`history_items.${idx}.year`} editMode={editMode}>{items[idx]?.year ?? m.year}</E>
                       </span>
                       <span style={{
                         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
@@ -347,13 +350,13 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
                         color: m.accent ? 'rgba(255,255,255,.35)' : 'var(--ink2)',
                         textTransform: 'uppercase',
                       }}>
-                        {m.title}
+                        <E id={`history_items.${idx}.title`} editMode={editMode}>{items[idx]?.title ?? m.title}</E>
                       </span>
                     </div>
 
                     {/* Events */}
-                    {m.events.map((evt, ei) => (
-                      <div key={evt} style={{
+                    {(items[idx]?.events ?? m.events).map((evt: string, ei: number) => (
+                      <div key={ei} style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '6px 0',
                       }}>
@@ -367,7 +370,7 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
                           color: m.accent ? 'rgba(255,255,255,.7)' : 'var(--ink2)',
                           fontWeight: ei === 0 ? 600 : 400,
                         }}>
-                          {evt}
+                          <E id={`history_items.${idx}.events.${ei}`} editMode={editMode}>{evt}</E>
                         </span>
                       </div>
                     ))}
