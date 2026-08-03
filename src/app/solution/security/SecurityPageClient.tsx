@@ -18,6 +18,7 @@ const DEFAULT_HERO = {
   title: '보안 솔루션',
   desc: '기업의 엔드포인트부터 네트워크까지,\n안전한 IT 환경을 구축합니다.',
 };
+const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, cat: p.cat, desc: p.desc }));
 const DEFAULT_CTA = {
   title: '보안은 선택이 아닌\n필수입니다.',
   desc: '유니온시스템즈가 최적의 보안 솔루션을 제안합니다.',
@@ -27,10 +28,11 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
   const editMode = useEditMode();
   useEditableManifest(editMode);
   const [hero, setHero] = useState(() => safeParse(ssrContent.security_hero, DEFAULT_HERO));
+  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.security_products, DEFAULT_PRODUCTS_DATA));
   const [cta, setCta] = useState(() => safeParse(ssrContent.security_cta, DEFAULT_CTA));
   useEffect(() => {
     if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = { security_hero: setHero as (v: unknown) => void, security_cta: setCta as (v: unknown) => void };
+    const setters: Record<string, (v: unknown) => void> = { security_hero: setHero as (v: unknown) => void, security_products: setProductsData as (v: unknown) => void, security_cta: setCta as (v: unknown) => void };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
@@ -169,16 +171,16 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.12em',
                     color: 'var(--accent)', margin: '0 0 10px',
-                  }}>{s.cat.toUpperCase()}</p>
+                  }}><E id={`security_products.${idx}.cat`} editMode={editMode}>{(productsData[idx]?.cat ?? s.cat).toUpperCase()}</E></p>
 
                   <h2 style={{
                     fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
                     letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 12px',
-                  }}>{s.name}</h2>
+                  }}><E id={`security_products.${idx}.name`} editMode={editMode}>{productsData[idx]?.name ?? s.name}</E></h2>
 
                   <p style={{
                     fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: '0 0 24px',
-                  }}>{s.desc}</p>
+                  }}><E id={`security_products.${idx}.desc`} editMode={editMode}>{productsData[idx]?.desc ?? s.desc}</E></p>
 
                   <span className="sec-row-arrow" style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 600,
@@ -244,7 +246,7 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .sec-row:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,.08); }
         .sec-row:hover .sec-row-img { transform: scale(1.05); }
         .sec-row:hover .sec-row-arrow span { transform: translateX(4px); }
@@ -253,7 +255,7 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
           .sec-row > div { order: unset !important; }
           .sec-row > div:first-child { min-height: 200px !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

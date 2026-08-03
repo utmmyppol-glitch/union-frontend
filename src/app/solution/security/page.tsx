@@ -1,7 +1,7 @@
 import SecurityPageClient from './SecurityPageClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['security_hero', 'security_cta'];
+const CONTENT_KEYS = ['security_hero', 'security_products', 'security_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {
