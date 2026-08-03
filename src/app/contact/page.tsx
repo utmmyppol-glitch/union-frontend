@@ -1,4 +1,14 @@
 import ContactPageClient from './ContactPageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '문의·상담',
+  description: '유니온시스템즈에 소프트웨어 구매, 보안 솔루션, IT 컨설팅 관련 문의를 남겨주세요.',
+  openGraph: {
+    title: '문의·상담 | 유니온시스템즈',
+    description: '소프트웨어 구매, 보안 솔루션, IT 컨설팅 관련 문의.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['contact_hero', 'contact_benefits'];

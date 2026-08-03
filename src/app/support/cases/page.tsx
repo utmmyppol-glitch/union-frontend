@@ -1,5 +1,15 @@
 import type { CustomerStory } from '@/types';
 import CasesPageClient from './CasesPageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '고객 사례',
+  description: '유니온시스템즈와 함께한 고객사들의 IT 인프라 구축 및 운영 사례를 확인하세요.',
+  openGraph: {
+    title: '고객 사례 | 유니온시스템즈',
+    description: '유니온시스템즈와 함께한 고객사들의 IT 인프라 구축 사례.',
+  },
+};
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 

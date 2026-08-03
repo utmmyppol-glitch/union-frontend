@@ -1,4 +1,14 @@
 import SoftwarePageClient from './SoftwarePageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '소프트웨어',
+  description: 'Microsoft, Adobe, Autodesk, 이스트소프트 등 주요 소프트웨어 라이선스 구매 및 컨설팅 서비스.',
+  openGraph: {
+    title: '소프트웨어 | 유니온시스템즈',
+    description: 'Microsoft, Adobe, Autodesk 등 주요 소프트웨어 라이선스 구매 및 컨설팅.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['software_hero', 'software_process', 'software_stats', 'software_cta'];

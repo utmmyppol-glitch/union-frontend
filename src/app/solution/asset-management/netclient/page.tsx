@@ -1,4 +1,14 @@
 import NetclientPageClient from './NetclientPageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'NetClient',
+  description: 'NetClient IT 자산관리 솔루션. 하드웨어·소프트웨어 자산 현황 파악부터 라이선스 관리까지.',
+  openGraph: {
+    title: 'NetClient IT 자산관리 | 유니온시스템즈',
+    description: 'NetClient IT 자산관리 솔루션.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['netclient_hero', 'netclient_modules', 'netclient_points', 'netclient_icons', 'netclient_cta'];

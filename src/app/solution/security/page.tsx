@@ -1,4 +1,14 @@
 import SecurityPageClient from './SecurityPageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '보안 솔루션',
+  description: '안랩, 이스트시큐리티 등 검증된 보안 솔루션으로 기업 보안 위협에 대응하세요.',
+  openGraph: {
+    title: '보안 솔루션 | 유니온시스템즈',
+    description: '안랩, 이스트시큐리티 등 검증된 보안 솔루션으로 기업 보안 위협에 대응.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['security_hero', 'security_products', 'security_cta'];

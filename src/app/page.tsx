@@ -1,4 +1,14 @@
 import HomePageClient from './HomePageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'IT 인프라 전문 파트너',
+  description: '소프트웨어 유통, 보안 솔루션, IT 자산관리, 데이터 분석까지 — 기업 IT 환경을 하나로 연결하는 유니온시스템즈.',
+  openGraph: {
+    title: 'IT 인프라 전문 파트너 | 유니온시스템즈',
+    description: '소프트웨어 유통, 보안 솔루션, IT 자산관리, 데이터 분석까지 — 기업 IT 환경을 하나로 연결하는 유니온시스템즈.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['home_stats', 'home_stats_items', 'home_cta', 'home_video'];

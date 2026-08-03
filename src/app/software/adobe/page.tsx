@@ -1,4 +1,14 @@
 import AdobePageClient from './AdobePageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Adobe Creative Cloud',
+  description: 'Adobe Creative Cloud 라이선스 구매, VIP 프로그램 안내. 기업 맞춤 플랜으로 비용을 절감하세요.',
+  openGraph: {
+    title: 'Adobe Creative Cloud | 유니온시스템즈',
+    description: 'Adobe Creative Cloud 라이선스 구매 및 VIP 프로그램 안내.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['adobe_hero', 'adobe_strengths', 'adobe_cta'];

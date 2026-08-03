@@ -1,4 +1,14 @@
 import OfficekeeperPageClient from './OfficekeeperPageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'OfficeKeeper',
+  description: 'OfficeKeeper 정보유출방지(DLP) 솔루션. 문서 보안, 매체 제어, 출력물 관리를 한 번에.',
+  openGraph: {
+    title: 'OfficeKeeper DLP | 유니온시스템즈',
+    description: 'OfficeKeeper 정보유출방지(DLP) 솔루션.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['officekeeper_hero', 'officekeeper_problems', 'officekeeper_features_main', 'officekeeper_features_sub', 'officekeeper_process', 'officekeeper_metrics', 'officekeeper_faqs', 'officekeeper_cta'];

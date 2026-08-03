@@ -1,4 +1,14 @@
 import SolutionsPageClient from './SolutionsPageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '솔루션',
+  description: '보안, IT 자산관리, 데이터 분석 등 기업 맞춤 IT 솔루션 라인업을 확인하세요.',
+  openGraph: {
+    title: '솔루션 | 유니온시스템즈',
+    description: '보안, IT 자산관리, 데이터 분석 등 기업 맞춤 IT 솔루션 라인업.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['solutions_hero', 'solutions_stats', 'solutions_cta', 'solutions_lineup'];

@@ -1,4 +1,14 @@
 import CalculatorPageClient from './CalculatorPageClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '라이선스 계산기',
+  description: 'Microsoft 365, Adobe 등 소프트웨어 라이선스 비용을 간편하게 계산해 보세요.',
+  openGraph: {
+    title: '라이선스 계산기 | 유니온시스템즈',
+    description: '소프트웨어 라이선스 비용 간편 계산.',
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 const CONTENT_KEYS = ['calculator_hero', 'calculator_cta'];
