@@ -55,6 +55,22 @@ export function useEditableManifest(editMode: boolean) {
     const timer = setTimeout(sendManifest, 400);
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'request-manifest') sendManifest();
+      if (e.data?.type === 'highlight-field') {
+        const el = document.querySelector(`[data-editable="${e.data.id}"]`) as HTMLElement | null;
+        if (el) { el.style.outline = '2px solid #3b82f6'; el.style.outlineOffset = '4px'; }
+      }
+      if (e.data?.type === 'clear-highlight') {
+        const el = document.querySelector(`[data-editable="${e.data.id}"]`) as HTMLElement | null;
+        if (el) { el.style.outline = ''; el.style.outlineOffset = ''; }
+      }
+      if (e.data?.type === 'scroll-to-field') {
+        const el = document.querySelector(`[data-editable="${e.data.id}"]`) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.style.outline = '2px solid #3b82f6'; el.style.outlineOffset = '4px';
+          setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 2000);
+        }
+      }
     };
     window.addEventListener('message', handler);
     return () => {
