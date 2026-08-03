@@ -1,7 +1,7 @@
 import EstsecurityPageClient from './EstsecurityPageClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['estsecurity_hero', 'estsecurity_cta'];
+const CONTENT_KEYS = ['estsecurity_hero', 'estsecurity_products', 'estsecurity_points', 'estsecurity_features', 'estsecurity_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

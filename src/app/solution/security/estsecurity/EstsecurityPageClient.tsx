@@ -28,16 +28,28 @@ const FEATURES = [
 ];
 
 const DEFAULT_HERO = { desc: '알약, ASM, AI EDR로 위협을 탐지하고 자동 대응하는 통합 보안.' };
+const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
+const DEFAULT_POINTS_DATA = POINTS.map(p => ({ title: p.title, desc: p.desc, stat: p.stat, statLabel: p.statLabel }));
+const DEFAULT_FEATURES_DATA = FEATURES.map(f => ({ label: f.label, desc: f.desc }));
 const DEFAULT_CTA = { title: 'AI가 지키는 보안,\nESTsecurity.', desc: 'ESTsecurity 공인 파트너 유니온시스템즈' };
 
 export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
   useEditableManifest(editMode);
   const [hero, setHero] = useState(() => safeParse(ssrContent.estsecurity_hero, DEFAULT_HERO));
+  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.estsecurity_products, DEFAULT_PRODUCTS_DATA));
+  const [pointsData, setPointsData] = useState(() => safeParse(ssrContent.estsecurity_points, DEFAULT_POINTS_DATA));
+  const [featuresData, setFeaturesData] = useState(() => safeParse(ssrContent.estsecurity_features, DEFAULT_FEATURES_DATA));
   const [cta, setCta] = useState(() => safeParse(ssrContent.estsecurity_cta, DEFAULT_CTA));
   useEffect(() => {
     if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = { estsecurity_hero: setHero as (v: unknown) => void, estsecurity_cta: setCta as (v: unknown) => void };
+    const setters: Record<string, (v: unknown) => void> = {
+      estsecurity_hero: setHero as (v: unknown) => void,
+      estsecurity_products: setProductsData as (v: unknown) => void,
+      estsecurity_points: setPointsData as (v: unknown) => void,
+      estsecurity_features: setFeaturesData as (v: unknown) => void,
+      estsecurity_cta: setCta as (v: unknown) => void,
+    };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
@@ -202,10 +214,10 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                   <h3 style={{
                     fontWeight: 900, fontSize: 22, letterSpacing: '-.02em',
                     margin: '0 0 10px',
-                  }}>{p.name}</h3>
+                  }}><E id={`estsecurity_products.${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
                   <p style={{
                     fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0,
-                  }}>{p.desc}</p>
+                  }}><E id={`estsecurity_products.${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
                 </div>
               </div>
             ))}
@@ -269,18 +281,18 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                   fontFamily: SERIF, fontStyle: 'italic',
                   fontSize: 40, fontWeight: 400, color: 'var(--accent)',
                   margin: '0 0 4px', lineHeight: 1,
-                }}>{pt.stat}</p>
+                }}><E id={`estsecurity_points.${i}.stat`} editMode={editMode}>{pointsData[i]?.stat ?? pt.stat}</E></p>
                 <p style={{
                   fontFamily: MONO, fontSize: 12, fontWeight: 500, letterSpacing: '.08em',
                   color: 'rgba(255,255,255,.5)', margin: '0 0 20px',
-                }}>{pt.statLabel}</p>
+                }}><E id={`estsecurity_points.${i}.statLabel`} editMode={editMode}>{pointsData[i]?.statLabel ?? pt.statLabel}</E></p>
 
                 <h3 style={{
                   fontWeight: 700, fontSize: 18, color: '#fff', margin: '0 0 8px',
-                }}>{pt.title}</h3>
+                }}><E id={`estsecurity_points.${i}.title`} editMode={editMode}>{pointsData[i]?.title ?? pt.title}</E></h3>
                 <p style={{
                   fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.6)', margin: 0,
-                }}>{pt.desc}</p>
+                }}><E id={`estsecurity_points.${i}.desc`} editMode={editMode}>{pointsData[i]?.desc ?? pt.desc}</E></p>
               </div>
             ))}
           </div>
@@ -343,10 +355,10 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                 }}>{String(i + 1).padStart(2, '0')}</span>
                 <h3 style={{
                   fontWeight: 700, fontSize: 18, color: '#fff', margin: '0 0 8px',
-                }}>{f.label}</h3>
+                }}><E id={`estsecurity_features.${i}.label`} editMode={editMode}>{featuresData[i]?.label ?? f.label}</E></h3>
                 <p style={{
                   fontSize: 16, lineHeight: 1.6, color: 'rgba(255,255,255,.4)', margin: 0,
-                }}>{f.desc}</p>
+                }}><E id={`estsecurity_features.${i}.desc`} editMode={editMode}>{featuresData[i]?.desc ?? f.desc}</E></p>
               </div>
             ))}
           </div>
@@ -390,7 +402,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
           <p className="reveal" style={{
             fontSize: 16, color: 'var(--ink2)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            유니온시스템즈가 AI 기반 보안 체계를 설계합니다.
+            <E id="estsecurity_cta.desc" editMode={editMode}>{cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
@@ -405,7 +417,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .est-prod-row:hover { transform: translateY(-4px) !important; box-shadow: 0 16px 48px rgba(0,0,0,.08) !important; }
         .est-prod-row:hover .est-prod-img { transform: scale(1.05); }
         .est-why-card:hover { transform: translateY(-3px) !important; background: rgba(255,255,255,.06) !important; border-color: rgba(245,51,63,.2) !important; }
@@ -415,7 +427,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
           .est-why-grid { grid-template-columns: 1fr !important; }
           .est-feat-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
