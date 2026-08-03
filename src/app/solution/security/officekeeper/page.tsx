@@ -1,7 +1,7 @@
 import OfficekeeperPageClient from './OfficekeeperPageClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['officekeeper_hero', 'officekeeper_cta'];
+const CONTENT_KEYS = ['officekeeper_hero', 'officekeeper_problems', 'officekeeper_features_main', 'officekeeper_features_sub', 'officekeeper_process', 'officekeeper_metrics', 'officekeeper_faqs', 'officekeeper_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

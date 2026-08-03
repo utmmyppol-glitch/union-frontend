@@ -60,16 +60,37 @@ const FAQS = [
    ════════════════════════════════════════════════════════════════════ */
 
 const DEFAULT_HERO = { desc: '매체 · 네트워크 · 출력물까지 모든 유출 경로를 차단하는 통합 DLP. 도입부터 운영까지 유니온시스템즈가 책임집니다.' };
+const DEFAULT_PROBLEMS_DATA = PROBLEMS.map(p => ({ title: p.title, stat: p.stat, statLabel: p.statLabel, desc: p.desc }));
+const DEFAULT_FEATURES_MAIN_DATA = FEATURES_MAIN.map(f => ({ title: f.title, desc: f.desc, tag: f.tag }));
+const DEFAULT_FEATURES_SUB_DATA = FEATURES_SUB.map(f => ({ title: f.title, desc: f.desc }));
+const DEFAULT_PROCESS_DATA = PROCESS.map(p => ({ title: p.title, desc: p.desc }));
+const DEFAULT_METRICS_DATA = METRICS.map(m => ({ num: m.num, label: m.label }));
+const DEFAULT_FAQS_DATA = FAQS.map(f => ({ q: f.q, a: f.a }));
 const DEFAULT_CTA = { title: '정보는 기업의\n가장 중요한 자산입니다.', desc: '유니온시스템즈가 OfficeKeeper로 기업 데이터를 보호합니다.' };
 
 export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
   useEditableManifest(editMode);
   const [hero, setHero] = useState(() => safeParse(ssrContent.officekeeper_hero, DEFAULT_HERO));
+  const [problemsData, setProblemsData] = useState(() => safeParse(ssrContent.officekeeper_problems, DEFAULT_PROBLEMS_DATA));
+  const [featMainData, setFeatMainData] = useState(() => safeParse(ssrContent.officekeeper_features_main, DEFAULT_FEATURES_MAIN_DATA));
+  const [featSubData, setFeatSubData] = useState(() => safeParse(ssrContent.officekeeper_features_sub, DEFAULT_FEATURES_SUB_DATA));
+  const [processData, setProcessData] = useState(() => safeParse(ssrContent.officekeeper_process, DEFAULT_PROCESS_DATA));
+  const [metricsData, setMetricsData] = useState(() => safeParse(ssrContent.officekeeper_metrics, DEFAULT_METRICS_DATA));
+  const [faqsData, setFaqsData] = useState(() => safeParse(ssrContent.officekeeper_faqs, DEFAULT_FAQS_DATA));
   const [cta, setCta] = useState(() => safeParse(ssrContent.officekeeper_cta, DEFAULT_CTA));
   useEffect(() => {
     if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = { officekeeper_hero: setHero as (v: unknown) => void, officekeeper_cta: setCta as (v: unknown) => void };
+    const setters: Record<string, (v: unknown) => void> = {
+      officekeeper_hero: setHero as (v: unknown) => void,
+      officekeeper_problems: setProblemsData as (v: unknown) => void,
+      officekeeper_features_main: setFeatMainData as (v: unknown) => void,
+      officekeeper_features_sub: setFeatSubData as (v: unknown) => void,
+      officekeeper_process: setProcessData as (v: unknown) => void,
+      officekeeper_metrics: setMetricsData as (v: unknown) => void,
+      officekeeper_faqs: setFaqsData as (v: unknown) => void,
+      officekeeper_cta: setCta as (v: unknown) => void,
+    };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
@@ -207,7 +228,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
 
           {/* 3 problems — not cards, editorial style with big numbers */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {PROBLEMS.map((p) => (
+            {PROBLEMS.map((p, pi) => (
               <div key={p.num} className="reveal" style={{
                 display: 'grid', gridTemplateColumns: '140px 1fr', gap: 32,
                 padding: '40px 0', borderTop: '1px solid var(--line)',
@@ -215,13 +236,13 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
               }}>
                 {/* Big stat */}
                 <div>
-                  <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(36px,5vw,56px)', fontWeight: 400, color: 'var(--accent)', margin: 0, lineHeight: 1 }}>{p.stat}</p>
-                  <p style={{ fontFamily: MONO, fontSize: 12, fontWeight: 500, letterSpacing: '.06em', color: 'var(--ink2)', margin: '8px 0 0' }}>{p.statLabel}</p>
+                  <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(36px,5vw,56px)', fontWeight: 400, color: 'var(--accent)', margin: 0, lineHeight: 1 }}><E id={`officekeeper_problems.${pi}.stat`} editMode={editMode}>{problemsData[pi]?.stat ?? p.stat}</E></p>
+                  <p style={{ fontFamily: MONO, fontSize: 12, fontWeight: 500, letterSpacing: '.06em', color: 'var(--ink2)', margin: '8px 0 0' }}><E id={`officekeeper_problems.${pi}.statLabel`} editMode={editMode}>{problemsData[pi]?.statLabel ?? p.statLabel}</E></p>
                 </div>
                 {/* Text */}
                 <div>
-                  <h3 style={{ fontWeight: 800, fontSize: 20, margin: '0 0 8px', letterSpacing: '-.02em' }}>{p.title}</h3>
-                  <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 500 }}>{p.desc}</p>
+                  <h3 style={{ fontWeight: 800, fontSize: 20, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`officekeeper_problems.${pi}.title`} editMode={editMode}>{problemsData[pi]?.title ?? p.title}</E></h3>
+                  <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 500 }}><E id={`officekeeper_problems.${pi}.desc`} editMode={editMode}>{problemsData[pi]?.desc ?? p.desc}</E></p>
                 </div>
               </div>
             ))}
@@ -275,9 +296,9 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 background: 'rgba(255,255,255,.02)', position: 'relative', overflow: 'hidden',
               }}>
                 <div aria-hidden="true" style={{ position: 'absolute', right: 8, bottom: -8, fontFamily: SERIF, fontStyle: 'italic', fontSize: 80, fontWeight: 300, color: 'rgba(255,255,255,.03)', pointerEvents: 'none' }}>{String(i + 2).padStart(2, '0')}</div>
-                <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginBottom: 12, display: 'block' }}>{f.tag}</span>
-                <h3 style={{ fontWeight: 800, fontSize: 20, color: '#fff', margin: '0 0 8px' }}>{f.title}</h3>
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: 'rgba(255,255,255,.45)', margin: 0 }}>{f.desc}</p>
+                <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginBottom: 12, display: 'block' }}><E id={`officekeeper_features_main.${i}.tag`} editMode={editMode}>{featMainData[i]?.tag ?? f.tag}</E></span>
+                <h3 style={{ fontWeight: 800, fontSize: 20, color: '#fff', margin: '0 0 8px' }}><E id={`officekeeper_features_main.${i}.title`} editMode={editMode}>{featMainData[i]?.title ?? f.title}</E></h3>
+                <p style={{ fontSize: 15, lineHeight: 1.6, color: 'rgba(255,255,255,.45)', margin: 0 }}><E id={`officekeeper_features_main.${i}.desc`} editMode={editMode}>{featMainData[i]?.desc ?? f.desc}</E></p>
               </div>
             ))}
           </div>
@@ -320,8 +341,8 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 }}>
                   <div aria-hidden="true" style={{ position: 'absolute', right: 6, bottom: -6, fontFamily: SERIF, fontStyle: 'italic', fontSize: isBig ? 72 : 48, fontWeight: 300, color: 'var(--line)', opacity: .3, pointerEvents: 'none' }}>{String(i + 4).padStart(2, '0')}</div>
                   <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: isBig ? 22 : 16, fontWeight: 300, color: isBig ? 'var(--accent)' : 'var(--line)', display: 'block', marginBottom: isBig ? 12 : 8 }}>{String(i + 4).padStart(2, '0')}</span>
-                  <h3 style={{ fontWeight: 700, fontSize: isBig ? 18 : 16, color: 'var(--ink)', margin: '0 0 6px' }}>{f.title}</h3>
-                  <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink2)', margin: 0 }}>{f.desc}</p>
+                  <h3 style={{ fontWeight: 700, fontSize: isBig ? 18 : 16, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`officekeeper_features_sub.${i}.title`} editMode={editMode}>{featSubData[i]?.title ?? f.title}</E></h3>
+                  <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink2)', margin: 0 }}><E id={`officekeeper_features_sub.${i}.desc`} editMode={editMode}>{featSubData[i]?.desc ?? f.desc}</E></p>
                 </div>
               );
             })}
@@ -371,8 +392,8 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
                   <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 28, fontWeight: 400, color: 'var(--accent)', opacity: .6 }}>{s.num}</span>
                   <div>
-                    <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}>{s.title}</h3>
-                    <p style={{ fontSize: 15, color: 'var(--ink2)', margin: 0 }}>{s.desc}</p>
+                    <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}><E id={`officekeeper_process.${i}.title`} editMode={editMode}>{processData[i]?.title ?? s.title}</E></h3>
+                    <p style={{ fontSize: 15, color: 'var(--ink2)', margin: 0 }}><E id={`officekeeper_process.${i}.desc`} editMode={editMode}>{processData[i]?.desc ?? s.desc}</E></p>
                   </div>
                 </div>
               </div>
@@ -399,8 +420,8 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 textAlign: 'center', padding: '32px 16px',
                 borderRight: i < 3 ? '1px solid rgba(255,255,255,.08)' : 'none',
               }}>
-                <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(36px,5vw,56px)', fontWeight: 400, color: '#fff', margin: 0, lineHeight: 1 }}>{m.num}</p>
-                <p style={{ fontFamily: MONO, fontSize: 12, fontWeight: 500, letterSpacing: '.06em', color: 'rgba(255,255,255,.4)', margin: '10px 0 0' }}>{m.label}</p>
+                <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(36px,5vw,56px)', fontWeight: 400, color: '#fff', margin: 0, lineHeight: 1 }}><E id={`officekeeper_metrics.${i}.num`} editMode={editMode}>{metricsData[i]?.num ?? m.num}</E></p>
+                <p style={{ fontFamily: MONO, fontSize: 12, fontWeight: 500, letterSpacing: '.06em', color: 'rgba(255,255,255,.4)', margin: '10px 0 0' }}><E id={`officekeeper_metrics.${i}.label`} editMode={editMode}>{metricsData[i]?.label ?? m.label}</E></p>
               </div>
             ))}
           </div>
@@ -434,12 +455,12 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
                 }}
               >
-                <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--ink)', lineHeight: 1.4 }}>{faq.q}</span>
+                <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--ink)', lineHeight: 1.4 }}><E id={`officekeeper_faqs.${i}.q`} editMode={editMode}>{faqsData[i]?.q ?? faq.q}</E></span>
                 <span style={{ fontFamily: SERIF, fontSize: 20, color: 'var(--ink2)', flexShrink: 0, transition: 'transform .2s', transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0)' }}>+</span>
               </button>
               {openFaq === i && (
                 <div style={{ padding: '0 0 24px', fontSize: 15, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600 }}>
-                  {faq.a}
+                  <E id={`officekeeper_faqs.${i}.a`} editMode={editMode}>{faqsData[i]?.a ?? faq.a}</E>
                 </div>
               )}
             </div>
@@ -485,7 +506,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
         .reveal.visible { opacity: 1; transform: none; }
         .ok-feat-card:hover { transform: translateY(-3px) !important; border-color: var(--accent) !important; box-shadow: 0 8px 28px rgba(0,0,0,.06) !important; }
@@ -499,7 +520,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
           .ok-feat-mag { grid-template-columns: 1fr !important; }
           .ok-metrics-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
