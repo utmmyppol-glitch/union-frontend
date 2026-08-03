@@ -14,7 +14,7 @@ const COMPANY_TABS = [
 ];
 
 /* ── 기본값 ── */
-const DEFAULT_HERO = { title: '복잡한 기업 IT를', accent: '하나로 연결', desc: '열정과 전문성을 바탕으로 소프트웨어 유통은 물론, 보안 및 데이터 사업까지 확대하며 제2의 도약을 실현해 가고 있습니다.' };
+const DEFAULT_HERO = { title: '복잡한 기업 IT를', accent: '하나로 연결', suffix: '합니다', desc: '열정과 전문성을 바탕으로 소프트웨어 유통은 물론, 보안 및 데이터 사업까지 확대하며 제2의 도약을 실현해 가고 있습니다.' };
 const DEFAULT_OVERVIEW = { title: 'IT Solution & Consulting 전문기업', text: '주식회사 유니온시스템즈는 2010년 4월 유니온소프트를 시작으로 기업·공공기관을 대상으로 고객의 IT 환경에 필요한 SW, 솔루션을 공급하여 최적의 IT 인프라를 만들어 온 IT Solution & Consulting 전문기업입니다.' };
 const DEFAULT_STATS = [
   { num: '16', label: '년 업력' }, { num: '200+', label: '고객사' },
@@ -112,7 +112,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
             <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 16px' }}>ABOUT US</p>
             <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 20px' }}>
               <E id="company_hero.title" editMode={editMode}>{hero.title}</E><br />
-              <span style={{ color: 'var(--accent)' }}><E id="company_hero.accent" editMode={editMode}>{hero.accent}</E></span>합니다
+              <span style={{ color: 'var(--accent)' }}><E id="company_hero.accent" editMode={editMode}>{hero.accent}</E></span><E id="company_hero.suffix" editMode={editMode}>{hero.suffix ?? '합니다'}</E>
             </h1>
             <p style={{ fontWeight: 400, fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0 }}>
               <E id="company_hero.desc" editMode={editMode}>{hero.desc}</E>
