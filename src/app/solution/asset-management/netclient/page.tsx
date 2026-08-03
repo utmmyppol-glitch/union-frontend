@@ -1,7 +1,7 @@
 import NetclientPageClient from './NetclientPageClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['netclient_hero', 'netclient_cta'];
+const CONTENT_KEYS = ['netclient_hero', 'netclient_modules', 'netclient_points', 'netclient_icons', 'netclient_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

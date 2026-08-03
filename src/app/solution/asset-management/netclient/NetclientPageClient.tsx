@@ -48,16 +48,28 @@ const ICONS = [
 ];
 
 const DEFAULT_HERO = { desc: 'PC 자산 관리(DMS), 패치 관리(PMS), 근로시간 관리(PC-OFF),\n하드웨어 보안(HSM) — 4대 모듈로 IT 자산을 통합 관리합니다.' };
+const DEFAULT_MODULES_DATA = MODULES.map(m => ({ name: m.name, desc: m.desc }));
+const DEFAULT_POINTS_DATA = POINTS.map(p => ({ title: p.title, desc: p.desc }));
+const DEFAULT_ICONS_DATA = ICONS.map(ic => ({ label: ic.label }));
 const DEFAULT_CTA = { title: 'NetClient 도입 상담', desc: '전문 컨설턴트가 귀사 환경에 맞는 최적의 구성을 안내합니다.' };
 
 export default function NetclientPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
   useEditableManifest(editMode);
   const [hero, setHero] = useState(() => safeParse(ssrContent.netclient_hero, DEFAULT_HERO));
+  const [modulesData, setModulesData] = useState(() => safeParse(ssrContent.netclient_modules, DEFAULT_MODULES_DATA));
+  const [pointsData, setPointsData] = useState(() => safeParse(ssrContent.netclient_points, DEFAULT_POINTS_DATA));
+  const [iconsData, setIconsData] = useState(() => safeParse(ssrContent.netclient_icons, DEFAULT_ICONS_DATA));
   const [cta, setCta] = useState(() => safeParse(ssrContent.netclient_cta, DEFAULT_CTA));
   useEffect(() => {
     if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = { netclient_hero: setHero as (v: unknown) => void, netclient_cta: setCta as (v: unknown) => void };
+    const setters: Record<string, (v: unknown) => void> = {
+      netclient_hero: setHero as (v: unknown) => void,
+      netclient_modules: setModulesData as (v: unknown) => void,
+      netclient_points: setPointsData as (v: unknown) => void,
+      netclient_icons: setIconsData as (v: unknown) => void,
+      netclient_cta: setCta as (v: unknown) => void,
+    };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
@@ -236,10 +248,10 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                     {m.num}
                   </span>
                   <h3 style={{ fontWeight: 800, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}>
-                    {m.name}
+                    <E id={`netclient_modules.${i}.name`} editMode={editMode}>{modulesData[i]?.name ?? m.name}</E>
                   </h3>
                   <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
-                    {m.desc}
+                    <E id={`netclient_modules.${i}.desc`} editMode={editMode}>{modulesData[i]?.desc ?? m.desc}</E>
                   </p>
                 </div>
               </div>
@@ -300,10 +312,10 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <h3 style={{ fontWeight: 700, fontSize: 22, color: '#fff', margin: '0 0 12px' }}>
-                  {pt.title}
+                  <E id={`netclient_points.${i}.title`} editMode={editMode}>{pointsData[i]?.title ?? pt.title}</E>
                 </h3>
                 <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', margin: 0 }}>
-                  {pt.desc}
+                  <E id={`netclient_points.${i}.desc`} editMode={editMode}>{pointsData[i]?.desc ?? pt.desc}</E>
                 </p>
               </div>
             ))}
@@ -362,7 +374,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                   fontSize: 13, fontWeight: 500, letterSpacing: '.04em',
                   color: 'var(--ink)', margin: 0,
                 }}>
-                  {ic.label}
+                  <E id={`netclient_icons.${i}.label`} editMode={editMode}>{iconsData[i]?.label ?? ic.label}</E>
                 </p>
               </div>
             ))}
@@ -413,7 +425,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .nc-mod:hover { transform: translateY(-4px) !important; box-shadow: 0 16px 48px rgba(0,0,0,.08) !important; border-color: var(--accent) !important; }
         .nc-mod:hover img { transform: scale(1.04); transition: transform .5s; }
         .nc-feat-card:hover { transform: translateY(-4px) !important; border-color: var(--accent) !important; box-shadow: 0 8px 28px rgba(0,0,0,.06) !important; }
@@ -426,7 +438,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
         @media (max-width: 560px) {
           .nc-feat-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
