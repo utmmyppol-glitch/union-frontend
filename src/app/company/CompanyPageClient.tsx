@@ -173,8 +173,8 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="about-strengths" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
             {strengths.map((item, idx) => (
               <div key={idx} className="reveal about-str-card" style={{ border: '1px solid var(--line)', background: 'var(--surface)', overflow: 'hidden', transition: 'transform .25s cubic-bezier(.16,.84,.3,1), box-shadow .25s', transitionDelay: `${idx * 0.06}s` }}>
-                <div style={{ height: 220, overflow: 'hidden', position: 'relative' }}>
-                  <OptImg id={`company_strengths.${idx}.img`} editMode={editMode} src={item.img} alt={item.title} fill style={{ objectFit: 'cover', transition: 'transform .5s' }} />
+                <div style={{ width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', position: 'relative' }}>
+                  <OptImg id={`company_strengths.${idx}.img`} editMode={editMode} src={item.img} alt={item.title} width={640} height={360} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transition: 'transform .5s' }} />
                   <span style={{ position: 'absolute', top: 16, left: 16, fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic', fontSize: 22, fontWeight: 300, color: '#fff', background: 'var(--charcoal)', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>{String(idx + 1).padStart(2, '0')}</span>
                 </div>
                 <div style={{ padding: 28 }}>
@@ -222,7 +222,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_org.title" editMode={editMode}>{org.title}</E></h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{org.text}</E></p>
           </div>
-          <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 32, position: 'relative', minHeight: 300 }}>
+          <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 32 }}>
             <OptImg id="company_org.img" editMode={editMode} src={org.img} alt="유니온시스템즈 조직도" width={1200} height={600} style={{ width: '100%', height: 'auto' }} />
           </div>
           <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
@@ -283,7 +283,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
 
       {editMode && <style>{EDITABLE_STYLES}</style>}
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .about-str-card:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 40px rgba(0,0,0,.07) !important; }
         .about-str-card:hover img { transform: scale(1.05) !important; }
         .about-val-card:hover { border-color: rgba(255,255,255,.2) !important; transform: translateY(-3px) !important; }
@@ -297,7 +297,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           .about-values { grid-template-columns: 1fr !important; }
           .about-depts { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
