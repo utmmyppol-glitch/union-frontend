@@ -27,16 +27,28 @@ const ICONS = [
 ];
 
 const DEFAULT_HERO = { desc: 'V3, EDR, MDS, 방화벽 등 국내 1위 통합 보안 체계를 구축합니다.' };
+const DEFAULT_PRODUCTS = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
+const DEFAULT_POINTS = POINTS.map(p => ({ title: p.title, desc: p.desc }));
+const DEFAULT_ICONS = ICONS.map(ic => ({ label: ic.label }));
 const DEFAULT_CTA = { title: '보안의 시작은\n안랩입니다.', desc: 'AhnLab 공인 파트너 유니온시스템즈' };
 
 export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
   useEditableManifest(editMode);
   const [hero, setHero] = useState(() => safeParse(ssrContent.ahnlab_hero, DEFAULT_HERO));
+  const [products, setProducts] = useState(() => safeParse(ssrContent.ahnlab_products, DEFAULT_PRODUCTS));
+  const [points, setPoints] = useState(() => safeParse(ssrContent.ahnlab_points, DEFAULT_POINTS));
+  const [icons, setIcons] = useState(() => safeParse(ssrContent.ahnlab_icons, DEFAULT_ICONS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.ahnlab_cta, DEFAULT_CTA));
   useEffect(() => {
     if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = { ahnlab_hero: setHero as (v: unknown) => void, ahnlab_cta: setCta as (v: unknown) => void };
+    const setters: Record<string, (v: unknown) => void> = {
+      ahnlab_hero: setHero as (v: unknown) => void,
+      ahnlab_products: setProducts as (v: unknown) => void,
+      ahnlab_points: setPoints as (v: unknown) => void,
+      ahnlab_icons: setIcons as (v: unknown) => void,
+      ahnlab_cta: setCta as (v: unknown) => void,
+    };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
@@ -205,12 +217,12 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                   <h3 style={{
                     fontWeight: 900, fontSize: 22, letterSpacing: '-.02em',
                     color: p.accent ? '#fff' : 'var(--ink)', margin: '0 0 10px',
-                  }}>{p.name}</h3>
+                  }}><E id={`ahnlab_products.${i}.name`} editMode={editMode}>{products[i]?.name ?? p.name}</E></h3>
                   <p style={{
                     fontSize: 16, lineHeight: 1.7,
                     color: p.accent ? 'rgba(255,255,255,.55)' : 'var(--ink2)',
                     margin: 0,
-                  }}>{p.desc}</p>
+                  }}><E id={`ahnlab_products.${i}.desc`} editMode={editMode}>{products[i]?.desc ?? p.desc}</E></p>
                 </div>
               </div>
             ))}
@@ -274,11 +286,11 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                 <h3 className="ah-point-title" style={{
                   fontWeight: 800, fontSize: 22, color: '#fff',
                   display: 'inline', letterSpacing: '-.02em', transition: 'color .2s',
-                }}>{pt.title}</h3>
+                }}><E id={`ahnlab_points.${i}.title`} editMode={editMode}>{points[i]?.title ?? pt.title}</E></h3>
                 <p style={{
                   fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
                   margin: '10px 0 0',
-                }}>{pt.desc}</p>
+                }}><E id={`ahnlab_points.${i}.desc`} editMode={editMode}>{points[i]?.desc ?? pt.desc}</E></p>
               </div>
             </div>
           ))}
@@ -332,7 +344,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                 <p style={{
                   fontFamily: MONO, fontSize: 13, fontWeight: 600,
                   letterSpacing: '.04em', color: 'var(--ink)', margin: 0,
-                }}>{ic.label}</p>
+                }}><E id={`ahnlab_icons.${i}.label`} editMode={editMode}>{icons[i]?.label ?? ic.label}</E></p>
               </div>
             ))}
           </div>
@@ -376,7 +388,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
           <p className="reveal" style={{
             fontSize: 16, color: 'var(--ink2)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            유니온시스템즈가 기업 환경에 맞는 AhnLab 보안 체계를 설계합니다.
+            <E id="ahnlab_cta.desc" editMode={editMode}>{cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
@@ -391,7 +403,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .ah-prod-card:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 40px rgba(0,0,0,.08) !important; }
         .ah-prod-card:hover .ah-prod-img { transform: scale(1.06); }
         .ah-point-row:hover { padding-left: 12px !important; }
@@ -407,7 +419,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
         @media (max-width: 560px) {
           .ah-feat-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

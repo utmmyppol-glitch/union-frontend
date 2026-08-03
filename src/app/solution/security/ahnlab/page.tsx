@@ -1,7 +1,7 @@
 import AhnlabPageClient from './AhnlabPageClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['ahnlab_hero', 'ahnlab_cta'];
+const CONTENT_KEYS = ['ahnlab_hero', 'ahnlab_products', 'ahnlab_points', 'ahnlab_icons', 'ahnlab_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {
