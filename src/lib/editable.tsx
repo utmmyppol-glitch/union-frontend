@@ -97,7 +97,7 @@ export function E({ id, editMode, children }: { id: string; editMode: boolean; c
     if (sanitized !== null) {
       return <span style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: sanitized }} />;
     }
-    return <>{children}</>;
+    return <span style={{ whiteSpace: 'pre-wrap' }}>{children}</span>;
   }
 
   if (sanitized !== null) {
@@ -114,7 +114,7 @@ export function E({ id, editMode, children }: { id: string; editMode: boolean; c
   }
 
   return (
-    <span data-editable={id} className="editable-field" style={{ cursor: 'pointer', position: 'relative' }}
+    <span data-editable={id} className="editable-field" style={{ cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap' }}
       onClick={(e) => {
         e.stopPropagation();
         const value = (e.currentTarget as HTMLElement).innerHTML || '';
