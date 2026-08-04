@@ -91,10 +91,13 @@ export interface Insight {
   id: number;
   title: string;
   summary: string;
-  link: string;
-  source: string;
-  pubDate: string;
-  thumbnail: string | null;
+  sourceUrl: string;
+  sourceName: string;
+  publishedAt: string;
+  thumbnailUrl: string | null;
+  status?: string;
+  approvedAt?: string;
+  approvedBy?: string;
 }
 
 // Pagination

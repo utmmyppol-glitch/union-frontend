@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 import type { Insight, Page } from '@/types';
 
@@ -42,9 +43,10 @@ export default function InsightsPageClient({
     return () => io.disconnect();
   }, [data]);
 
-  const formatDate = (dateStr: string) => {
+  const formatDate = (dateStr: string): string => {
+    if (!dateStr) return '';
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
+    if (isNaN(d.getTime())) return '';
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
@@ -94,11 +96,9 @@ export default function InsightsPageClient({
               gap: 28,
             }}>
               {items.map((item: Insight, idx: number) => (
-                <a
+                <Link
                   key={item.id}
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/insights/${item.id}`}
                   className="reveal ins-card"
                   style={{
                     display: 'block',
@@ -117,8 +117,8 @@ export default function InsightsPageClient({
                     overflow: 'hidden',
                     background: 'var(--charcoal)',
                   }}>
-                    {item.thumbnail ? (
-                      <InsightThumbnail src={item.thumbnail} alt={item.title} />
+                    {item.thumbnailUrl ? (
+                      <InsightThumbnail src={item.thumbnailUrl} alt={item.title} />
                     ) : (
                       <div style={{
                         position: 'absolute', inset: 0,
@@ -140,15 +140,19 @@ export default function InsightsPageClient({
                       display: 'flex', alignItems: 'center', gap: 8,
                       marginBottom: 10,
                     }}>
-                      <span style={{
-                        fontFamily: MONO, fontSize: 11, fontWeight: 600,
-                        letterSpacing: '.04em', color: 'var(--accent)',
-                        padding: '2px 7px', background: 'rgba(245,51,63,.06)',
-                      }}>{item.source}</span>
-                      <span style={{
-                        fontFamily: MONO, fontSize: 11, fontWeight: 500,
-                        letterSpacing: '.04em', color: 'var(--ink2)',
-                      }}>{formatDate(item.pubDate)}</span>
+                      {item.sourceName && (
+                        <span style={{
+                          fontFamily: MONO, fontSize: 11, fontWeight: 600,
+                          letterSpacing: '.04em', color: 'var(--accent)',
+                          padding: '2px 7px', background: 'rgba(245,51,63,.06)',
+                        }}>{item.sourceName}</span>
+                      )}
+                      {formatDate(item.publishedAt) && (
+                        <span style={{
+                          fontFamily: MONO, fontSize: 11, fontWeight: 500,
+                          letterSpacing: '.04em', color: 'var(--ink2)',
+                        }}>{formatDate(item.publishedAt)}</span>
+                      )}
                     </div>
 
                     <h3 className="ins-card-title" style={{
@@ -172,11 +176,11 @@ export default function InsightsPageClient({
                       letterSpacing: '.04em', color: 'var(--accent)',
                       display: 'flex', alignItems: 'center', gap: 4,
                     }}>
-                      원문 보기
-                      <span className="ins-card-arrow" style={{ transition: 'transform .2s' }}>↗</span>
+                      자세히 보기
+                      <span className="ins-card-arrow" style={{ transition: 'transform .2s' }}>→</span>
                     </div>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           )}
