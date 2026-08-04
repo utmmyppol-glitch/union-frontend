@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -177,7 +178,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)',
                 position: 'relative', overflow: 'hidden',
               }}>
-                <img src={`${CRAWL}/solution_list_officekeeper_179.jpg`} alt="OfficeKeeper Dashboard" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: .6 }} />
+                <Image src={`${CRAWL}/solution_list_officekeeper_179.jpg`} alt="OfficeKeeper Dashboard" fill style={{ objectFit: 'cover', opacity: .6 }} />
                 {/* Floating panel */}
                 <div style={{
                   position: 'absolute', bottom: 20, right: -20,

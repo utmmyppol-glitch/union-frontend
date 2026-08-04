@@ -60,7 +60,7 @@ export default function InsightDetailClient({ post }: { post: PostData | null })
 
               {post.thumbnailUrl && (
                 <div style={{ marginBottom: 40, overflow: 'hidden' }}>
-                  <img src={post.thumbnailUrl} alt={post.title} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  <img src={post.thumbnailUrl} alt={post.title} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block' }} />
                 </div>
               )}
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
@@ -273,15 +274,16 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <div style={{ overflow: 'hidden' }}>
-                  <img
+                <div style={{ overflow: 'hidden', position: 'relative', aspectRatio: '4/3' }}>
+                  <Image
                     src={`${CRAWL}${p.img}`} alt={p.name}
+                    fill
                     style={{
-                      width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block',
+                      objectFit: 'cover',
                       transition: 'transform .4s ease',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.03)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                    onMouseEnter={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1.03)'; }}
+                    onMouseLeave={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1)'; }}
                   />
                 </div>
                 <div style={{ padding: '20px 22px' }}>
@@ -366,13 +368,14 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                 }}>
                   <div style={{
                     border: '1px solid var(--line)', overflow: 'hidden',
-                    position: 'relative',
+                    position: 'relative', aspectRatio: '16/9',
                   }}>
-                    <img
+                    <Image
                       src={`${CRAWL}${s.img}`} alt={s.title}
-                      style={{ width: '100%', display: 'block', transition: 'transform .5s ease' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                      fill
+                      style={{ objectFit: 'cover', transition: 'transform .5s ease' }}
+                      onMouseEnter={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1.02)'; }}
+                      onMouseLeave={(e) => { (e.target as HTMLImageElement).style.transform = 'scale(1)'; }}
                     />
                   </div>
                 </div>
@@ -473,10 +476,11 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <img
+                <Image
                   src={`${CRAWL}${ic.img}`} alt={ic.name}
+                  width={56} height={56}
                   style={{
-                    width: 56, height: 56, objectFit: 'contain',
+                    objectFit: 'contain',
                     margin: '0 auto 12px', display: 'block',
                   }}
                 />
@@ -552,9 +556,9 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     fontFamily: MONO, fontSize: 12, fontWeight: 700, letterSpacing: '.06em',
                   }}>{pl.badge}</div>
                 )}
-                <div style={{ height: 180, overflow: 'hidden' }}>
-                  <img src={`${CRAWL}${pl.img}`} alt={pl.name} className="es-plan-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
+                  <Image src={`${CRAWL}${pl.img}`} alt={pl.name} className="es-plan-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>

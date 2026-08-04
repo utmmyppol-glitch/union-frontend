@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -226,12 +227,13 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               >
                 <div style={{
                   background: 'var(--soft)', minHeight: 260,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  position: 'relative',
                   order: i % 2 === 0 ? 0 : 1,
                 }}>
-                  <img
+                  <Image
                     src={m.img} alt={m.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    fill
+                    style={{ objectFit: 'cover' }}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 </div>

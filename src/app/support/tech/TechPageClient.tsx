@@ -186,7 +186,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             marginBottom: 20,
           }}>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
-              <img src="/images/crawl/unionsystems/customer_header_img-01_5.png" alt="기술지원팀" style={{
+              <img src="/images/crawl/unionsystems/customer_header_img-01_5.png" alt="기술지원팀" loading="lazy" style={{
                 width: '100%', height: '100%', objectFit: 'cover', display: 'block',
               }} onError={(e) => {
                 const el = e.target as HTMLImageElement;
@@ -217,7 +217,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
               </p>
             </div>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
-              <img src="/images/crawl/unionsystems/customer_header_img-02_99.png" alt="리뉴얼팀" style={{
+              <img src="/images/crawl/unionsystems/customer_header_img-02_99.png" alt="리뉴얼팀" loading="lazy" style={{
                 width: '100%', height: '100%', objectFit: 'cover', display: 'block',
               }} onError={(e) => {
                 const el = e.target as HTMLImageElement;

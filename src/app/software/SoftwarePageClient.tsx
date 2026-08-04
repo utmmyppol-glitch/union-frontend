@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -153,8 +154,8 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.04)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
               >
-                <img src={p.img} alt={p.name} style={{
-                  height: 44, objectFit: 'contain', opacity: 1,
+                <Image src={p.img} alt={p.name} width={100} height={44} style={{
+                  height: 44, width: 'auto', objectFit: 'contain', opacity: 1,
                   filter: 'brightness(0) invert(1)',
                   transition: 'opacity .3s, transform .3s',
                 }}
@@ -222,8 +223,8 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
                 position: 'absolute', right: 40, top: '50%', transform: 'translateY(-55%)',
                 opacity: .12,
               }}>
-                <img src="/images/crawl/unionsystems/main_software_microsoft_80.png" alt="" style={{
-                  height: 300, objectFit: 'contain',
+                <Image src="/images/crawl/unionsystems/main_software_microsoft_80.png" alt="" width={400} height={300} style={{
+                  height: 300, width: 'auto', objectFit: 'contain',
                 }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               </div>
 

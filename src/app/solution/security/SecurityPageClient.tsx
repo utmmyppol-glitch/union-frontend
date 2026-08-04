@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -146,9 +147,10 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
                 <div style={{
                   order: isEven ? 1 : 2,
                   overflow: 'hidden', minHeight: 280,
+                  position: 'relative',
                 }}>
-                  <img src={s.img} alt={s.name} className="sec-row-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                  <Image src={s.img} alt={s.name} className="sec-row-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>

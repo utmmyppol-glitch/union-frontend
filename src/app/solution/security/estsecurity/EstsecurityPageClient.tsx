@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -188,10 +189,10 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                 transition: 'transform .3s cubic-bezier(.16,.84,.3,1), box-shadow .3s',
                 transitionDelay: `${i * 0.08}s`,
               }}>
-                <div style={{ overflow: 'hidden' }}>
-                  <img src={p.img} alt={p.name} className="est-prod-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-                    minHeight: 200, transition: 'transform .5s',
+                <div style={{ overflow: 'hidden', position: 'relative', minHeight: 200 }}>
+                  <Image src={p.img} alt={p.name} className="est-prod-img" fill style={{
+                    objectFit: 'cover',
+                    transition: 'transform .5s',
                   }} />
                 </div>
                 <div style={{

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -196,9 +197,9 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               overflow: 'hidden', background: 'var(--surface)',
               position: 'relative',
             }}>
-              <div style={{ overflow: 'hidden', height: '70%' }}>
-                <img src={`${CRAWL}${PRODUCTS[0].img}`} alt={PRODUCTS[0].name} className="ab-bento-img" style={{
-                  width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+              <div style={{ overflow: 'hidden', height: '70%', position: 'relative' }}>
+                <Image src={`${CRAWL}${PRODUCTS[0].img}`} alt={PRODUCTS[0].name} className="ab-bento-img" fill style={{
+                  objectFit: 'cover',
                   transition: 'transform .5s',
                 }} />
               </div>
@@ -220,9 +221,9 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                 display: 'flex', alignItems: 'center', gap: 16, padding: 0,
                 transitionDelay: `${(i + 1) * 0.06}s`,
               }}>
-                <div style={{ width: 120, height: '100%', overflow: 'hidden', flexShrink: 0 }}>
-                  <img src={`${CRAWL}${p.img}`} alt={p.name} className="ab-bento-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                <div style={{ width: 120, height: '100%', overflow: 'hidden', flexShrink: 0, position: 'relative' }}>
+                  <Image src={`${CRAWL}${p.img}`} alt={p.name} className="ab-bento-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>
@@ -262,8 +263,8 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <div key={`${ic.name}-${idx}`} style={{
               display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
             }}>
-              <img src={`${CRAWL}${ic.img}`} alt={ic.name} style={{
-                width: 32, height: 32, objectFit: 'contain',
+              <Image src={`${CRAWL}${ic.img}`} alt={ic.name} width={32} height={32} style={{
+                objectFit: 'contain',
               }} />
               <span style={{
                 fontFamily: MONO, fontSize: 13, fontWeight: 500,
@@ -312,9 +313,9 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                 transitionDelay: `${i * 0.08}s`,
               }}>
                 {/* Image top */}
-                <div style={{ overflow: 'hidden', height: 200 }}>
-                  <img src={`${CRAWL}${s.img}`} alt={s.en} className="ab-str-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                <div style={{ overflow: 'hidden', height: 200, position: 'relative' }}>
+                  <Image src={`${CRAWL}${s.img}`} alt={s.en} className="ab-str-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>
@@ -423,9 +424,9 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                 )}
 
                 {/* Image */}
-                <div style={{ height: 180, overflow: 'hidden' }}>
-                  <img src={`${CRAWL}${pl.img}`} alt={pl.name} className="ab-plan-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
+                  <Image src={`${CRAWL}${pl.img}`} alt={pl.name} className="ab-plan-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>

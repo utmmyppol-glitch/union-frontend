@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { NAV_ITEMS } from '@/lib/constants';
 import type { NavItem } from '@/types';
 
@@ -397,7 +398,7 @@ export default function Header({ ssrMenu }: { ssrMenu?: NavItem[] | null }) {
           borderBottom: '1px solid rgba(255,255,255,.08)',
         }}>
           <Link href="/" onClick={() => setMobileOpen(false)}>
-            <img src="/images/logo_w.png" alt="UNION SYSTEMS" style={{ height: 18 }} />
+            <Image src="/images/logo_w.png" alt="UNION SYSTEMS" width={120} height={18} style={{ height: 18, width: 'auto' }} />
           </Link>
           <button
             onClick={() => setMobileOpen(false)}

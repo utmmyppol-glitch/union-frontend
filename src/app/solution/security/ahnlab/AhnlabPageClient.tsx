@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -191,9 +192,9 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                   }} />
                 )}
                 {/* Image */}
-                <div style={{ overflow: 'hidden', height: 200 }}>
-                  <img src={p.img} alt={p.name} className="ah-prod-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                <div style={{ overflow: 'hidden', height: 200, position: 'relative' }}>
+                  <Image src={p.img} alt={p.name} className="ah-prod-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>
@@ -271,9 +272,10 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             }}>
               <div style={{
                 border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden',
+                position: 'relative', height: 160,
               }}>
-                <img src={pt.img} alt={pt.title} className="ah-point-img" style={{
-                  width: '100%', height: 160, objectFit: 'cover', display: 'block',
+                <Image src={pt.img} alt={pt.title} className="ah-point-img" fill style={{
+                  objectFit: 'cover',
                   transition: 'transform .5s',
                 }} />
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -197,9 +198,9 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
               }}
             >
               {/* Image thumbnail */}
-              <div style={{ overflow: 'hidden', border: '1px solid var(--line)' }}>
-                <img src={`${CRAWL}${p.img}`} alt={p.name} className="ad-prod-img" style={{
-                  width: '100%', height: 120, objectFit: 'cover', display: 'block',
+              <div style={{ overflow: 'hidden', border: '1px solid var(--line)', position: 'relative', height: 120 }}>
+                <Image src={`${CRAWL}${p.img}`} alt={p.name} className="ad-prod-img" fill style={{
+                  objectFit: 'cover',
                   transition: 'transform .4s',
                 }} />
               </div>
@@ -367,8 +368,8 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                   background: 'rgba(255,255,255,.02)',
                   transition: 'border-color .2s, transform .2s',
                 }}>
-                  <img src={`${CRAWL}${ic.img}`} alt={ic.name} style={{
-                    width: 44, height: 44, objectFit: 'contain',
+                  <Image src={`${CRAWL}${ic.img}`} alt={ic.name} width={44} height={44} style={{
+                    objectFit: 'contain',
                     margin: '0 auto 10px', display: 'block',
                   }} />
                   <span style={{
@@ -439,9 +440,9 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     fontFamily: MONO, fontSize: 12, fontWeight: 700, letterSpacing: '.06em',
                   }}>{pl.badge}</div>
                 )}
-                <div style={{ height: 180, overflow: 'hidden' }}>
-                  <img src={pl.img} alt={pl.name} style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
+                  <Image src={pl.img} alt={pl.name} fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
@@ -192,8 +193,8 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
             <div key={`${ic.name}-${idx}`} style={{
               display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0,
             }}>
-              <img src={`${CRAWL}${ic.img}`} alt={ic.name} style={{
-                width: 36, height: 36, objectFit: 'contain',
+              <Image src={`${CRAWL}${ic.img}`} alt={ic.name} width={36} height={36} style={{
+                objectFit: 'contain',
               }} />
               <span style={{
                 fontFamily: MONO, fontSize: 13, fontWeight: 500,
@@ -271,9 +272,9 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                 transition: 'transform .25s cubic-bezier(.16,.84,.3,1), box-shadow .25s',
                 transitionDelay: `${i * 0.06}s`,
               }}>
-                <div style={{ overflow: 'hidden' }}>
-                  <img src={`${CRAWL}${p.img}`} alt={p.name} className="ms-prod-img" style={{
-                    width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block',
+                <div style={{ overflow: 'hidden', position: 'relative', aspectRatio: '4/3' }}>
+                  <Image src={`${CRAWL}${p.img}`} alt={p.name} className="ms-prod-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .4s',
                   }} />
                 </div>
@@ -368,10 +369,10 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
           }}>
             <div style={{
               border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden',
-              position: 'relative',
+              position: 'relative', minHeight: 280,
             }}>
-              <img src={`${CRAWL}${s.img}`} alt={s.title} style={{
-                width: '100%', display: 'block', minHeight: 280, objectFit: 'cover',
+              <Image src={`${CRAWL}${s.img}`} alt={s.title} fill style={{
+                objectFit: 'cover',
               }} />
               {/* Number overlay on image */}
               <div aria-hidden="true" style={{
@@ -477,9 +478,9 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                     letterSpacing: '.06em', color: '#fff',
                   }}>RECOMMENDED</div>
                 )}
-                <div style={{ height: 180, overflow: 'hidden' }}>
-                  <img src={`${CRAWL}${pl.img}`} alt={pl.name} className="ms-plan-img" style={{
-                    width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
+                  <Image src={`${CRAWL}${pl.img}`} alt={pl.name} className="ms-plan-img" fill style={{
+                    objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
                 </div>
