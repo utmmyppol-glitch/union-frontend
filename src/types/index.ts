@@ -86,6 +86,20 @@ export interface ClientLogo {
   createdAt: string;
 }
 
+// Insight (auto-curated news)
+export interface Insight {
+  id: number;
+  title: string;
+  summary: string;
+  sourceUrl: string;
+  sourceName: string;
+  publishedAt: string;
+  thumbnailUrl: string | null;
+  status?: string;
+  approvedAt?: string;
+  approvedBy?: string;
+}
+
 // Pagination
 export interface Page<T> {
   content: T[];

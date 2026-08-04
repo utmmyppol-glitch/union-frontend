@@ -25,6 +25,7 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
       setData(initialData);
       return;
     }
+    if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
     const params = new URLSearchParams({ page: String(page), size: '9' });
     if (industry !== '전체') params.set('industry', industry);
@@ -101,7 +102,7 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
                   <div key={story.id} className="reveal case-card" style={{ background: isDark ? 'var(--charcoal)' : 'var(--surface)', border: isDark ? 'none' : '1px solid var(--line)', padding: 0, overflow: 'hidden', transition: 'transform .25s cubic-bezier(.16,.84,.3,1), box-shadow .25s', transitionDelay: `${idx * 0.05}s`, cursor: 'pointer' }}>
                     <div style={{ height: 160, position: 'relative', overflow: 'hidden', background: isDark ? 'radial-gradient(ellipse at 50% 80%, rgba(148,53,67,.1) 0%, var(--charcoal) 60%)' : 'var(--soft)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {story.thumbnailUrl ? (
-                        <img src={story.thumbnailUrl} alt={story.company} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={story.thumbnailUrl} alt={story.company} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
                         <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 56, fontWeight: 300, color: isDark ? 'rgba(255,255,255,.06)' : 'var(--line)' }}>{story.company.charAt(0)}</span>
                       )}

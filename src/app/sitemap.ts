@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { USE_MOCK, MOCK_INSIGHTS } from '@/lib/mock';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.unionsystems.co.kr';
 
@@ -30,23 +31,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamically add insight posts
   let insightPages: MetadataRoute.Sitemap = [];
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-    const res = await fetch(`${apiUrl}/posts?category=INSIGHT&page=0&size=100`, {
-      next: { revalidate: 3600 },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const posts = data.content || [];
-      insightPages = posts.map((post: { id: number; updatedAt?: string; createdAt?: string }) => ({
-        url: `${SITE_URL}/insights/${post.id}`,
-        lastModified: post.updatedAt || post.createdAt,
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
-      }));
+  if (USE_MOCK) {
+    insightPages = MOCK_INSIGHTS.map((item) => ({
+      url: `${SITE_URL}/insights/${item.id}`,
+      lastModified: item.publishedAt,
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }));
+  } else {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+      const res = await fetch(`${apiUrl}/posts?category=INSIGHT&page=0&size=100`, {
+        next: { revalidate: 3600 },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const posts = data.content || [];
+        insightPages = posts.map((post: { id: number; updatedAt?: string; createdAt?: string }) => ({
+          url: `${SITE_URL}/insights/${post.id}`,
+          lastModified: post.updatedAt || post.createdAt,
+          changeFrequency: 'weekly' as const,
+          priority: 0.7,
+        }));
+      }
+    } catch {
+      // silently skip dynamic pages
     }
-  } catch {
-    // silently skip dynamic pages
   }
 
   return [...staticPages, ...insightPages];

@@ -11,15 +11,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        accent: "#F5333F",
-        ms: "#00A4EF",
-        graphite: "#2B2C30",
-        charcoal: "#141210",
-        ivory: "#FBFAF7",
+        accent: "var(--accent)",
+        "accent-dark": "var(--accent-dark)",
+        ms: "var(--ms)",
+        graphite: "var(--graphite)",
+        charcoal: "var(--charcoal)",
+        ivory: "var(--bg)",
+        soft: "var(--soft)",
+        ink2: "var(--ink2)",
         background: "var(--bg)",
         foreground: "var(--ink)",
         surface: "var(--surface)",
         border: "var(--line)",
+        success: "var(--success)",
+        warning: "var(--warning)",
+        error: "var(--error)",
       },
       fontFamily: {
         sans: [
@@ -46,6 +52,7 @@ const config: Config = {
         DEFAULT: "0px",
       },
       screens: {
+        xs: "480px",
         tablet: "920px",
       },
       keyframes: {

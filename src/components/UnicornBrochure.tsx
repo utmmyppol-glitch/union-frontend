@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { apiClient } from '@/lib/api';
 import PrivacyConsent from '@/components/ui/PrivacyConsent';
 
@@ -196,8 +197,7 @@ export default function UnicornBrochure() {
             overflow: 'hidden',
             animation: 'ub-fly .88s cubic-bezier(.42,.02,.32,1) forwards',
           }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/union-u-logo.png" alt="" draggable={false} style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <Image src="/images/union-u-logo.png" alt="" width={36} height={36} style={{ objectFit: 'contain' }} draggable={false} />
             <div style={{ fontSize: 10, fontWeight: 800, color: '#111', letterSpacing: '.04em' }}>UNION SYSTEMS</div>
             <div style={{ width: '70%', height: 1, background: '#eee' }} />
             <div style={{ fontSize: 9, color: '#888' }}>회사소개서</div>
@@ -250,8 +250,7 @@ export default function UnicornBrochure() {
 
             {/* 헤더 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/brand-logo.png" alt="UNION SYSTEMS" draggable={false} style={{ height: 28 }} />
+              <Image src="/images/brand-logo.png" alt="UNION SYSTEMS" width={140} height={28} style={{ height: 28, width: 'auto' }} draggable={false} />
               <button
                 onClick={handleClose}
                 aria-label="닫기"

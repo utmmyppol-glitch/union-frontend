@@ -26,6 +26,7 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
       setData(initialData);
       return;
     }
+    if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
     fetch(`${apiUrl}/posts?category=NOTICE&page=${page}&size=${PER_PAGE}`)
       .then(r => r.ok ? r.json() : null)
@@ -43,7 +44,7 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
     }, { threshold: 0.08 });
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [notices]);
+  }, [data]);
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -82,7 +83,7 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
                 return (
                   <div key={post.id} className="reveal ntc-card" style={{ border: '1px solid var(--line)', overflow: 'hidden', background: 'var(--surface)', cursor: 'pointer', transition: 'transform .3s cubic-bezier(.16,.84,.3,1), box-shadow .3s', transitionDelay: `${idx * 0.05}s` }}>
                     <div style={{ overflow: 'hidden', aspectRatio: '16/10' }}>
-                      <img src={img} alt={post.title} className="ntc-img" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform .5s' }} onError={(e) => { (e.target as HTMLImageElement).src = `${UP}01_1.png`; }} />
+                      <img src={img} alt={post.title} className="ntc-img" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform .5s' }} onError={(e) => { (e.target as HTMLImageElement).src = `${UP}01_1.png`; }} />
                     </div>
                     <div style={{ padding: '20px 22px' }}>
                       <h3 className="ntc-title" style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)', margin: '0 0 8px', lineHeight: 1.4, transition: 'color .2s', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.title}</h3>

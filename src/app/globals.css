@@ -17,7 +17,11 @@
   --graphite: #2B2C30;
   --charcoal: #141210;
   --accent: #F5333F;
+  --accent-dark: #E4002B;
   --ms: #00A4EF;
+  --success: #059669;
+  --warning: #D97706;
+  --error: #c0392f;
 }
 
 /* ── Base styles ─────────────────────────────────────── */
@@ -66,6 +70,25 @@
   ::selection {
     background: var(--accent);
     color: #fff;
+  }
+
+  /* ── Focus-visible: 키보드 접근성 ─── */
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* 다크 배경 위의 포커스 링 */
+  [data-dark] *:focus-visible,
+  .bg-charcoal *:focus-visible,
+  .bg-graphite *:focus-visible {
+    outline-color: #fff;
+  }
+
+  /* 네이티브 포커스 제거 (focus-visible이 대체) */
+  *:focus:not(:focus-visible) {
+    outline: none;
   }
 }
 
@@ -299,6 +322,29 @@
 
   .bg-soft {
     background-color: var(--soft);
+  }
+
+  /* Responsive grid — 모바일 1열, 태블릿 2열, 데스크톱 3열 */
+  .grid-responsive {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 640px) {
+    .grid-responsive { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .grid-responsive { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* 2-column responsive grid */
+  .grid-responsive-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 640px) {
+    .grid-responsive-2 { grid-template-columns: repeat(2, 1fr); }
   }
 
   /* Glass effect for scrolled header */

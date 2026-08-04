@@ -158,7 +158,7 @@ export default function EventsPage() {
                   }}
                 >
                   <div style={{ position: 'relative', overflow: 'hidden', minHeight: 320 }}>
-                    <img src={featured.img} alt={featured.title} className="evt-img" style={{
+                    <img src={featured.img} alt={featured.title} className="evt-img" loading="lazy" style={{
                       width: '100%', height: '100%', objectFit: 'cover', display: 'block',
                       transition: 'transform .5s',
                     }} onError={(e) => {
