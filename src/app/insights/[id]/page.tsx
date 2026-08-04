@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import InsightDetailClient from './InsightDetailClient';
+import { USE_MOCK, MOCK_INSIGHTS } from '@/lib/mock';
 import type { Insight, Page } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
@@ -8,6 +9,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/a
 type InsightPage = Pick<Page<Insight>, 'content' | 'totalPages'>;
 
 async function getAllInsights(): Promise<Insight[]> {
+  if (USE_MOCK) return MOCK_INSIGHTS;
   try {
     const res = await fetch(`${API_BASE_URL}/insights?page=0&size=100`, {
       next: { revalidate: 60 },
@@ -16,7 +18,7 @@ async function getAllInsights(): Promise<Insight[]> {
     const data: InsightPage = await res.json();
     return data.content ?? [];
   } catch {
-    return [];
+    return MOCK_INSIGHTS;
   }
 }
 

@@ -1,6 +1,7 @@
 import type { CustomerStory } from '@/types';
 import CasesPageClient from './CasesPageClient';
 import type { Metadata } from 'next';
+import { USE_MOCK, MOCK_STORIES } from '@/lib/mock';
 
 export const metadata: Metadata = {
   title: '고객 사례',
@@ -23,6 +24,7 @@ const FALLBACK_STORIES: CustomerStory[] = [
 ];
 
 async function getCustomerStories() {
+  if (USE_MOCK) return { content: MOCK_STORIES, totalPages: 1, first: true, last: true };
   try {
     const res = await fetch(`${API_BASE_URL}/customer-stories?page=0&size=9`, {
       next: { revalidate: 60 },
