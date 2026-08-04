@@ -25,7 +25,6 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
       setData(initialData);
       return;
     }
-    if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
     const params = new URLSearchParams({ page: String(page), size: '9' });
     if (industry !== '전체') params.set('industry', industry);

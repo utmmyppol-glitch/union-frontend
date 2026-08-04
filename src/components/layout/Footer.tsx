@@ -1,13 +1,11 @@
 import Link from 'next/link';
 import { NAV_ITEMS } from '@/lib/constants';
 import type { NavItem } from '@/types';
-import { USE_MOCK, MOCK_CONFIG } from '@/lib/mock';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
 
 /** 설정값 가져오기 (ISR 60초) */
 async function fetchConfig(): Promise<Record<string, string>> {
-  if (USE_MOCK) return MOCK_CONFIG;
   try {
     const baseUrl = API_URL.replace('/api/union', '');
     const res = await fetch(`${baseUrl}/api/union/config`, {

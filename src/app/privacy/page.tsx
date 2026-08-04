@@ -1,6 +1,5 @@
 import PrivacyPageClient from './PrivacyPageClient';
 import type { Metadata } from 'next';
-import { USE_MOCK, MOCK_CONTENT } from '@/lib/mock';
 
 export const metadata: Metadata = {
   title: '개인정보처리방침',
@@ -15,7 +14,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/un
 const CONTENT_KEYS = ['privacy_hero', 'privacy_intro', 'privacy_officer', 'privacy_date'];
 
 async function getContent(): Promise<Record<string, string>> {
-  if (USE_MOCK) return MOCK_CONTENT;
   try {
     const base = API_URL.replace(/\/api\/union\/?$/, '');
     const res = await fetch(

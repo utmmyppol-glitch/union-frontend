@@ -26,7 +26,6 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
       setData(initialData);
       return;
     }
-    if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
     fetch(`${apiUrl}/posts?category=NOTICE&page=${page}&size=${PER_PAGE}`)
       .then(r => r.ok ? r.json() : null)

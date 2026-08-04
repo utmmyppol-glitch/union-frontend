@@ -1,6 +1,5 @@
 import NetclientPageClient from './NetclientPageClient';
 import type { Metadata } from 'next';
-import { USE_MOCK, MOCK_CONTENT } from '@/lib/mock';
 
 export const metadata: Metadata = {
   title: 'NetClient',
@@ -15,7 +14,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/un
 const CONTENT_KEYS = ['netclient_hero', 'netclient_modules', 'netclient_points', 'netclient_icons', 'netclient_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
-  if (USE_MOCK) return MOCK_CONTENT;
   try {
     const base = API_URL.replace(/\/api\/union\/?$/, '');
     const res = await fetch(`${base}/api/union/content?keys=${CONTENT_KEYS.join(',')}`, { next: { revalidate: 60 } });

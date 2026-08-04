@@ -25,7 +25,6 @@ export default function InsightsPageClient({
 
   useEffect(() => {
     if (page === 0) { setData(initialData); return; }
-    if (process.env.NEXT_PUBLIC_USE_MOCK === 'true') return;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
     fetch(`${apiUrl}/insights?page=${page}&size=12`)
       .then(r => r.ok ? r.json() : null)

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import NoticesPageClient from './NoticesPageClient';
-import { USE_MOCK, MOCK_NOTICES } from '@/lib/mock';
 
 export const metadata: Metadata = {
   title: '공지사항',
@@ -29,14 +28,6 @@ const SAMPLE_NOTICES = [
 ];
 
 async function getNotices() {
-  if (USE_MOCK) {
-    return {
-      content: MOCK_NOTICES.slice(0, PER_PAGE),
-      totalPages: Math.ceil(MOCK_NOTICES.length / PER_PAGE),
-      first: true,
-      last: false,
-    };
-  }
   try {
     const res = await fetch(`${API_BASE_URL}/posts?category=NOTICE&page=0&size=${PER_PAGE}`, {
       next: { revalidate: 60 },

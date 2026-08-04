@@ -6,7 +6,6 @@ import ScrollReveal from "@/components/layout/ScrollReveal";
 import ChannelTalk from "@/components/ChannelTalk";
 import UniMascot from "@/components/UniMascot";
 import type { NavItem } from "@/types";
-import { USE_MOCK } from "@/lib/mock";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/union";
 
@@ -28,7 +27,6 @@ function apiToNavItems(items: MenuApiItem[]): NavItem[] {
 }
 
 async function getMenu(): Promise<NavItem[] | null> {
-  if (USE_MOCK) return null;
   try {
     const base = API_URL.replace(/\/api\/union\/?$/, "");
     const res = await fetch(`${base}/api/union/menus`, { next: { revalidate: 60 } });
