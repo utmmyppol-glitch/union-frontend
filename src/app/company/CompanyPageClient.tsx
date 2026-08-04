@@ -32,10 +32,22 @@ const DEFAULT_VALUES = [
   { num: '03', title: '파트너십', desc: '단순 공급이 아닌 도입부터 운영, 유지보수까지 전 과정을 함께하는 진정한 IT 파트너가 되겠습니다.' },
 ];
 const DEFAULT_DEPTS = [
-  { name: '솔루션사업부', desc: 'DATA / SW / SI 사업팀' }, { name: '영업부', desc: '공공영업 / 기업영업 / 교육영업' },
-  { name: '서비스사업부', desc: '기술지원 팀' }, { name: '사업지원부', desc: '리뉴얼 / 마케팅 / 영업지원' },
+  { name: '마케팅팀', desc: '브랜드·홍보와 콘텐츠로 시장 접점을 넓힙니다.' },
+  { name: '영업팀', desc: '공공·기업·교육 시장을 아우르는 영업을 수행합니다.' },
+  { name: '개발팀', desc: '커스터마이징·SI 개발로 프로젝트를 완성합니다.' },
+  { name: '기술팀', desc: '설치부터 유지보수까지 안정 운영을 책임집니다.' },
+  { name: 'D.A팀', desc: '데이터 아키텍처·품질·거버넌스를 담당합니다.' },
+  { name: '사업지원팀', desc: '경영지원과 운영으로 조직을 뒷받침합니다.' },
 ];
-const DEFAULT_ORG = { img: '/images/crawl/unionsystems/about_organization_chart_30.jpg', title: '소수정예 전문가 조직', text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.' };
+const ORG_TEAMS = [
+  { name: '마케팅팀', items: ['브랜드·홍보', '콘텐츠 기획'] },
+  { name: '영업팀', items: ['공공영업', '기업영업', '교육영업'] },
+  { name: '개발팀', items: ['커스터마이징 개발', 'SI 개발', '프로젝트 관리'] },
+  { name: '기술팀', items: ['설치·구축', '유지보수', '기술지원'] },
+  { name: 'D.A팀', items: ['데이터 아키텍처', '데이터 품질', '데이터 거버넌스'] },
+  { name: '사업지원팀', items: ['경영지원', '리뉴얼', '영업지원'] },
+];
+const DEFAULT_ORG = { title: '소수정예 전문가 조직', text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.' };
 const DEFAULT_CI = { img: '/images/crawl/unionsystems/about_ci_31.jpg', title: '기업 아이덴티티', subtitle: 'UNION RED는 고객을 향한 열정을 담고 있습니다', quote: '고객과 신뢰로 만들어진 유니온시스템즈,\n함께 구축하겠다는 열정을 담고 있습니다.', ceo: 'CEO 홍민석' };
 const DEFAULT_CTA = { title: '유니온시스템즈와 함께 시작하세요', desc: '귀사의 IT 환경에 최적화된 솔루션을 제안해 드립니다.' };
 
@@ -211,25 +223,52 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
       </section>
 
       {/* ═══ Organization ═══ */}
-      <section style={{ padding: 'clamp(56px, 8vw, 96px) 0', background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
-        <div aria-hidden="true" style={{ position: 'absolute', top: 0, bottom: 0, right: 'clamp(16px,2.5vw,40px)', width: 1, background: 'var(--line)', opacity: .2, pointerEvents: 'none' }} />
-        <div aria-hidden="true" style={{ position: 'absolute', top: 'clamp(40px,5vw,80px)', right: 'clamp(12px,2.5vw,36px)', width: 7, height: 7, border: '1px solid var(--line)', opacity: .5 }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'var(--line)', opacity: .3 }} />
-        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, var(--line) 0.5px, transparent 0.5px)', backgroundSize: '40px 40px', opacity: .15, pointerEvents: 'none' }} />
-        <div className="wrap">
+      <section style={{ padding: 'clamp(56px, 8vw, 96px) 0', background: 'var(--charcoal)', position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: 0, bottom: 0, left: 'clamp(16px,2.5vw,40px)', width: 1, background: 'rgba(255,255,255,.06)', pointerEvents: 'none' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', top: 'clamp(40px,5vw,80px)', left: 'clamp(12px,2.5vw,36px)', width: 7, height: 7, border: '1px solid rgba(255,255,255,.1)' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'rgba(255,255,255,.06)' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 80%, rgba(148,53,67,.05) 0%, transparent 50%)', pointerEvents: 'none' }} />
+        <div className="wrap" style={{ position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 48 }}>
-            <p className="eyebrow" style={{ margin: '0 0 14px' }}>ORGANIZATION</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_org.title" editMode={editMode}>{org.title}</E></h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{org.text}</E></p>
+            <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 14px' }}>ORGANIZATION</p>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: '0 0 12px' }}><E id="company_org.title" editMode={editMode}>{org.title}</E></h2>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{org.text}</E></p>
           </div>
-          <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 32 }}>
-            <OptImg id="company_org.img" editMode={editMode} src={org.img} alt="유니온시스템즈 조직도" width={1200} height={600} style={{ width: '100%', height: 'auto' }} />
+
+          {/* Org Chart */}
+          <div className="reveal" style={{ marginBottom: 40, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <div style={{ minWidth: 720 }}>
+              {/* CEO + Advisor */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, padding: '12px 36px', textAlign: 'center' }}>CEO</div>
+                <div style={{ width: 36, height: 2, background: 'var(--accent)' }} />
+                <div style={{ border: '1.5px solid var(--accent)', color: 'rgba(255,255,255,.85)', fontSize: 13, padding: '8px 20px', textAlign: 'center' }}>기술자문</div>
+              </div>
+              {/* Vertical line from CEO */}
+              <div style={{ width: 2, height: 28, background: 'var(--accent)', margin: '0 auto' }} />
+              {/* Horizontal connector */}
+              <div style={{ height: 2, background: 'var(--accent)', marginLeft: 'calc(100% / 12)', marginRight: 'calc(100% / 12)' }} />
+              {/* Teams */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, padding: '0 calc(100% / 12 - 5px)' }}>
+                {ORG_TEAMS.map((team) => (
+                  <div key={team.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ width: 2, height: 18, background: 'var(--accent)' }} />
+                    <div style={{ background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 13, padding: '9px 0', textAlign: 'center', width: '100%', marginBottom: 6 }}>{team.name}</div>
+                    {team.items.map((item) => (
+                      <div key={item} style={{ border: '1px solid var(--accent)', color: 'rgba(255,255,255,.8)', fontSize: 12, padding: '6px 4px', textAlign: 'center', width: '100%', marginBottom: 4 }}>{item}</div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+
+          {/* Summary */}
+          <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
             {depts.map((d, idx) => (
-              <div key={idx} className="reveal" style={{ borderTop: idx === 0 ? '2px solid var(--accent)' : '2px solid var(--line)', padding: '20px 0 0', transitionDelay: `${idx * 0.06}s` }}>
-                <h3 style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></h3>
-                <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: 'var(--ink2)', margin: 0, letterSpacing: '.02em' }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
+              <div key={idx} className="reveal" style={{ borderTop: '2px solid var(--accent)', padding: '20px 0 0', transitionDelay: `${idx * 0.06}s` }}>
+                <h3 style={{ fontWeight: 700, fontSize: 15, color: '#fff', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></h3>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,.45)', margin: 0, lineHeight: 1.6 }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
               </div>
             ))}
           </div>
@@ -291,7 +330,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           .about-stats { grid-template-columns: repeat(2, 1fr) !important; }
           .about-strengths { grid-template-columns: 1fr !important; }
           .about-values { grid-template-columns: 1fr 1fr !important; }
-          .about-depts { grid-template-columns: 1fr 1fr !important; }
+          .about-depts { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 560px) {
           .about-values { grid-template-columns: 1fr !important; }

@@ -4,14 +4,14 @@ import React from 'react';
 
 const cards = [
   {
-    label: '리뉴얼팀',
+    label: '사업지원팀',
     heading: '라이선스 갱신·관리',
     items: ['벤더사와 긴밀한 연결', '라이선스 정책 안내', '갱신 관리 자동화', '성능 향상 교육·세미나'],
     stat: '98%',
     statLabel: '재계약률',
   },
   {
-    label: '기술지원팀',
+    label: '기술팀',
     heading: '도입 후 기술지원',
     items: ['전담 엔지니어 배정', '원격지원 · 장애 처리', '유지보수 · 이슈 대응', '정기 방문 점검'],
     stat: '24/7',
