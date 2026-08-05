@@ -29,11 +29,11 @@ const DEFAULT_PROCESS = [
 ];
 
 const DEFAULT_TECH_TEAM = [
-  { name: '조성준', title: '차장/팀장', email: 'kevin@unionsystems.co.kr' },
-  { name: '박상현', title: '차장', email: 'mite5@unionsystems.co.kr' },
+  { name: '조성준', position: '차장/팀장', email: 'kevin@unionsystems.co.kr' },
+  { name: '박상현', position: '차장', email: 'mite5@unionsystems.co.kr' },
 ];
 
-const DEFAULT_DA_TEAM: { name: string; title: string; email: string }[] = [];
+const DEFAULT_DA_TEAM: { name: string; position: string; email: string }[] = [];
 
 const DEFAULT_FAQ = [
   { category: 'Microsoft 365', question: 'Microsoft 365 라이선스 갱신은 어떻게 하나요?', answer: '라이선스 만료일 30일 전 안내 메일을 발송해 드립니다. 자동 갱신 설정이 되어 있는 경우 별도 조치 없이 갱신되며, 수동 갱신의 경우 담당자에게 연락해주시면 처리해 드립니다.' },
@@ -355,8 +355,10 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
           <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 18 }}>
               <tbody>
-                {techTeam.map((m: { name: string; title: string; email: string }, i: number) => (
-                  <tr key={m.email} style={{ borderBottom: '1px solid var(--line)' }}>
+                {techTeam.map((m: { name: string; position?: string; title?: string; email: string }, i: number) => {
+                  const pos = m.position ?? m.title ?? '';
+                  return (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--line)' }}>
                     {i === 0 && (
                       <td rowSpan={techTeam.length} style={{
                         padding: '28px 36px', fontWeight: 800, fontSize: 18, color: 'var(--ink)',
@@ -366,7 +368,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                     )}
                     <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220 }}>
                       <E id={`tech_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
-                      <E id={`tech_team.${i}.title`} editMode={editMode}>{m.title}</E>
+                      <E id={`tech_team.${i}.position`} editMode={editMode}>{pos}</E>
                     </td>
                     <td style={{ padding: '22px 28px' }}>
                       <a href={`mailto:${m.email}`} style={{ color: 'var(--ink2)', textDecoration: 'none', fontSize: 18 }}>
@@ -374,9 +376,12 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                       </a>
                     </td>
                   </tr>
-                ))}
-                {daTeam.length > 0 && daTeam.map((m: { name: string; title: string; email: string }, i: number) => (
-                  <tr key={m.email} style={{ borderBottom: i < daTeam.length - 1 ? '1px solid var(--line)' : 'none' }}>
+                  );
+                })}
+                {daTeam.length > 0 && daTeam.map((m: { name: string; position?: string; title?: string; email: string }, i: number) => {
+                  const pos = m.position ?? m.title ?? '';
+                  return (
+                  <tr key={i} style={{ borderBottom: i < daTeam.length - 1 ? '1px solid var(--line)' : 'none' }}>
                     {i === 0 && (
                       <td rowSpan={daTeam.length} style={{
                         padding: '28px 36px', fontWeight: 800, fontSize: 18, color: 'var(--ink)',
@@ -386,7 +391,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                     )}
                     <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220, borderTop: i === 0 ? '1px solid var(--line)' : 'none' }}>
                       <E id={`tech_da_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
-                      <E id={`tech_da_team.${i}.title`} editMode={editMode}>{m.title}</E>
+                      <E id={`tech_da_team.${i}.position`} editMode={editMode}>{pos}</E>
                     </td>
                     <td style={{ padding: '18px 24px', borderTop: i === 0 ? '1px solid var(--line)' : 'none' }}>
                       <a href={`mailto:${m.email}`} style={{ color: 'var(--ink2)', textDecoration: 'none', fontSize: 18 }}>
@@ -394,7 +399,8 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                       </a>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
