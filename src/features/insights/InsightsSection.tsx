@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/ui';
+import { apiClient } from '@/lib/api';
 
 interface Insight {
   id?: number;
@@ -30,6 +31,9 @@ function mapInsight(item: Insight) {
 }
 
 const InsightsSection: React.FC<{ insights?: Record<string, unknown>[] }> = ({ insights }) => {
+  const [nlEmail, setNlEmail] = useState('');
+  const [nlDone, setNlDone] = useState(false);
+  const [nlLoading, setNlLoading] = useState(false);
   const posts = insights && insights.length >= 3
     ? insights.slice(0, 3).map((i) => mapInsight(i as unknown as Insight))
     : FALLBACK_POSTS.map((p) => ({ ...p, url: '/insights' }));
@@ -265,34 +269,61 @@ const InsightsSection: React.FC<{ insights?: Record<string, unknown>[] }> = ({ i
               매월 IT 담당자를 위한 보안·라이선스·데이터 인사이트를 보내드립니다.
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input
-              type="email"
-              placeholder="이메일 주소"
-              style={{
-                padding: '10px 14px',
-                border: '1px solid var(--line)',
-                background: 'var(--bg)',
-                fontSize: 18,
-                color: 'var(--ink)',
-                outline: 'none',
-                width: 220,
-              }}
-            />
-            <button
-              style={{
-                padding: '10px 20px',
-                border: 'none',
-                background: 'var(--accent)',
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: 18,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              구독하기
-            </button>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {!nlDone ? (<>
+              <input
+                type="email"
+                placeholder="이메일 주소"
+                value={nlEmail}
+                onChange={(e) => setNlEmail(e.target.value)}
+                style={{
+                  padding: '10px 14px',
+                  border: '1px solid var(--line)',
+                  background: 'var(--bg)',
+                  fontSize: 18,
+                  color: 'var(--ink)',
+                  outline: 'none',
+                  width: 220,
+                }}
+              />
+              <button
+                disabled={nlLoading}
+                onClick={async () => {
+                  if (!nlEmail.includes('@')) return;
+                  setNlLoading(true);
+                  try {
+                    await apiClient.submitInquiry({
+                      name: '뉴스레터 구독',
+                      company: '-',
+                      phone: '-',
+                      email: nlEmail,
+                      product: '뉴스레터',
+                      message: '[뉴스레터 구독] IT 트렌드 뉴스레터 구독 신청',
+                      consentPrivacy: true,
+                    });
+                  } catch { /* ignore */ }
+                  setNlDone(true);
+                  setNlLoading(false);
+                }}
+                style={{
+                  padding: '10px 20px',
+                  border: 'none',
+                  background: 'var(--accent)',
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: 18,
+                  cursor: nlLoading ? 'wait' : 'pointer',
+                  whiteSpace: 'nowrap',
+                  opacity: nlLoading ? .6 : 1,
+                }}
+              >
+                {nlLoading ? '처리 중...' : '구독하기'}
+              </button>
+            </>) : (
+              <p style={{ fontWeight: 700, fontSize: 15, color: 'var(--accent)', margin: 0 }}>
+                ✓ 구독 신청이 완료되었습니다!
+              </p>
+            )}
           </div>
         </div>
       </Container>
