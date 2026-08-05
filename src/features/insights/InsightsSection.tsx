@@ -100,8 +100,7 @@ const InsightsSection: React.FC<{ insights?: Record<string, unknown>[] }> = ({ i
           {/* Featured post */}
           <Link
             href={featured.url}
-            target={featured.url.startsWith('http') ? '_blank' : undefined}
-            rel={featured.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+            {...(featured.url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             className="insights-featured"
             style={{
               padding: 36,
@@ -178,8 +177,7 @@ const InsightsSection: React.FC<{ insights?: Record<string, unknown>[] }> = ({ i
             <Link
               key={i}
               href={post.url}
-              target={post.url.startsWith('http') ? '_blank' : undefined}
-              rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+              {...(post.url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               style={{
                 background: 'var(--surface)',
                 border: '1px solid var(--line)',
