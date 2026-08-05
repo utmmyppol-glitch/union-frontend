@@ -233,7 +233,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
             {depts.map((d, idx) => (
               <div key={idx} className="reveal" style={{ borderTop: idx === 0 ? '2px solid var(--accent)' : '2px solid var(--line)', padding: '20px 0 0', transitionDelay: `${idx * 0.06}s` }}>
                 <h3 style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></h3>
-                <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: 'var(--ink2)', margin: 0, letterSpacing: '.02em' }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
+                <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: 0 }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
               </div>
             ))}
           </div>
