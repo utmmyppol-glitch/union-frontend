@@ -50,8 +50,8 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
   const [stats, setStats] = useState(() => safeParse(ssrContent.company_stats, DEFAULT_STATS));
   const [strengths, setStrengths] = useState(() => safeParse(ssrContent.company_strengths, DEFAULT_STRENGTHS));
   const [values, setValues] = useState(() => safeParse(ssrContent.company_values, DEFAULT_VALUES));
-  const [depts, setDepts] = useState(DEFAULT_DEPTS);
-  const [org, setOrg] = useState(DEFAULT_ORG);
+  const [depts, setDepts] = useState(() => safeParse(ssrContent.company_depts, DEFAULT_DEPTS));
+  const [org, setOrg] = useState(() => safeParse(ssrContent.company_org, DEFAULT_ORG));
   const [ci, setCi] = useState(() => safeParse(ssrContent.company_ci, DEFAULT_CI));
   const [cta, setCta] = useState(() => safeParse(ssrContent.company_cta, DEFAULT_CTA));
 
