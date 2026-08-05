@@ -278,10 +278,10 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                 transitionDelay: `${i * .06}s`,
               }}>
                 <h3 style={{ fontWeight: 800, fontSize: 18, color: 'var(--ink)', margin: '0 0 8px' }}>
-                  <E id={`tech_services[${i}].title`} editMode={editMode}>{s.title}</E>
+                  <E id={`tech_services.${i}.title`} editMode={editMode}>{s.title}</E>
                 </h3>
                 <p style={{ fontSize: 18, color: 'var(--ink2)', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-line' }}>
-                  <E id={`tech_services[${i}].desc`} editMode={editMode}>{s.desc}</E>
+                  <E id={`tech_services.${i}.desc`} editMode={editMode}>{s.desc}</E>
                 </p>
               </div>
             ))}
@@ -316,10 +316,10 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                 }}>{s.num}</div>
                 <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 22, color: 'var(--accent)', opacity: .6 }}>{s.num}</span>
                 <h3 style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)', margin: '8px 0 6px' }}>
-                  <E id={`tech_process[${i}].title`} editMode={editMode}>{s.title}</E>
+                  <E id={`tech_process.${i}.title`} editMode={editMode}>{s.title}</E>
                 </h3>
                 <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--ink2)', margin: 0 }}>
-                  <E id={`tech_process[${i}].desc`} editMode={editMode}>{s.desc}</E>
+                  <E id={`tech_process.${i}.desc`} editMode={editMode}>{s.desc}</E>
                 </p>
               </div>
             ))}
@@ -365,12 +365,12 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                       }}>기술지원팀</td>
                     )}
                     <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220 }}>
-                      <E id={`tech_team[${i}].name`} editMode={editMode}>{m.name}</E>{' '}
-                      <E id={`tech_team[${i}].title`} editMode={editMode}>{m.title}</E>
+                      <E id={`tech_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
+                      <E id={`tech_team.${i}.title`} editMode={editMode}>{m.title}</E>
                     </td>
                     <td style={{ padding: '22px 28px' }}>
                       <a href={`mailto:${m.email}`} style={{ color: 'var(--ink2)', textDecoration: 'none', fontSize: 18 }}>
-                        <E id={`tech_team[${i}].email`} editMode={editMode}>{m.email}</E>
+                        <E id={`tech_team.${i}.email`} editMode={editMode}>{m.email}</E>
                       </a>
                     </td>
                   </tr>
@@ -385,12 +385,12 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                       }}>DA팀</td>
                     )}
                     <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220, borderTop: i === 0 ? '1px solid var(--line)' : 'none' }}>
-                      <E id={`tech_da_team[${i}].name`} editMode={editMode}>{m.name}</E>{' '}
-                      <E id={`tech_da_team[${i}].title`} editMode={editMode}>{m.title}</E>
+                      <E id={`tech_da_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
+                      <E id={`tech_da_team.${i}.title`} editMode={editMode}>{m.title}</E>
                     </td>
                     <td style={{ padding: '18px 24px', borderTop: i === 0 ? '1px solid var(--line)' : 'none' }}>
                       <a href={`mailto:${m.email}`} style={{ color: 'var(--ink2)', textDecoration: 'none', fontSize: 18 }}>
-                        <E id={`tech_da_team[${i}].email`} editMode={editMode}>{m.email}</E>
+                        <E id={`tech_da_team.${i}.email`} editMode={editMode}>{m.email}</E>
                       </a>
                     </td>
                   </tr>
@@ -430,10 +430,10 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                       padding: '2px 8px', fontFamily: MONO, fontSize: 18, fontWeight: 500,
                       border: '1px solid rgba(255,255,255,.12)', color: 'rgba(255,255,255,.4)',
                     }}>
-                      <E id={`tech_faq[${idx}].category`} editMode={editMode}>{item.category}</E>
+                      <E id={`tech_faq.${idx}.category`} editMode={editMode}>{item.category}</E>
                     </span>
                     <span style={{ fontSize: 18, fontWeight: 600, color: '#fff' }}>
-                      <E id={`tech_faq[${idx}].question`} editMode={editMode}>{item.question}</E>
+                      <E id={`tech_faq.${idx}.question`} editMode={editMode}>{item.question}</E>
                     </span>
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2"
@@ -444,7 +444,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                 {openFaq === idx && (
                   <div style={{ padding: '0 20px 16px', borderTop: '1px solid rgba(255,255,255,.06)' }}>
                     <p style={{ fontSize: 18, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', margin: '12px 0 0' }}>
-                      <E id={`tech_faq[${idx}].answer`} editMode={editMode}>{item.answer}</E>
+                      <E id={`tech_faq.${idx}.answer`} editMode={editMode}>{item.answer}</E>
                     </p>
                   </div>
                 )}
