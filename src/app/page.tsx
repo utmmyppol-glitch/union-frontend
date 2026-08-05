@@ -22,7 +22,16 @@ async function getContent(): Promise<Record<string, string>> {
   } catch { return {}; }
 }
 
+async function getInsights() {
+  try {
+    const res = await fetch(`${API_URL}/insights?page=0&size=3`, { next: { revalidate: 60 } });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.content ?? [];
+  } catch { return []; }
+}
+
 export default async function Page() {
-  const content = await getContent();
-  return <HomePageClient ssrContent={content} />;
+  const [content, insights] = await Promise.all([getContent(), getInsights()]);
+  return <HomePageClient ssrContent={content} ssrInsights={insights} />;
 }

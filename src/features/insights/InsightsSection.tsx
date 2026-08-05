@@ -1,30 +1,38 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Container } from '@/components/ui';
 
-const posts = [
-  {
-    cat: '보안',
-    title: '2026년 기업이 대비해야 할 5가지 보안 위협',
-    date: '2026.06.20',
-    read: '5분',
-  },
-  {
-    cat: '데이터',
-    title: '데이터 표준화, 왜 지금 시작해야 할까',
-    date: '2026.05.28',
-    read: '7분',
-  },
-  {
-    cat: '라이선스',
-    title: 'Microsoft 365 라이선스, 이렇게 하면 아낀다',
-    date: '2026.04.15',
-    read: '4분',
-  },
+interface Insight {
+  id?: number;
+  title?: string;
+  summary?: string;
+  sourceName?: string;
+  sourceUrl?: string;
+  publishedAt?: string;
+  thumbnailUrl?: string;
+}
+
+const FALLBACK_POSTS = [
+  { cat: '보안', title: '2026년 기업이 대비해야 할 5가지 보안 위협', date: '2026.06.20' },
+  { cat: '데이터', title: '데이터 표준화, 왜 지금 시작해야 할까', date: '2026.05.28' },
+  { cat: '라이선스', title: 'Microsoft 365 라이선스, 이렇게 하면 아낀다', date: '2026.04.15' },
 ];
 
-const InsightsSection: React.FC = () => {
+function mapInsight(item: Insight) {
+  return {
+    cat: item.sourceName ?? '',
+    title: item.title ?? '',
+    date: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '',
+    url: item.sourceUrl ?? '/insights',
+  };
+}
+
+const InsightsSection: React.FC<{ insights?: Record<string, unknown>[] }> = ({ insights }) => {
+  const posts = insights && insights.length >= 3
+    ? insights.slice(0, 3).map((i) => mapInsight(i as unknown as Insight))
+    : FALLBACK_POSTS.map((p) => ({ ...p, url: '/insights' }));
   const featured = posts[0];
   const rest = posts.slice(1);
 
@@ -90,7 +98,10 @@ const InsightsSection: React.FC = () => {
         {/* 2-column grid */}
         <div className="insights-grid">
           {/* Featured post */}
-          <div
+          <Link
+            href={featured.url}
+            target={featured.url.startsWith('http') ? '_blank' : undefined}
+            rel={featured.url.startsWith('http') ? 'noopener noreferrer' : undefined}
             className="insights-featured"
             style={{
               padding: 36,
@@ -104,6 +115,7 @@ const InsightsSection: React.FC = () => {
               color: '#fff',
               transition: 'transform .2s',
               cursor: 'pointer',
+              textDecoration: 'none',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-4px)';
@@ -156,18 +168,22 @@ const InsightsSection: React.FC = () => {
                   opacity: 0.5,
                 }}
               >
-                {featured.date} &middot; {featured.read} 읽기
+                {featured.date}
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Smaller posts — leisure row style */}
           {rest.map((post, i) => (
-            <div
+            <Link
               key={i}
+              href={post.url}
+              target={post.url.startsWith('http') ? '_blank' : undefined}
+              rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
               style={{
                 background: 'var(--surface)',
                 border: '1px solid var(--line)',
+                textDecoration: 'none',
                 padding: '26px 28px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -223,9 +239,9 @@ const InsightsSection: React.FC = () => {
                   color: 'var(--ink2)',
                 }}
               >
-                {post.date} &middot; {post.read} 읽기
+                {post.date}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
 

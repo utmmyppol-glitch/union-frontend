@@ -95,6 +95,7 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { label: '라이선스 관리 상담', href: '/license-alert' },
       { label: '보안 점검', href: '/security-check' },
+      { label: '3분 진단', href: '/diagnostic' },
       { label: 'IT·보안 용어사전', href: '/glossary' },
     ],
   },

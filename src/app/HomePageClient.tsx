@@ -7,6 +7,7 @@ import { SolutionCarousel } from "@/features/solution-carousel";
 import { SupportSection } from "@/features/support";
 import { ClientMarquee } from "@/features/clients";
 import { DownloadGateModal } from "@/features/cta";
+import { InsightsSection } from "@/features/insights";
 
 import Link from "next/link";
 import { gsap } from "@/lib/gsap-init";
@@ -639,7 +640,7 @@ function CtaBanner({ editMode, cta }: { editMode: boolean; cta: typeof DEFAULT_C
 /* ═══════════════════════════════════════════════════════════
    Main Page
    ═══════════════════════════════════════════════════════════ */
-export default function HomePageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
+export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent: Record<string, string>; ssrInsights?: Record<string, unknown>[] }) {
   const editMode = useEditMode();
   useEditableManifest(editMode);
 
@@ -780,6 +781,11 @@ export default function HomePageClient({ ssrContent }: { ssrContent: Record<stri
       {/* 7. Clients marquee */}
       <div className="gsap-reveal">
         <ClientMarquee />
+      </div>
+
+      {/* 7.5 Insights */}
+      <div className="gsap-reveal">
+        <InsightsSection insights={ssrInsights} />
       </div>
 
       {/* 8. CTA */}
