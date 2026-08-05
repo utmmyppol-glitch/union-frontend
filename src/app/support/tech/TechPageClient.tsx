@@ -29,18 +29,11 @@ const DEFAULT_PROCESS = [
 ];
 
 const DEFAULT_TECH_TEAM = [
-  { name: '강호진', title: '이사', email: 'hjkang@unionsystems.co.kr' },
   { name: '조성준', title: '차장/팀장', email: 'kevin@unionsystems.co.kr' },
   { name: '박상현', title: '차장', email: 'mite5@unionsystems.co.kr' },
-  { name: '원희상', title: '차장', email: 'hswon@unionsystems.co.kr' },
-  { name: '황철민', title: '주임', email: 'hcm@unionsystems.co.kr' },
 ];
 
-const DEFAULT_DA_TEAM = [
-  { name: '원희상', title: '차장/팀장', email: 'hswon@unionsystems.co.kr' },
-  { name: '최경빈', title: '과장', email: 'ckb@unionsystems.co.kr' },
-  { name: '윤정화', title: '주임', email: 'jeong@unionsystems.co.kr' },
-];
+const DEFAULT_DA_TEAM: { name: string; title: string; email: string }[] = [];
 
 const DEFAULT_FAQ = [
   { category: 'Microsoft 365', question: 'Microsoft 365 라이선스 갱신은 어떻게 하나요?', answer: '라이선스 만료일 30일 전 안내 메일을 발송해 드립니다. 자동 갱신 설정이 되어 있는 경우 별도 조치 없이 갱신되며, 수동 갱신의 경우 담당자에게 연락해주시면 처리해 드립니다.' },
@@ -382,7 +375,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                     </td>
                   </tr>
                 ))}
-                {daTeam.map((m: { name: string; title: string; email: string }, i: number) => (
+                {daTeam.length > 0 && daTeam.map((m: { name: string; title: string; email: string }, i: number) => (
                   <tr key={m.email} style={{ borderBottom: i < daTeam.length - 1 ? '1px solid var(--line)' : 'none' }}>
                     {i === 0 && (
                       <td rowSpan={daTeam.length} style={{
