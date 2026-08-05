@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { apiClient } from '@/lib/api';
 
 const QUESTIONS = [
   { q: '기업용 백신(안티바이러스)을 전 PC에 설치하고 있나요?', cat: '엔드포인트 보안', solutions: ['AhnLab V3', 'ESTsecurity 알약'] },
@@ -58,6 +59,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(false);
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
 
   const answer = (val: Answer) => {
     const next = [...answers];
@@ -261,9 +263,27 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
             <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, color: 'var(--ink2)', marginBottom: 24 }}>이메일로 상세 리포트를 보내드립니다.</p>
             <input type="email" placeholder="이메일 주소" value={email} onChange={e => setEmail(e.target.value)}
               style={{ width: '100%', padding: '12px 16px', borderRadius: 0, border: '1px solid var(--line)', background: 'var(--bg)', fontFamily: "'Pretendard'", fontSize: 18, color: 'var(--ink)', marginBottom: 16, boxSizing: 'border-box' }} />
-            <button onClick={() => { if (email.includes('@')) setEmailSent(true); }}
-              style={{ width: '100%', padding: '14px', borderRadius: 0, background: 'var(--ink2)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, border: 'none', cursor: 'pointer' }}>
-              PDF 받기
+            <button disabled={emailSubmitting} onClick={async () => {
+              if (!email.includes('@')) return;
+              setEmailSubmitting(true);
+              try {
+                const weakNames = weakAreas.map(w => w.cat).join(', ');
+                const partialNames = partialAreas.map(p => p.cat).join(', ');
+                await apiClient.submitInquiry({
+                  name: '보안점검 결과',
+                  company: '-',
+                  phone: '-',
+                  email,
+                  product: '보안 점검',
+                  message: `[보안 점검 결과] 점수: ${score}/100 (${grade.label}) / 취약: ${weakNames || '없음'} / 부분: ${partialNames || '없음'}`,
+                  consentPrivacy: true,
+                });
+              } catch { /* 실패해도 결과는 보여줌 */ }
+              setEmailSent(true);
+              setEmailSubmitting(false);
+            }}
+              style={{ width: '100%', padding: '14px', borderRadius: 0, background: 'var(--ink2)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, border: 'none', cursor: emailSubmitting ? 'wait' : 'pointer', opacity: emailSubmitting ? .6 : 1 }}>
+              {emailSubmitting ? '전송 중...' : 'PDF 받기'}
             </button>
           </>) : (
             <div style={{ textAlign: 'center', padding: '20px 0' }}>

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/ui';
 import { apiClient } from '@/lib/api';
+import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 /* ── Data ── */
 const STEPS = [
@@ -69,7 +70,29 @@ function summarizeAnswers(answers: Record<number, string[]>) {
 }
 
 /* ── Component ── */
-const SolutionDiagnostic: React.FC = () => {
+const SolutionDiagnostic: React.FC<{ ssrContent?: Record<string, string> }> = ({ ssrContent = {} }) => {
+  const editMode = useEditMode();
+  useEditableManifest(editMode);
+
+  const [steps, setSteps] = useState(() => safeParse(ssrContent.diagnostic_steps, STEPS));
+  const [solutions, setSolutions] = useState(() => safeParse(ssrContent.diagnostic_solutions, SOLUTIONS));
+
+  useEffect(() => {
+    if (!editMode) return;
+    const setters: Record<string, (v: unknown) => void> = {
+      diagnostic_steps: setSteps as (v: unknown) => void,
+      diagnostic_solutions: setSolutions as (v: unknown) => void,
+    };
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === 'content-update') {
+        const fn = setters[e.data.section];
+        if (fn) fn(e.data.data);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [editMode]);
+
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string[]>>({});
   const [showResult, setShowResult] = useState(false);
@@ -79,7 +102,7 @@ const SolutionDiagnostic: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const currentStep = STEPS[step];
+  const currentStep = steps[step];
   const selected = answers[step] || [];
 
   const toggleOption = (value: string) => {
@@ -93,7 +116,7 @@ const SolutionDiagnostic: React.FC = () => {
     } else {
       setAnswers({ ...answers, [step]: [value] });
       // Auto-advance for single select
-      if (step < STEPS.length - 1) {
+      if (step < steps.length - 1) {
         setTimeout(() => setStep(step + 1), 300);
       } else {
         setTimeout(() => setShowResult(true), 300);
@@ -102,7 +125,7 @@ const SolutionDiagnostic: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (step < STEPS.length - 1) setStep(step + 1);
+    if (step < steps.length - 1) setStep(step + 1);
     else setShowResult(true);
   };
 
@@ -122,7 +145,7 @@ const SolutionDiagnostic: React.FC = () => {
 
   // Calculate recommendations
   const allValues = Object.values(answers).flat();
-  const recommended = SOLUTIONS
+  const recommended = solutions
     .map((s) => ({
       ...s,
       score: s.match.filter((m) => allValues.includes(m)).length,
@@ -133,6 +156,7 @@ const SolutionDiagnostic: React.FC = () => {
 
   return (
     <section style={{ padding: 'clamp(56px, 7vw, 96px) 0', background: 'var(--soft)' }}>
+      {editMode && <style>{EDITABLE_STYLES}</style>}
       <Container>
         <div style={{ marginBottom: 40 }}>
           <span style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", fontWeight: 500, fontSize: 18, letterSpacing: '.16em', color: 'var(--ink2)', textTransform: 'uppercase' as const }}>
@@ -151,24 +175,24 @@ const SolutionDiagnostic: React.FC = () => {
             <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, padding: 'clamp(28px, 4vw, 44px)', }}>
               {/* Progress bar */}
               <div style={{ display: 'flex', gap: 6, marginBottom: 28 }}>
-                {STEPS.map((_, i) => (
+                {steps.map((_: unknown, i: number) => (
                   <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? 'var(--accent)' : 'var(--line)', transition: 'background .3s' }} />
                 ))}
               </div>
 
               {/* Step label */}
               <p style={{ fontFamily: "'Pretendard', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--accent)', marginBottom: 8 }}>
-                STEP {step + 1} / {STEPS.length}
+                STEP {step + 1} / {steps.length}
               </p>
 
               {/* Question */}
               <h3 style={{ fontFamily: "'Pretendard', sans-serif", fontWeight: 800, fontSize: 'clamp(18px, 2.5vw, 22px)', color: 'var(--ink)', marginBottom: 24 }}>
-                {currentStep.question}
+                <E id={`diagnostic_steps.${step}.question`} editMode={editMode}>{currentStep.question}</E>
               </h3>
 
               {/* Options */}
               <div style={{ display: 'grid', gap: 10 }}>
-                {currentStep.options.map((opt) => {
+                {currentStep.options.map((opt: { label: string; value: string; icon?: string }, oi: number) => {
                   const isSelected = selected.includes(opt.value);
                   return (
                     <button
@@ -200,8 +224,8 @@ const SolutionDiagnostic: React.FC = () => {
                       }}>
                         {isSelected && <svg width="12" height="12" viewBox="0 0 20 20" fill="#fff"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" /></svg>}
                       </span>
-                      {'icon' in opt && <span style={{ fontSize: 18 }}>{(opt as { icon?: string }).icon}</span>}
-                      {opt.label}
+                      {opt.icon && <span style={{ fontSize: 18 }}>{opt.icon}</span>}
+                      <E id={`diagnostic_steps.${step}.options.${oi}.label`} editMode={editMode}>{opt.label}</E>
                     </button>
                   );
                 })}
@@ -222,7 +246,7 @@ const SolutionDiagnostic: React.FC = () => {
                     disabled={selected.length === 0}
                     style={{ padding: '10px 24px', borderRadius: 0, border: 'none', background: selected.length > 0 ? 'var(--accent)' : 'var(--line)', color: '#fff', cursor: selected.length > 0 ? 'pointer' : 'default', fontFamily: "'Pretendard', sans-serif", fontWeight: 700, fontSize: 18 }}
                   >
-                    {step < STEPS.length - 1 ? '다음' : '결과 보기'}
+                    {step < steps.length - 1 ? '다음' : '결과 보기'}
                   </button>
                 )}
               </div>

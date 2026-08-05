@@ -337,10 +337,10 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
             {benefits.map((b: { title: string; desc: string }, i: number) => (
               <div key={i} style={{ marginBottom: i < benefits.length - 1 ? 18 : 0, paddingBottom: i < benefits.length - 1 ? 18 : 0, borderBottom: i < benefits.length - 1 ? '1px solid var(--line)' : 'none' }}>
                 <h4 style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, color: 'var(--ink)', marginBottom: 4 }}>
-                  <E id={`licensealert_benefits[${i}].title`} editMode={editMode}>{b.title}</E>
+                  <E id={`licensealert_benefits.${i}.title`} editMode={editMode}>{b.title}</E>
                 </h4>
                 <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 14, color: 'var(--ink2)', lineHeight: 1.6 }}>
-                  <E id={`licensealert_benefits[${i}].desc`} editMode={editMode}>{b.desc}</E>
+                  <E id={`licensealert_benefits.${i}.desc`} editMode={editMode}>{b.desc}</E>
                 </p>
               </div>
             ))}
