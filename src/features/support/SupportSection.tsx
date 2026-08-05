@@ -4,46 +4,25 @@ import React from 'react';
 
 const cards = [
   {
-    label: '마케팅팀',
-    heading: '브랜드·홍보 · 콘텐츠',
-    items: ['브랜드 전략 · 홍보', '콘텐츠 기획 · 제작', '시장 트렌드 분석', '고객 커뮤니케이션'],
-    stat: '6',
-    statLabel: '전문 채널',
-  },
-  {
-    label: '영업팀',
-    heading: '공공·기업·교육 영업',
-    items: ['공공기관 영업', '기업 영업 · 컨설팅', '교육기관 영업', '맞춤 비교견적 제공'],
-    stat: '200+',
-    statLabel: '고객사',
-  },
-  {
-    label: '개발팀',
-    heading: '커스터마이징·SI 개발',
-    items: ['기업 맞춤 시스템 구축', '데이터 연동 · 마이그레이션', '관리 콘솔 개발', '프로젝트 관리'],
-    stat: '100+',
-    statLabel: '구축 프로젝트',
+    label: '사업지원팀',
+    heading: '라이선스 갱신·관리',
+    items: ['벤더사와 긴밀한 연결', '라이선스 정책 안내', '갱신 관리 자동화', '성능 향상 교육·세미나'],
+    stat: '98%',
+    statLabel: '재계약률',
   },
   {
     label: '기술팀',
-    heading: '설치·구축 · 유지보수',
-    items: ['설치 · 구축 · 세팅', '전담 엔지니어 배정', '원격지원 · 장애 처리', '유지보수 · 정기 점검'],
+    heading: '도입 후 기술지원',
+    items: ['전담 엔지니어 배정', '원격지원 · 장애 처리', '유지보수 · 이슈 대응', '정기 방문 점검'],
     stat: '24/7',
     statLabel: '기술지원',
   },
   {
-    label: 'D.A팀',
-    heading: '데이터 아키텍처·품질',
-    items: ['데이터 모델링 · 표준화', '데이터 품질 진단 · 개선', '데이터 거버넌스 체계 수립', 'DA# 구축 · 기술지원'],
-    stat: 'DA#',
-    statLabel: '공인총판',
-  },
-  {
-    label: '사업지원팀',
-    heading: '경영지원 · 운영',
-    items: ['경영지원 · 총무', '라이선스 리뉴얼 관리', '영업지원 · 견적 관리', '벤더사 연결 · 정책 안내'],
-    stat: '98%',
-    statLabel: '재계약률',
+    label: '개발팀',
+    heading: 'SI · 커스터마이징',
+    items: ['기업 맞춤 시스템 구축', '데이터 연동 · 마이그레이션', '관리 콘솔 개발', 'API 연계 지원'],
+    stat: '100+',
+    statLabel: '구축 프로젝트',
   },
 ] as const;
 
@@ -596,7 +575,7 @@ export default function SupportSection() {
                 fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                 fontSize: 12, fontWeight: 500, letterSpacing: '.06em',
                 color: 'var(--ink2)', opacity: .5, margin: 0,
-              }}>6 DEDICATED TEAMS · 16+ YEARS EXPERIENCE</p>
+              }}>3 DEDICATED TEAMS · 16+ YEARS EXPERIENCE</p>
               <a href="/support/tech" style={{
                 fontWeight: 600, fontSize: 14, color: 'var(--ink2)',
                 textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6,
