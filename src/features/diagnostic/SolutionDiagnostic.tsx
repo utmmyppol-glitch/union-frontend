@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/ui';
+import { apiClient } from '@/lib/api';
 
 /* ── Data ── */
 const STEPS = [
@@ -56,11 +57,27 @@ const SOLUTIONS: Solution[] = [
   { code: 'Adobe CC', name: 'Adobe 기업 라이선스', desc: 'VIP 프로그램으로 중앙 관리 + 비용 절감', color: '#FF0000', match: ['office', 'cost'] },
 ];
 
+/* ── Helper: 진단 답변을 문자열로 요약 ── */
+function summarizeAnswers(answers: Record<number, string[]>) {
+  const sizeMap: Record<string, string> = { small: '10명 이하', mid: '11~50명', large: '51~200명', enterprise: '200명 이상' };
+  const interestMap: Record<string, string> = { office: '오피스 SW', security: '보안', asset: 'IT 자산관리', data: '데이터 관리' };
+  const concernMap: Record<string, string> = { cost: '라이선스 비용', threat: '보안 위협·정보유출', visibility: 'IT 자산 현황 파악', standard: '데이터 표준화', worktime: '주52시간 근태관리', manpower: 'IT 인력 부족' };
+  const size = (answers[0] || []).map((v) => sizeMap[v] || v).join(', ');
+  const interests = (answers[1] || []).map((v) => interestMap[v] || v).join(', ');
+  const concerns = (answers[2] || []).map((v) => concernMap[v] || v).join(', ');
+  return `[3분 진단] 규모: ${size} / 관심분야: ${interests} / 고민: ${concerns}`;
+}
+
 /* ── Component ── */
 const SolutionDiagnostic: React.FC = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string[]>>({});
   const [showResult, setShowResult] = useState(false);
+  const [form, setForm] = useState({ name: '', company: '', phone: '', email: '' });
+  const [consent, setConsent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const currentStep = STEPS[step];
   const selected = answers[step] || [];
@@ -97,6 +114,10 @@ const SolutionDiagnostic: React.FC = () => {
     setStep(0);
     setAnswers({});
     setShowResult(false);
+    setForm({ name: '', company: '', phone: '', email: '' });
+    setConsent(false);
+    setSubmitted(false);
+    setSubmitError('');
   };
 
   // Calculate recommendations
@@ -241,20 +262,87 @@ const SolutionDiagnostic: React.FC = () => {
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                <Link
-                  href="/contact"
-                  style={{ padding: '14px 28px', borderRadius: 0, background: 'var(--accent)', color: '#fff', fontFamily: "'Pretendard', sans-serif", fontWeight: 700, fontSize: 18, textDecoration: 'none' }}
-                >
-                  무료 견적 받기 →
-                </Link>
-                <button
-                  onClick={handleReset}
-                  style={{ padding: '14px 20px', borderRadius: 0, border: '1px solid var(--line)', background: 'transparent', fontFamily: "'Pretendard', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--ink2)', cursor: 'pointer' }}
-                >
-                  다시 진단
-                </button>
-              </div>
+              {/* ── 연락처 입력 + 제출 ── */}
+              {!submitted ? (
+                <>
+                  <div style={{ borderTop: '1px solid var(--line)', paddingTop: 24, marginBottom: 20 }}>
+                    <p style={{ fontWeight: 700, fontSize: 16, color: 'var(--ink)', marginBottom: 14 }}>
+                      진단 결과와 함께 맞춤 견적을 받아보세요
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                      {([['name', '이름', 'text'], ['company', '회사명', 'text'], ['phone', '연락처', 'tel'], ['email', '이메일', 'email']] as const).map(([key, placeholder, type]) => (
+                        <input
+                          key={key}
+                          type={type}
+                          placeholder={placeholder}
+                          value={form[key]}
+                          onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                          style={{ padding: '12px 14px', border: '1px solid var(--line)', background: 'var(--bg)', fontSize: 15, color: 'var(--ink)', outline: 'none' }}
+                        />
+                      ))}
+                    </div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, cursor: 'pointer', fontSize: 13, color: 'var(--ink2)' }}>
+                      <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+                      개인정보 수집·이용에 동의합니다
+                    </label>
+                    {submitError && <p style={{ color: 'var(--accent)', fontSize: 13, marginTop: 8 }}>{submitError}</p>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                    <button
+                      disabled={submitting}
+                      onClick={async () => {
+                        if (!form.name || !form.company || !form.phone || !form.email) { setSubmitError('모든 항목을 입력해주세요.'); return; }
+                        if (!consent) { setSubmitError('개인정보 수집에 동의해주세요.'); return; }
+                        setSubmitError('');
+                        setSubmitting(true);
+                        try {
+                          await apiClient.submitInquiry({
+                            name: form.name,
+                            company: form.company,
+                            phone: form.phone,
+                            email: form.email,
+                            product: recommended.map((s) => s.code).join(', '),
+                            message: summarizeAnswers(answers),
+                            consentPrivacy: true,
+                          });
+                          setSubmitted(true);
+                        } catch {
+                          setSubmitError('제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                        } finally {
+                          setSubmitting(false);
+                        }
+                      }}
+                      style={{ padding: '14px 28px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 16, border: 'none', cursor: submitting ? 'wait' : 'pointer', opacity: submitting ? .6 : 1 }}
+                    >
+                      {submitting ? '제출 중...' : '무료 견적 받기 →'}
+                    </button>
+                    <button
+                      onClick={handleReset}
+                      style={{ padding: '14px 20px', border: '1px solid var(--line)', background: 'transparent', fontWeight: 600, fontSize: 16, color: 'var(--ink2)', cursor: 'pointer' }}
+                    >
+                      다시 진단
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <span style={{ fontSize: 36 }}>✅</span>
+                  <p style={{ fontWeight: 800, fontSize: 18, color: 'var(--ink)', marginTop: 10 }}>
+                    제출이 완료되었습니다!
+                  </p>
+                  <p style={{ fontSize: 15, color: 'var(--ink2)', marginTop: 6 }}>
+                    담당자가 확인 후 빠르게 연락드리겠습니다.
+                  </p>
+                  <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 20 }}>
+                    <Link href="/" style={{ padding: '12px 24px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
+                      홈으로
+                    </Link>
+                    <button onClick={handleReset} style={{ padding: '12px 20px', border: '1px solid var(--line)', background: 'transparent', fontWeight: 600, fontSize: 15, color: 'var(--ink2)', cursor: 'pointer' }}>
+                      다시 진단
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
