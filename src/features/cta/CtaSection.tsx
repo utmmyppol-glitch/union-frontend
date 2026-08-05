@@ -29,8 +29,8 @@ const CtaSection: React.FC = () => {
       await apiClient.submitInquiry({
         name,
         company,
-        phone: contact,
-        email: contact.includes('@') ? contact : '',
+        phone: contact.includes('@') ? '-' : contact,
+        email: contact.includes('@') ? contact : `${contact}@no-email.local`,
         consentPrivacy,
       });
       setSubmitted(true);
@@ -40,7 +40,6 @@ const CtaSection: React.FC = () => {
       setConsentPrivacy(false);
       setTimeout(() => setSubmitted(false), 3000);
     } catch {
-      // 백엔드 미실행 시에도 UI 피드백
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 3000);
     } finally {
