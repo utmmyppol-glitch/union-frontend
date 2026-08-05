@@ -32,22 +32,10 @@ const DEFAULT_VALUES = [
   { num: '03', title: '파트너십', desc: '단순 공급이 아닌 도입부터 운영, 유지보수까지 전 과정을 함께하는 진정한 IT 파트너가 되겠습니다.' },
 ];
 const DEFAULT_DEPTS = [
-  { name: '마케팅팀', desc: '브랜드·홍보와 콘텐츠로 시장 접점을 넓힙니다.' },
-  { name: '영업팀', desc: '공공·기업·교육 시장을 아우르는 영업을 수행합니다.' },
-  { name: '개발팀', desc: '커스터마이징·SI 개발로 프로젝트를 완성합니다.' },
-  { name: '기술팀', desc: '설치부터 유지보수까지 안정 운영을 책임집니다.' },
-  { name: 'D.A팀', desc: '데이터 아키텍처·품질·거버넌스를 담당합니다.' },
-  { name: '사업지원팀', desc: '경영지원과 운영으로 조직을 뒷받침합니다.' },
+  { name: '솔루션사업부', desc: 'DATA / SW / SI 사업팀' }, { name: '영업부', desc: '공공영업 / 기업영업 / 교육영업' },
+  { name: '서비스사업부', desc: '기술지원 팀' }, { name: '사업지원부', desc: '리뉴얼 / 마케팅 / 영업지원' },
 ];
-const DEFAULT_ORG_TEAMS = [
-  { name: '마케팅팀', items: ['브랜드·홍보', '콘텐츠 기획'] },
-  { name: '영업팀', items: ['공공영업', '기업영업', '교육영업'] },
-  { name: '개발팀', items: ['커스터마이징 개발', 'SI 개발', '프로젝트 관리'] },
-  { name: '기술팀', items: ['설치·구축', '유지보수', '기술지원'] },
-  { name: 'D.A팀', items: ['데이터 아키텍처', '데이터 품질', '데이터 거버넌스'] },
-  { name: '사업지원팀', items: ['경영지원', '리뉴얼', '영업지원'] },
-];
-const DEFAULT_ORG = { title: '소수정예 전문가 조직', text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.', ceo: 'CEO', advisor: '기술자문', teams: DEFAULT_ORG_TEAMS };
+const DEFAULT_ORG = { img: '/images/crawl/unionsystems/about_organization_chart_30.jpg', title: '소수정예 전문가 조직', text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.' };
 const DEFAULT_CI = { img: '/images/crawl/unionsystems/about_ci_31.jpg', title: '기업 아이덴티티', subtitle: 'UNION RED는 고객을 향한 열정을 담고 있습니다', quote: '고객과 신뢰로 만들어진 유니온시스템즈,\n함께 구축하겠다는 열정을 담고 있습니다.', ceo: 'CEO 홍민석' };
 const DEFAULT_CTA = { title: '유니온시스템즈와 함께 시작하세요', desc: '귀사의 IT 환경에 최적화된 솔루션을 제안해 드립니다.' };
 
@@ -234,44 +222,14 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_org.title" editMode={editMode}>{org.title}</E></h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{org.text}</E></p>
           </div>
-          {/* CSS Org Chart */}
-          <div className="reveal" style={{ border: '1px solid var(--line)', background: 'var(--charcoal)', padding: 'clamp(32px, 4vw, 48px) clamp(16px, 3vw, 32px)', marginBottom: 32, overflowX: 'auto' }}>
-            <div style={{ minWidth: 700 }}>
-              {/* CEO + Advisor */}
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 16, padding: '14px 40px', textAlign: 'center' }}>
-                  <E id="company_org.ceo" editMode={editMode}>{org.ceo}</E>
-                </div>
-                <div style={{ width: 40, height: 2, background: 'var(--accent)' }} />
-                <div style={{ border: '1.5px solid var(--accent)', color: 'rgba(255,255,255,.85)', fontSize: 14, padding: '10px 22px', textAlign: 'center' }}>
-                  <E id="company_org.advisor" editMode={editMode}>{org.advisor}</E>
-                </div>
-              </div>
-              <div style={{ width: 2, height: 32, background: 'var(--accent)', margin: '0 auto' }} />
-              <div style={{ height: 2, background: 'var(--accent)', marginLeft: 'calc(100% / 12)', marginRight: 'calc(100% / 12)' }} />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10, padding: '0 calc(100% / 12 - 5px)' }}>
-                {(org.teams ?? DEFAULT_ORG_TEAMS).map((team: { name: string; items: string[] }, ti: number) => (
-                  <div key={ti} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ width: 2, height: 20, background: 'var(--accent)' }} />
-                    <div style={{ background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 14, padding: '10px 0', textAlign: 'center', width: '100%', marginBottom: 6 }}>
-                      <E id={`company_org.teams.${ti}.name`} editMode={editMode}>{team.name}</E>
-                    </div>
-                    {team.items.map((item: string, ii: number) => (
-                      <div key={ii} style={{ border: '1px solid var(--accent)', color: 'rgba(255,255,255,.8)', fontSize: 13, padding: '7px 4px', textAlign: 'center', width: '100%', marginBottom: 4 }}>
-                        <E id={`company_org.teams.${ti}.items.${ii}`} editMode={editMode}>{item}</E>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 32 }}>
+            <OptImg id="company_org.img" editMode={editMode} src={org.img} alt="유니온시스템즈 조직도" width={1200} height={600} style={{ width: '100%', height: 'auto' }} />
           </div>
-          {/* Dept summary cards */}
-          <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
             {depts.map((d, idx) => (
-              <div key={idx} className="reveal" style={{ borderTop: '2px solid var(--accent)', padding: '20px 0 0', transitionDelay: `${idx * 0.06}s` }}>
+              <div key={idx} className="reveal" style={{ borderTop: idx === 0 ? '2px solid var(--accent)' : '2px solid var(--line)', padding: '20px 0 0', transitionDelay: `${idx * 0.06}s` }}>
                 <h3 style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></h3>
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: 0 }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
+                <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: 'var(--ink2)', margin: 0, letterSpacing: '.02em' }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
               </div>
             ))}
           </div>
