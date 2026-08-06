@@ -42,3 +42,7 @@ next-env.d.ts
 # 작업용 참고 파일
 *.dc.html
 *.zip
+
+# secrets & local tooling
+.env*
+.claude/
