@@ -27,7 +27,32 @@ async function getContent(): Promise<Record<string, string>> {
   }
 }
 
+interface HistoryEntity {
+  id: number; year: string; title: string; events: string; sortOrder: number; isActive: boolean;
+}
+
+async function getHistoryItems(): Promise<{ year: string; title: string; events: string[] }[] | null> {
+  try {
+    const base = API_URL.replace(/\/api\/union\/?$/, '');
+    const res = await fetch(`${base}/api/union/history`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    const items: HistoryEntity[] = await res.json();
+    if (!items.length) return null;
+    return items.map(h => ({
+      year: h.year,
+      title: h.title,
+      events: (() => { try { return JSON.parse(h.events || '[]'); } catch { return []; } })(),
+    }));
+  } catch {
+    return null;
+  }
+}
+
 export default async function HistoryPage() {
-  const content = await getContent();
-  return <HistoryPageClient ssrContent={content} />;
+  const [content, dbItems] = await Promise.all([getContent(), getHistoryItems()]);
+  const ssrContent = { ...content };
+  if (dbItems) {
+    ssrContent.history_items = JSON.stringify(dbItems);
+  }
+  return <HistoryPageClient ssrContent={ssrContent} />;
 }

@@ -22,7 +22,33 @@ async function getContent(): Promise<Record<string, string>> {
   } catch { return {}; }
 }
 
+interface GlossaryEntity {
+  id: number; term: string; fullName: string; definition: string; category: string; sortOrder: number; isActive: boolean;
+}
+
+async function getGlossaryTerms(): Promise<{ term: string; full: string; def: string; category: string }[] | null> {
+  try {
+    const base = API_URL.replace(/\/api\/union\/?$/, '');
+    const res = await fetch(`${base}/api/union/glossary`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    const items: GlossaryEntity[] = await res.json();
+    if (!items.length) return null;
+    return items.map(g => ({
+      term: g.term,
+      full: g.fullName || '',
+      def: g.definition || '',
+      category: g.category || '',
+    }));
+  } catch {
+    return null;
+  }
+}
+
 export default async function Page() {
-  const content = await getContent();
-  return <GlossaryPageClient ssrContent={content} />;
+  const [content, dbTerms] = await Promise.all([getContent(), getGlossaryTerms()]);
+  const ssrContent = { ...content };
+  if (dbTerms) {
+    ssrContent.glossary_terms = JSON.stringify(dbTerms);
+  }
+  return <GlossaryPageClient ssrContent={ssrContent} />;
 }
