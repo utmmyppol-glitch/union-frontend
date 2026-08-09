@@ -170,7 +170,7 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
               { label: 'TEL', value: SITE.tel, big: true },
               { label: 'FAX', value: SITE.fax, big: false },
               { label: 'EMAIL', value: SITE.emailSales, big: false },
-              { label: 'HOURS', value: '평일 10:00 – 18:00', big: false },
+              { label: 'HOURS', value: <E id="inquiry_contact.hours_value" editMode={editMode}>평일 10:00 – 18:00</E>, big: false },
             ].map((item) => (
               <div key={item.label} className="reveal" style={{
                 padding: '24px 20px', border: '1px solid rgba(255,255,255,.08)',
@@ -221,7 +221,7 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .inq-contact-grid > div:hover { border-color: rgba(245,51,63,.2) !important; transform: translateY(-2px); }
         @media (max-width: 920px) {
           .inq-contact-grid { grid-template-columns: 1fr 1fr !important; }
@@ -231,7 +231,7 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
         @media (max-width: 560px) {
           .inq-contact-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

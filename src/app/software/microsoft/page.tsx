@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['microsoft_hero', 'microsoft_strengths', 'microsoft_cta'];
+const CONTENT_KEYS = ['microsoft_hero', 'microsoft_strengths', 'microsoft_sections', 'microsoft_accents', 'microsoft_products', 'microsoft_plans', 'microsoft_buttons', 'microsoft_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

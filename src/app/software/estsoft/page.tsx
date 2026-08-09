@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['estsoft_hero', 'estsoft_strengths', 'estsoft_cta'];
+const CONTENT_KEYS = ['estsoft_hero', 'estsoft_strengths', 'estsoft_stats', 'estsoft_products', 'estsoft_plans', 'estsoft_sections', 'estsoft_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -28,11 +28,17 @@ const FEATURES = [
   { label: '중앙 관리', desc: '웹 콘솔에서 전사 정책 일괄 관리' },
 ];
 
-const DEFAULT_HERO = { desc: '알약, ASM, AI EDR로 위협을 탐지하고 자동 대응하는 통합 보안.' };
+const DEFAULT_HERO = { title1: 'AI 기반 차세대', title2: '엔드포인트 보안', desc: '알약, ASM, AI EDR로 위협을 탐지하고 자동 대응하는 통합 보안.', btn: '도입 문의하기 →' };
 const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
 const DEFAULT_POINTS_DATA = POINTS.map(p => ({ title: p.title, desc: p.desc, stat: p.stat, statLabel: p.statLabel }));
 const DEFAULT_FEATURES_DATA = FEATURES.map(f => ({ label: f.label, desc: f.desc }));
-const DEFAULT_CTA = { title: 'AI가 지키는 보안,\nESTsecurity.', desc: 'ESTsecurity 공인 파트너 유니온시스템즈' };
+const DEFAULT_CTA = { title: 'AI가 지키는 보안,\nESTsecurity.', desc: 'ESTsecurity 공인 파트너 유니온시스템즈', btn1: '도입 문의하기', btn2: '견적 요청하기' };
+
+const DEFAULT_SECTIONS = {
+  productsTitle: '주요 제품',
+  whyTitle: '도입 효과',
+  featuresTitle: '주요 기능',
+};
 
 export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
@@ -42,6 +48,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
   const [pointsData, setPointsData] = useState(() => safeParse(ssrContent.estsecurity_points, DEFAULT_POINTS_DATA));
   const [featuresData, setFeaturesData] = useState(() => safeParse(ssrContent.estsecurity_features, DEFAULT_FEATURES_DATA));
   const [cta, setCta] = useState(() => safeParse(ssrContent.estsecurity_cta, DEFAULT_CTA));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.estsecurity_sections, DEFAULT_SECTIONS));
   useEffect(() => {
     if (!editMode) return;
     const setters: Record<string, (v: unknown) => void> = {
@@ -50,6 +57,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
       estsecurity_points: setPointsData as (v: unknown) => void,
       estsecurity_features: setFeaturesData as (v: unknown) => void,
       estsecurity_cta: setCta as (v: unknown) => void,
+      estsecurity_sections: setSections as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
@@ -124,8 +132,8 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 16px',
             }}>
-              AI 기반 차세대<br />
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>엔드포인트 보안</span>
+              <E id="estsecurity_hero.title1" editMode={editMode}>{hero.title1}</E><br />
+              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}><E id="estsecurity_hero.title2" editMode={editMode}>{hero.title2}</E></span>
             </h1>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
@@ -152,7 +160,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}>도입 문의하기 →</Link>
+              }}><E id="estsecurity_hero.btn" editMode={editMode}>{hero.btn}</E></Link>
               <a href="tel:02-706-8999" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
@@ -177,7 +185,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}>주요 제품</h2>
+            }}><E id="estsecurity_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -256,7 +264,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}>도입 효과</h2>
+            }}><E id="estsecurity_sections.whyTitle" editMode={editMode}>{sections.whyTitle}</E></h2>
           </div>
 
           <div className="est-why-grid" style={{
@@ -327,7 +335,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}>주요 기능</h2>
+            }}><E id="estsecurity_sections.featuresTitle" editMode={editMode}>{sections.featuresTitle}</E></h2>
           </div>
 
           <div className="est-feat-grid" style={{
@@ -395,7 +403,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="estsecurity_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -409,11 +417,11 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}>도입 문의하기</Link>
+            }}><E id="estsecurity_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}>견적 요청하기</Link>
+            }}><E id="estsecurity_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
           </div>
         </div>
       </section>

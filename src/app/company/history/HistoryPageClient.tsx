@@ -256,6 +256,9 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 clamp(20px, 4vw, 52px)', position: 'relative' }}>
           {MILESTONES.map((m, idx) => {
             const isLeft = idx % 2 === 0;
+            // yearBg(장식용 큰 숫자)는 실제 표시 연도에서 자동 파생 → year 편집 시 항상 동기화
+            const displayYear = String(items[idx]?.year ?? m.year);
+            const yearBg = displayYear.slice(-2);
 
             return (
               <div
@@ -330,7 +333,7 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
                     pointerEvents: 'none',
                     userSelect: 'none',
                   }}>
-                    {m.yearBg}
+                    {yearBg}
                   </div>
 
                   {/* Content */}

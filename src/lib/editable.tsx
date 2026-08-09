@@ -81,6 +81,18 @@ export function useEditableManifest(editMode: boolean) {
   }, [editMode, pathname]); // ← pathname 변화마다 재전송
 }
 
+/* ── HTML 태그 제거 (RichEditor 편집값 → 텍스트 변환) ── */
+export function stripHtml(s: string): string {
+  if (!/<[a-z][\s\S]*?>/i.test(s)) return s;
+  return s
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\n{2,}/g, '\n')
+    .trim();
+}
+
 /* ── HTML 태그 포함 여부 판별 ── */
 function containsHtml(v: React.ReactNode): v is string {
   return typeof v === 'string' && /<[a-z][\s\S]*>/i.test(v);
@@ -95,15 +107,15 @@ export function E({ id, editMode, children }: { id: string; editMode: boolean; c
 
   if (!editMode) {
     if (sanitized !== null) {
-      return <span style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: sanitized }} />;
+      return <span className="rich-html" style={{ whiteSpace: 'pre-wrap' }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: sanitized }} />;
     }
     return <span style={{ whiteSpace: 'pre-wrap' }}>{children}</span>;
   }
 
   if (sanitized !== null) {
     return (
-      <span data-editable={id} className="editable-field" style={{ cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap' }}
-        dangerouslySetInnerHTML={{ __html: sanitized }}
+      <span data-editable={id} className="editable-field rich-html" style={{ cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap' }}
+        suppressHydrationWarning dangerouslySetInnerHTML={{ __html: sanitized }}
         onClick={(e) => {
           e.stopPropagation();
           const value = (e.currentTarget as HTMLElement).innerHTML || '';

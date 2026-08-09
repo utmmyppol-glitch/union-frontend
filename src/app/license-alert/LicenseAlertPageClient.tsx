@@ -53,6 +53,22 @@ const DEFAULT_DONE = {
   subtitle_suffix: '로 연락드리겠습니다.',
   link_estimate: '온라인 견적 받기',
   link_home: '홈으로',
+  listTitle: '요청한 라이선스 현황',
+};
+
+const DEFAULT_LABELS = {
+  basicInfo: '기본 정보',
+  company: '회사명 *',
+  manager: '담당자명 *',
+  email: '이메일 *',
+  phone: '연락처',
+  licenses: '보유 라이선스',
+  addBtn: '+ 추가',
+  product: '제품',
+  productName: '제품명',
+  qty: '수량',
+  expiry: '만료일 (알고 있다면)',
+  samBenefits: 'SAM 상담을 받으면',
 };
 
 export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
@@ -64,6 +80,7 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
   const [samBox, setSamBox] = useState(() => safeParse(ssrContent.licensealert_sam, DEFAULT_SAM_BOX));
   const [form, setForm] = useState(() => safeParse(ssrContent.licensealert_form, DEFAULT_FORM));
   const [done, setDone] = useState(() => safeParse(ssrContent.licensealert_done, DEFAULT_DONE));
+  const [labels, setLabels] = useState(() => safeParse(ssrContent.licensealert_labels, DEFAULT_LABELS));
 
   /* content-update 수신 */
   useEffect(() => {
@@ -74,6 +91,7 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
       licensealert_sam: setSamBox as (v: unknown) => void,
       licensealert_form: setForm as (v: unknown) => void,
       licensealert_done: setDone as (v: unknown) => void,
+      licensealert_labels: setLabels as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -174,7 +192,7 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 24 }}>
             <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--line)', fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 16, color: 'var(--ink)' }}>
-              요청한 라이선스 현황
+              <E id="licensealert_done.listTitle" editMode={editMode}>{done.listTitle}</E>
             </div>
             {licenses.filter(l => l.product).map((l, i, arr) => (
               <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none' }}>
@@ -253,25 +271,25 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
         {/* Form */}
         <div style={{ flex: 2 }}>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: 'clamp(24px,4vw,36px)', marginBottom: 24 }}>
-            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)', marginBottom: 24 }}>기본 정보</h2>
+            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)', marginBottom: 24 }}><E id="licensealert_labels.basicInfo" editMode={editMode}>{labels.basicInfo}</E></h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="la-form-grid">
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}>회사명 *</label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.company" editMode={editMode}>{labels.company}</E></label>
                 <input value={company} onChange={e => setCompany(e.target.value)} placeholder="주식회사 유니온시스템즈" style={inputStyle(errors.company)} />
                 {errors.company && <span style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginTop: 4, display: 'block' }}>{errors.company}</span>}
               </div>
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}>담당자명 *</label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.manager" editMode={editMode}>{labels.manager}</E></label>
                 <input value={name} onChange={e => setName(e.target.value)} placeholder="홍길동" style={inputStyle(errors.name)} />
                 {errors.name && <span style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginTop: 4, display: 'block' }}>{errors.name}</span>}
               </div>
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}>이메일 *</label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.email" editMode={editMode}>{labels.email}</E></label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@company.com" style={inputStyle(errors.email)} />
                 {errors.email && <span style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginTop: 4, display: 'block' }}>{errors.email}</span>}
               </div>
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}>연락처</label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.phone" editMode={editMode}>{labels.phone}</E></label>
                 <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="010-0000-0000" style={inputStyle()} />
               </div>
             </div>
@@ -280,9 +298,9 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
           {/* Licenses */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: 'clamp(24px,4vw,36px)', marginBottom: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)' }}>보유 라이선스</h2>
+              <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)' }}><E id="licensealert_labels.licenses" editMode={editMode}>{labels.licenses}</E></h2>
               <button onClick={addLicense}
-                style={{ padding: '8px 16px', background: '#11121410', color: 'var(--accent)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}>+ 추가</button>
+                style={{ padding: '8px 16px', background: '#11121410', color: 'var(--accent)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}><E id="licensealert_labels.addBtn" editMode={editMode}>{labels.addBtn}</E></button>
             </div>
             {errors.license && <p style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginBottom: 12 }}>{errors.license}</p>}
 
@@ -290,7 +308,7 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
               <div key={l.id} style={{ padding: '16px 0', borderTop: i > 0 ? '1px solid var(--line)' : 'none' }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
                   <div style={{ flex: 2, minWidth: 160 }}>
-                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}>제품</label>
+                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.product`} editMode={editMode}>{labels.product}</E></label>
                     <select value={l.product} onChange={e => updateLicense(l.id, 'product', e.target.value)}
                       style={{ ...inputStyle(), appearance: 'auto' }}>
                       {PRODUCTS.map(p => <option key={p} value={p}>{p}</option>)}
@@ -298,16 +316,16 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
                   </div>
                   {l.product === '기타' && (
                     <div style={{ flex: 2, minWidth: 140 }}>
-                      <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}>제품명</label>
+                      <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.productName`} editMode={editMode}>{labels.productName}</E></label>
                       <input value={l.customProduct} onChange={e => updateLicense(l.id, 'customProduct', e.target.value)} placeholder="제품명 입력" style={inputStyle()} />
                     </div>
                   )}
                   <div style={{ width: 80 }}>
-                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}>수량</label>
+                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.qty`} editMode={editMode}>{labels.qty}</E></label>
                     <input type="number" min={1} value={l.qty} onChange={e => updateLicense(l.id, 'qty', Number(e.target.value))} style={{ ...inputStyle(), textAlign: 'center' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 150 }}>
-                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}>만료일 (알고 있다면)</label>
+                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.expiry`} editMode={editMode}>{labels.expiry}</E></label>
                     <input type="date" value={l.expiry} onChange={e => updateLicense(l.id, 'expiry', e.target.value)} style={inputStyle()} />
                   </div>
                   {licenses.length > 1 && (
@@ -333,7 +351,7 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
         {/* Benefits sidebar */}
         <div style={{ flex: 1, minWidth: 280, position: 'sticky', top: 100 }} className="la-sidebar">
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: 'clamp(24px,3vw,32px)', marginBottom: 16 }}>
-            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 16, color: 'var(--ink)', marginBottom: 20 }}>SAM 상담을 받으면</h3>
+            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 16, color: 'var(--ink)', marginBottom: 20 }}><E id="licensealert_labels.samBenefits" editMode={editMode}>{labels.samBenefits}</E></h3>
             {benefits.map((b: { title: string; desc: string }, i: number) => (
               <div key={i} style={{ marginBottom: i < benefits.length - 1 ? 18 : 0, paddingBottom: i < benefits.length - 1 ? 18 : 0, borderBottom: i < benefits.length - 1 ? '1px solid var(--line)' : 'none' }}>
                 <h4 style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, color: 'var(--ink)', marginBottom: 4 }}>

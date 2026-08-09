@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['autodesk_hero', 'autodesk_strengths', 'autodesk_cta'];
+const CONTENT_KEYS = ['autodesk_hero', 'autodesk_strengths', 'autodesk_products', 'autodesk_plans', 'autodesk_cta'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -27,11 +27,17 @@ const ICONS = [
   { label: '위협 인텔리전스' }, { label: '취약점 관리' }, { label: '보안 리포트' },
 ];
 
-const DEFAULT_HERO = { desc: 'V3, EDR, MDS, 방화벽 등 국내 1위 통합 보안 체계를 구축합니다.' };
+const DEFAULT_HERO = { title: '국내 1위\n엔드포인트 보안', desc: 'V3, EDR, MDS, 방화벽 등 국내 1위 통합 보안 체계를 구축합니다.', heroBtn: '도입 문의하기 →' };
 const DEFAULT_PRODUCTS = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
 const DEFAULT_POINTS = POINTS.map(p => ({ title: p.title, desc: p.desc }));
 const DEFAULT_ICONS = ICONS.map(ic => ({ label: ic.label }));
-const DEFAULT_CTA = { title: '보안의 시작은\n안랩입니다.', desc: 'AhnLab 공인 파트너 유니온시스템즈' };
+const DEFAULT_CTA = { title: '보안의 시작은\n안랩입니다.', desc: 'AhnLab 공인 파트너 유니온시스템즈', btn1: '도입 문의하기', btn2: '견적 요청하기' };
+
+const DEFAULT_SECTIONS = {
+  productsTitle: '주요 제품',
+  whyTitle: '도입 효과',
+  featuresTitle: '주요 기능',
+};
 
 export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
@@ -41,6 +47,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
   const [points, setPoints] = useState(() => safeParse(ssrContent.ahnlab_points, DEFAULT_POINTS));
   const [icons, setIcons] = useState(() => safeParse(ssrContent.ahnlab_icons, DEFAULT_ICONS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.ahnlab_cta, DEFAULT_CTA));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.ahnlab_sections, DEFAULT_SECTIONS));
   useEffect(() => {
     if (!editMode) return;
     const setters: Record<string, (v: unknown) => void> = {
@@ -49,6 +56,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
       ahnlab_points: setPoints as (v: unknown) => void,
       ahnlab_icons: setIcons as (v: unknown) => void,
       ahnlab_cta: setCta as (v: unknown) => void,
+      ahnlab_sections: setSections as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
@@ -117,8 +125,14 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 16px',
             }}>
-              국내 1위<br />
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>엔드포인트 보안</span>
+              <E id="ahnlab_hero.title" editMode={editMode}>
+                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && <br />}
+                    {i > 0 ? <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>{line}</span> : line}
+                  </React.Fragment>
+                ))}
+              </E>
             </h1>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
@@ -145,7 +159,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}>도입 문의하기 →</Link>
+              }}><E id="ahnlab_hero.heroBtn" editMode={editMode}>{hero.heroBtn}</E></Link>
               <a href="tel:02-706-8999" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
@@ -169,7 +183,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}>주요 제품</h2>
+            }}><E id="ahnlab_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
           </div>
 
           <div className="ah-prod-grid" style={{
@@ -258,7 +272,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}>도입 효과</h2>
+            }}><E id="ahnlab_sections.whyTitle" editMode={editMode}>{sections.whyTitle}</E></h2>
           </div>
 
           {POINTS.map((pt, i) => (
@@ -322,7 +336,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}>주요 기능</h2>
+            }}><E id="ahnlab_sections.featuresTitle" editMode={editMode}>{sections.featuresTitle}</E></h2>
           </div>
 
           <div className="ah-feat-grid" style={{
@@ -382,7 +396,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="ahnlab_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -396,11 +410,11 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}>도입 문의하기</Link>
+            }}><E id="ahnlab_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}>견적 요청하기</Link>
+            }}><E id="ahnlab_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
           </div>
         </div>
       </section>

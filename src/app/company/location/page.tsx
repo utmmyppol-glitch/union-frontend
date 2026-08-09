@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['location_hero','location_address','location_contact','location_subway','location_bus','location_parking','location_cta'];
+const CONTENT_KEYS = ['location_hero','location_address','location_contact','location_subway','location_bus','location_parking','location_cta','location_sections','location_buttons'];
 
 async function getLocationContent(): Promise<Record<string, string>> {
   try {

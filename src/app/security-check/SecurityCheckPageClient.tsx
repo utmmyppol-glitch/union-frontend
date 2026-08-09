@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 import { apiClient } from '@/lib/api';
 
 const QUESTIONS = [
@@ -101,7 +101,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
         </svg>
         <h1 style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 'clamp(28px,4.5vw,48px)', lineHeight: 1.2, letterSpacing: '-.03em', marginBottom: 12 }}>
           <E id="securitycheck_hero.title" editMode={editMode}>
-            {hero.title.split('\n').map((line: string, i: number) => (
+            {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
               <span key={i}>{i > 0 && <br />}{line}</span>
             ))}
           </E>
@@ -122,7 +122,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
           {/* Progress */}
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, color: 'var(--ink2)' }}>질문 {current + 1} / 10</span>
+              <span style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, color: 'var(--ink2)' }}><E id="securitycheck_ui.progress" editMode={editMode}>질문 {current + 1} / 10</E></span>
               <span style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, color: 'var(--ink2)' }}>{Math.round(progress)}%</span>
             </div>
             <div style={{ height: 6, borderRadius: 3, background: 'var(--line)' }}>
@@ -192,7 +192,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ fontSize: 36, marginBottom: 4 }}>{grade.emoji}</span>
               <span style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 48, color: grade.color, lineHeight: 1 }}>{score}</span>
-              <span style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, color: 'var(--ink2)' }}>/ 100점</span>
+              <span style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, color: 'var(--ink2)' }}><E id="securitycheck_ui.score_unit" editMode={editMode}>/ 100점</E></span>
             </div>
           </div>
           <div style={{ display: 'inline-block', padding: '6px 20px', borderRadius: 0, background: `${grade.color}15`, marginBottom: 12 }}>
@@ -204,7 +204,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
         {/* Weak areas */}
         {weakAreas.length > 0 && (
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, padding: 'clamp(24px,4vw,36px)', marginBottom: 24 }}>
-            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: '#F5333F', marginBottom: 20 }}>취약 영역 ({weakAreas.length}개)</h3>
+            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: '#F5333F', marginBottom: 20 }}><E id="securitycheck_ui.weak_title" editMode={editMode}>취약 영역 ({weakAreas.length}개)</E></h3>
             {weakAreas.map((item, i) => (
               <div key={i} style={{ padding: '16px 0', borderBottom: i < weakAreas.length - 1 ? '1px solid var(--line)' : 'none' }}>
                 <div style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, color: 'var(--ink)', marginBottom: 8 }}>
@@ -212,7 +212,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {item.solutions.map(sol => (
-                    <span key={sol} style={{ padding: '4px 12px', borderRadius: 0, background: '#11121410', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18 }}>추천: {sol}</span>
+                    <span key={sol} style={{ padding: '4px 12px', borderRadius: 0, background: '#11121410', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18 }}><E id={`securitycheck_ui.recommend_${i}`} editMode={editMode}>추천: {sol}</E></span>
                   ))}
                 </div>
               </div>
@@ -223,7 +223,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
         {/* Partial areas */}
         {partialAreas.length > 0 && (
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, padding: 'clamp(24px,4vw,36px)', marginBottom: 24 }}>
-            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: '#D97706', marginBottom: 20 }}>개선 필요 ({partialAreas.length}개)</h3>
+            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: '#D97706', marginBottom: 20 }}><E id="securitycheck_ui.partial_title" editMode={editMode}>개선 필요 ({partialAreas.length}개)</E></h3>
             {partialAreas.map((item, i) => (
               <div key={i} style={{ padding: '16px 0', borderBottom: i < partialAreas.length - 1 ? '1px solid var(--line)' : 'none' }}>
                 <div style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, color: 'var(--ink)' }}>
@@ -238,15 +238,15 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <button onClick={() => setShowEmailModal(true)}
             style={{ flex: 1, padding: '14px 20px', borderRadius: 0, border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--ink)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, cursor: 'pointer', minWidth: 180 }}>
-            &#x1F4C4; 결과 PDF로 받기
+            &#x1F4C4; <E id="securitycheck_buttons.pdf" editMode={editMode}>결과 PDF로 받기</E>
           </button>
           <Link href="/contact"
             style={{ flex: 1, padding: '14px 20px', borderRadius: 0, background: 'var(--ink2)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, textDecoration: 'none', textAlign: 'center', minWidth: 180, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            보안 취약점 무료 상담 받기
+            <E id="securitycheck_buttons.consult" editMode={editMode}>보안 취약점 무료 상담 받기</E>
           </Link>
           <button onClick={() => { setDone(false); setCurrent(0); setAnswers(Array(10).fill(null)); }}
             style={{ flex: 1, padding: '14px 20px', borderRadius: 0, border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, cursor: 'pointer', minWidth: 180 }}>
-            다시 점검하기
+            <E id="securitycheck_buttons.retry" editMode={editMode}>다시 점검하기</E>
           </button>
         </div>
       </div>
@@ -259,8 +259,8 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
         <div onClick={e => e.stopPropagation()}
           style={{ background: 'var(--surface)', borderRadius: 0, padding: 32, maxWidth: 400, width: '100%' }}>
           {!emailSent ? (<>
-            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 8 }}>보안 점검 결과 PDF</h3>
-            <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, color: 'var(--ink2)', marginBottom: 24 }}>이메일로 상세 리포트를 보내드립니다.</p>
+            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 8 }}><E id="securitycheck_modal.title" editMode={editMode}>보안 점검 결과 PDF</E></h3>
+            <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, color: 'var(--ink2)', marginBottom: 24 }}><E id="securitycheck_modal.desc" editMode={editMode}>이메일로 상세 리포트를 보내드립니다.</E></p>
             <input type="email" placeholder="이메일 주소" value={email} onChange={e => setEmail(e.target.value)}
               style={{ width: '100%', padding: '12px 16px', borderRadius: 0, border: '1px solid var(--line)', background: 'var(--bg)', fontFamily: "'Pretendard'", fontSize: 18, color: 'var(--ink)', marginBottom: 16, boxSizing: 'border-box' }} />
             <button disabled={emailSubmitting} onClick={async () => {
@@ -283,15 +283,15 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
               setEmailSubmitting(false);
             }}
               style={{ width: '100%', padding: '14px', borderRadius: 0, background: 'var(--ink2)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, border: 'none', cursor: emailSubmitting ? 'wait' : 'pointer', opacity: emailSubmitting ? .6 : 1 }}>
-              {emailSubmitting ? '전송 중...' : 'PDF 받기'}
+              <E id="securitycheck_buttons.submit" editMode={editMode}>{emailSubmitting ? '전송 중...' : 'PDF 받기'}</E>
             </button>
           </>) : (
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>&#x2705;</div>
-              <p style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, color: 'var(--ink)', marginBottom: 8 }}>전송 완료!</p>
-              <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, color: 'var(--ink2)' }}>{email}로 결과 리포트를 보내드리겠습니다.</p>
+              <p style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, color: 'var(--ink)', marginBottom: 8 }}><E id="securitycheck_modal.success" editMode={editMode}>전송 완료!</E></p>
+              <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, color: 'var(--ink2)' }}><E id="securitycheck_modal.sent_desc" editMode={editMode}>{email}로 결과 리포트를 보내드리겠습니다.</E></p>
               <button onClick={() => setShowEmailModal(false)}
-                style={{ marginTop: 20, padding: '10px 24px', borderRadius: 0, background: 'var(--line)', color: 'var(--ink)', fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, border: 'none', cursor: 'pointer' }}>닫기</button>
+                style={{ marginTop: 20, padding: '10px 24px', borderRadius: 0, background: 'var(--line)', color: 'var(--ink)', fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, border: 'none', cursor: 'pointer' }}><E id="securitycheck_buttons.close" editMode={editMode}>닫기</E></button>
             </div>
           )}
         </div>

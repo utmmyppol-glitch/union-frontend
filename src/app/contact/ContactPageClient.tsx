@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { CtaSection } from '@/features/cta';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const DEFAULT_HERO = {
   eyebrow: 'CONTACT US',
@@ -103,7 +103,7 @@ export default function ContactPageClient({ ssrContent }: { ssrContent: Record<s
             color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: '0 auto',
           }}>
             <E id="contact_hero.desc" editMode={editMode}>
-              {hero.desc.split('\n').map((line: string, i: number) => (
+              {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>

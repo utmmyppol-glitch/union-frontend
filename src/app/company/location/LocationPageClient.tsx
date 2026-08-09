@@ -34,6 +34,12 @@ const DEFAULT_BUS = [
 ];
 const DEFAULT_PARKING = { title: '건물 내 지하주차장', desc: '방문 시 안내데스크 문의' };
 const DEFAULT_CTA = { text: '방문 전 사전 연락을 부탁드립니다.' };
+const DEFAULT_SECTIONS = {
+  transport_title: '교통 안내', contact_title: '연락처',
+  subway_label: '지하철', bus_label: '버스', parking_label: '주차',
+  kakaomap: '카카오맵 →', navermap: '네이버지도 →', googlemap: '구글맵 →',
+};
+const DEFAULT_BUTTONS = { tel: '전화하기', inquiry: '1:1 문의하기' };
 
 export default function LocationPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -48,6 +54,8 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
   const [bus, setBus] = useState(() => safeParse(ssrContent.location_bus, DEFAULT_BUS));
   const [parking, setParking] = useState(() => safeParse(ssrContent.location_parking, DEFAULT_PARKING));
   const [cta, setCta] = useState(() => safeParse(ssrContent.location_cta, DEFAULT_CTA));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.location_sections, DEFAULT_SECTIONS));
+  const [buttons, setButtons] = useState(() => safeParse(ssrContent.location_buttons, DEFAULT_BUTTONS));
 
   // 편집모드 매니페스트 전송 (pathname 변화마다 재전송)
   useEditableManifest(editMode);
@@ -63,6 +71,8 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
       location_bus: setBus as (v: unknown) => void,
       location_parking: setParking as (v: unknown) => void,
       location_cta: setCta as (v: unknown) => void,
+      location_sections: setSections as (v: unknown) => void,
+      location_buttons: setButtons as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -251,11 +261,11 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               </span>
               <div style={{ display: 'flex', gap: 16 }}>
                 <a href="https://map.kakao.com/link/to/유니온시스템즈,37.5447,127.0566" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}>카카오맵 →</a>
+                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}><E id="location_sections.kakaomap" editMode={editMode}>{sections.kakaomap}</E></a>
                 <a href="https://map.naver.com/p/search/서울시 성동구 아차산로17길 49" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}>네이버지도 →</a>
+                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}><E id="location_sections.navermap" editMode={editMode}>{sections.navermap}</E></a>
                 <a href="https://www.google.com/maps/search/서울시+성동구+아차산로17길+49" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textDecoration: 'none' }}>구글맵 →</a>
+                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textDecoration: 'none' }}><E id="location_sections.googlemap" editMode={editMode}>{sections.googlemap}</E></a>
               </div>
             </div>
           </div>
@@ -276,7 +286,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              교통 안내
+              <E id="location_sections.transport_title" editMode={editMode}>{sections.transport_title}</E>
             </h2>
           </div>
 
@@ -304,7 +314,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 18, fontWeight: 700, color: '#fff',
                   }}>2</span>
-                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>지하철</span>
+                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.subway_label" editMode={editMode}>{sections.subway_label}</E></span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {subway.map((item: { line: string; desc: string }, idx: number) => (
@@ -349,7 +359,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 18, fontWeight: 700, color: '#fff',
                   }}>B</span>
-                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>버스</span>
+                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.bus_label" editMode={editMode}>{sections.bus_label}</E></span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {bus.map((item: { type: string; routes: string }, idx: number) => (
@@ -394,7 +404,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 18, fontWeight: 700, color: '#fff',
                   }}>P</span>
-                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>주차</span>
+                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.parking_label" editMode={editMode}>{sections.parking_label}</E></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   <span style={{ width: 16, height: 1, background: 'var(--graphite)', flexShrink: 0, marginTop: 10 }} />
@@ -437,7 +447,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              연락처
+              <E id="location_sections.contact_title" editMode={editMode}>{sections.contact_title}</E>
             </h2>
           </div>
 
@@ -517,14 +527,14 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',
             }}>
-              전화하기 {contact.tel}
+              <E id="location_buttons.tel" editMode={editMode}>{buttons.tel}</E> {contact.tel}
             </a>
             <Link href="/support/inquiry" className="btn" style={{
               display: 'inline-block', padding: '14px 32px',
               background: 'transparent', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 700, fontSize: 18, textDecoration: 'none',
             }}>
-              1:1 문의하기
+              <E id="location_buttons.inquiry" editMode={editMode}>{buttons.inquiry}</E>
             </Link>
           </div>
         </div>

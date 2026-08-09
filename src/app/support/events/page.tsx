@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-
+import { E, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -40,6 +40,8 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
 ];
 
 export default function EventsPage() {
+  const editMode = useEditMode();
+  useEditableManifest(editMode);
   const [filter, setFilter] = useState<FilterTab>('all');
 
   const filtered = EVENTS.filter((e) => {
@@ -90,7 +92,7 @@ export default function EventsPage() {
         <div className="wrap" style={{ position: 'relative', zIndex: 1, padding: '120px clamp(20px,4vw,52px) 64px' }}>
           <p style={{ fontFamily: MONO, fontWeight: 500, fontSize: 18, letterSpacing: '.14em', color: 'var(--accent)', margin: '0 0 12px' }}>EVENTS</p>
           <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: 1.05, letterSpacing: '-.04em', color: '#fff', margin: '0 0 12px' }}>
-            이벤트 소식을 만나보세요.
+            <E id="events_hero.title" editMode={editMode}>이벤트 소식을 만나보세요.</E>
           </h1>
           {activeCount > 0 && (
             <div style={{
@@ -141,7 +143,7 @@ export default function EventsPage() {
         const rest = filtered.filter(e => e !== featured);
         if (!featured) return (
           <section style={{ padding: 'clamp(56px, 8vw, 96px) 0' }}>
-            <div className="wrap" style={{ padding: '80px 0', textAlign: 'center', color: 'var(--ink2)', fontSize: 16 }}>해당하는 이벤트가 없습니다.</div>
+            <div className="wrap" style={{ padding: '80px 0', textAlign: 'center', color: 'var(--ink2)', fontSize: 16 }}><E id="events_empty.text" editMode={editMode}>해당하는 이벤트가 없습니다.</E></div>
           </section>
         );
         return (
@@ -201,7 +203,7 @@ export default function EventsPage() {
                         padding: '12px 24px', background: 'var(--accent)', color: '#fff',
                         fontWeight: 700, fontSize: 14, transition: 'transform .2s, box-shadow .2s',
                       }}>
-                        자세히 보기 <span>&rarr;</span>
+                        <E id="events_buttons.detail" editMode={editMode}>자세히 보기</E> <span>&rarr;</span>
                       </span>
                     </div>
                   </div>
@@ -311,7 +313,7 @@ export default function EventsPage() {
               fontWeight: 800, fontSize: 'clamp(20px, 2.5vw, 28px)',
               color: '#fff', margin: 0, letterSpacing: '-0.02em',
             }}>
-              새로운 이벤트와 프로모션 소식을 놓치지 마세요
+              <E id="events_cta.title" editMode={editMode}>새로운 이벤트와 프로모션 소식을 놓치지 마세요</E>
             </h3>
           </div>
           <a href="/contact" style={{
@@ -321,10 +323,12 @@ export default function EventsPage() {
             transition: 'transform .2s, box-shadow .2s',
             boxShadow: '0 4px 20px -4px rgba(245,51,63,.35)',
           }}>
-            도입 문의하기 <span>&rarr;</span>
+            <E id="events_buttons.cta" editMode={editMode}>도입 문의하기</E> <span>&rarr;</span>
           </a>
         </div>
       </section>
+
+      {editMode && <style>{EDITABLE_STYLES}</style>}
 
       <style>{`
         @keyframes evtPulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }

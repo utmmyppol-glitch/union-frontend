@@ -100,9 +100,9 @@ export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<
           <h1 style={{
             fontSize: 'clamp(28px, 4.5vw, 48px)', fontWeight: 900,
             letterSpacing: '-.03em', marginTop: 16, lineHeight: 1.2,
-          }}>IT · 보안 용어사전</h1>
+          }}><E id="glossary_hero.title" editMode={editMode}>IT · 보안 용어사전</E></h1>
           <p style={{ opacity: 0.7, fontSize: 16, marginTop: 12, maxWidth: 640 }}>
-            유니온시스템즈가 취급하는 제품과 관련된 IT·보안 핵심 용어를 정리했습니다.
+            <E id="glossary_hero.desc" editMode={editMode}>유니온시스템즈가 취급하는 제품과 관련된 IT·보안 핵심 용어를 정리했습니다.</E>
           </p>
         </div>
       </section>
@@ -147,7 +147,7 @@ export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<
               <button onClick={() => setSearch('')} style={{
                 padding: '10px 12px', border: '1px solid var(--line)', borderLeft: 'none',
                 background: 'var(--surface)', color: 'var(--ink2)', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-              }}>초기화</button>
+              }}><E id="glossary_buttons.reset" editMode={editMode}>초기화</E></button>
             )}
           </div>
         </div>
@@ -190,7 +190,7 @@ export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<
 
         {filtered.length === 0 && (
           <p style={{ textAlign: 'center', padding: 40, color: 'var(--ink2)', fontSize: 15 }}>
-            검색 결과가 없습니다.
+            <E id="glossary_empty.text" editMode={editMode}>검색 결과가 없습니다.</E>
           </p>
         )}
 
@@ -201,20 +201,20 @@ export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<
           display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 20,
         }}>
           <div>
-            <h3 style={{ fontSize: 20, fontWeight: 800 }}>용어가 어렵게 느껴지시나요?</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 800 }}><E id="glossary_cta.title" editMode={editMode}>용어가 어렵게 느껴지시나요?</E></h3>
             <p style={{ fontSize: 14, opacity: 0.8, marginTop: 6 }}>
-              전문 컨설턴트가 우리 회사에 꼭 필요한 솔루션을 쉽게 설명해드립니다.
+              <E id="glossary_cta.desc" editMode={editMode}>전문 컨설턴트가 우리 회사에 꼭 필요한 솔루션을 쉽게 설명해드립니다.</E>
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <Link href="/contact" style={{
               padding: '12px 24px', background: '#fff', color: 'var(--ink)',
               fontWeight: 700, fontSize: 14, textDecoration: 'none',
-            }}>무료 상담 신청</Link>
+            }}><E id="glossary_buttons.consult" editMode={editMode}>무료 상담 신청</E></Link>
             <Link href="/estimate" style={{
               padding: '12px 24px', border: '1px solid rgba(255,255,255,.4)',
               color: '#fff', fontWeight: 700, fontSize: 14, textDecoration: 'none',
-            }}>온라인 견적</Link>
+            }}><E id="glossary_buttons.estimate" editMode={editMode}>온라인 견적</E></Link>
           </div>
         </div>
       </section>

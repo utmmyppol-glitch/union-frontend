@@ -70,6 +70,13 @@ const DEFAULT_CTA = {
   phone_text: "전화 상담 02-706-8999 · 평일 10:00 – 18:00",
 };
 
+const DEFAULT_CTA_MINI_STATS = [
+  { num: "200+", label: "고객사" },
+  { num: "16년", label: "파트너십" },
+  { num: "98%", label: "재계약률" },
+  { num: "24/7", label: "기술지원" },
+];
+
 const DEFAULT_VIDEO = {
   eyebrow: "Company Introduction",
   title: "유니온시스템즈를 소개합니다",
@@ -284,7 +291,7 @@ function StatsSection({ editMode, statsHeader, statsItems }: {
 /* ═══════════════════════════════════════════════════════════
    CTA Section
    ═══════════════════════════════════════════════════════════ */
-function CtaBanner({ editMode, cta }: { editMode: boolean; cta: typeof DEFAULT_CTA }) {
+function CtaBanner({ editMode, cta, ctaMiniStats }: { editMode: boolean; cta: typeof DEFAULT_CTA; ctaMiniStats: typeof DEFAULT_CTA_MINI_STATS }) {
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -578,13 +585,8 @@ function CtaBanner({ editMode, cta }: { editMode: boolean; cta: typeof DEFAULT_C
             marginBottom: 36,
             flexWrap: "wrap",
           }}>
-            {[
-              { num: "200+", label: "고객사" },
-              { num: "16년", label: "파트너십" },
-              { num: "98%", label: "재계약률" },
-              { num: "24/7", label: "기술지원" },
-            ].map((s) => (
-              <div key={s.label} className="cta-stat-item" style={{ textAlign: "center" }}>
+            {ctaMiniStats.map((s: { num: string; label: string }, i: number) => (
+              <div key={i} className="cta-stat-item" style={{ textAlign: "center" }}>
                 <p style={{
                   fontFamily: "'Newsreader', Georgia, serif",
                   fontStyle: "italic",
@@ -593,7 +595,7 @@ function CtaBanner({ editMode, cta }: { editMode: boolean; cta: typeof DEFAULT_C
                   color: "#fff",
                   margin: "0 0 2px",
                   lineHeight: 1,
-                }}>{s.num}</p>
+                }}><E id={`home_cta_mini${i}.num`} editMode={editMode}>{s.num}</E></p>
                 <p style={{
                   fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
                   fontSize: 12,
@@ -601,7 +603,7 @@ function CtaBanner({ editMode, cta }: { editMode: boolean; cta: typeof DEFAULT_C
                   letterSpacing: ".08em",
                   color: "rgba(255,255,255,.45)",
                   margin: 0,
-                }}>{s.label}</p>
+                }}><E id={`home_cta_mini${i}.label`} editMode={editMode}>{s.label}</E></p>
               </div>
             ))}
           </div>
@@ -647,6 +649,7 @@ export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent
   const [statsHeader, setStatsHeader] = useState(() => safeParse(ssrContent.home_stats, DEFAULT_STATS_HEADER));
   const [statsItems, setStatsItems] = useState(() => safeParse(ssrContent.home_stats_items, DEFAULT_STATS_ITEMS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.home_cta, DEFAULT_CTA));
+  const [ctaMiniStats, setCtaMiniStats] = useState(() => safeParse(ssrContent.home_cta_mini_stats, DEFAULT_CTA_MINI_STATS));
   const [video, setVideo] = useState(() => safeParse(ssrContent.home_video, DEFAULT_VIDEO));
 
   useEffect(() => {
@@ -655,6 +658,7 @@ export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent
       home_stats: setStatsHeader as (v: unknown) => void,
       home_stats_items: setStatsItems as (v: unknown) => void,
       home_cta: setCta as (v: unknown) => void,
+      home_cta_mini_stats: setCtaMiniStats as (v: unknown) => void,
       home_video: setVideo as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
@@ -790,7 +794,7 @@ export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent
 
       {/* 8. CTA */}
       <div className="gsap-scale">
-        <CtaBanner editMode={editMode} cta={cta} />
+        <CtaBanner editMode={editMode} cta={cta} ctaMiniStats={ctaMiniStats} />
       </div>
     </div>
   );

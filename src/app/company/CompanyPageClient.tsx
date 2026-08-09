@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { E, OptImg, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, OptImg, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 // fallback 이미지 경로 (onError 시 사용하지 않음 — next/image가 대체)
 
@@ -32,12 +32,14 @@ const DEFAULT_VALUES = [
   { num: '03', title: '파트너십', desc: '단순 공급이 아닌 도입부터 운영, 유지보수까지 전 과정을 함께하는 진정한 IT 파트너가 되겠습니다.' },
 ];
 const DEFAULT_DEPTS = [
-  { name: '솔루션사업부', desc: 'DATA / SW / SI 사업팀' }, { name: '영업부', desc: '공공영업 / 기업영업 / 교육영업' },
-  { name: '서비스사업부', desc: '기술지원 팀' }, { name: '사업지원부', desc: '리뉴얼 / 마케팅 / 영업지원' },
+  { name: '솔루션사업부', desc: 'DATA / SW / SI 사업팀', team: '' }, { name: '영업부', desc: '공공영업 / 기업영업 / 교육영업', team: '' },
+  { name: '서비스사업부', desc: '기술지원 팀', team: '' }, { name: '사업지원부', desc: '리뉴얼 / 마케팅 / 영업지원', team: '' },
 ];
 const DEFAULT_ORG = { img: '/images/crawl/unionsystems/about_organization_chart_30.jpg', title: '소수정예 전문가 조직', text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.' };
 const DEFAULT_CI = { img: '/images/crawl/unionsystems/about_ci_31.jpg', title: '기업 아이덴티티', subtitle: 'UNION RED는 고객을 향한 열정을 담고 있습니다', quote: '고객과 신뢰로 만들어진 유니온시스템즈,\n함께 구축하겠다는 열정을 담고 있습니다.', ceo: 'CEO 홍민석' };
 const DEFAULT_CTA = { title: '유니온시스템즈와 함께 시작하세요', desc: '귀사의 IT 환경에 최적화된 솔루션을 제안해 드립니다.' };
+const DEFAULT_SECTIONS = { strengths_title: '유니온시스템즈가\n선택받는 이유', values_title: '핵심 가치' };
+const DEFAULT_BUTTONS = { cta: '도입문의 하기 →' };
 
 export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -54,6 +56,8 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
   const [org, setOrg] = useState(() => safeParse(ssrContent.company_org, DEFAULT_ORG));
   const [ci, setCi] = useState(() => safeParse(ssrContent.company_ci, DEFAULT_CI));
   const [cta, setCta] = useState(() => safeParse(ssrContent.company_cta, DEFAULT_CTA));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.company_sections, DEFAULT_SECTIONS));
+  const [buttons, setButtons] = useState(() => safeParse(ssrContent.company_buttons, DEFAULT_BUTTONS));
 
   // 편집모드 매니페스트 전송 (pathname 변화마다 재전송)
   useEditableManifest(editMode);
@@ -71,6 +75,8 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
       company_org: setOrg as (v: unknown) => void,
       company_ci: setCi as (v: unknown) => void,
       company_cta: setCta as (v: unknown) => void,
+      company_sections: setSections as (v: unknown) => void,
+      company_buttons: setButtons as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -139,9 +145,9 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 16px' }}>
               <E id="company_overview.title" editMode={editMode}>{overview.title}</E>
             </h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 680, margin: 0 }}>
+            <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 680, margin: 0 }}>
               <E id="company_overview.text" editMode={editMode}>{overview.text}</E>
-            </p>
+            </div>
           </div>
           <div className="reveal about-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, borderTop: '1px solid var(--line)', paddingTop: 40 }}>
             {stats.map((s, i) => (
@@ -168,7 +174,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         <div className="wrap">
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>OUR STRENGTHS</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: 0 }}>유니온시스템즈가<br />선택받는 이유</h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: 0 }}><E id="company_sections.strengths_title" editMode={editMode}>{stripHtml(sections.strengths_title).split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}</E></h2>
           </div>
           <div className="about-strengths" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
             {strengths.map((item, idx) => (
@@ -196,7 +202,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         <div className="wrap" style={{ position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 14px' }}>CORE VALUES</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0 }}>핵심 가치</h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0 }}><E id="company_sections.values_title" editMode={editMode}>{sections.values_title}</E></h2>
           </div>
           <div className="about-values" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
             {values.map((v, idx) => (
@@ -230,6 +236,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
               <div key={idx} className="reveal" style={{ borderTop: '2px solid var(--accent)', padding: '20px 0 0', transitionDelay: `${idx * 0.06}s` }}>
                 <h3 style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></h3>
                 <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: 'var(--ink2)', margin: 0, letterSpacing: '.02em' }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
+                {d.team && <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 12, color: 'var(--ink2)', margin: '4px 0 0', letterSpacing: '.02em', opacity: .7 }}><E id={`company_depts.${idx}.team`} editMode={editMode}>{d.team}</E></p>}
               </div>
             ))}
           </div>
@@ -254,7 +261,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="reveal" style={{ marginTop: 48, maxWidth: 600, margin: '48px auto 0' }}>
             <blockquote style={{ fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic', fontSize: 'clamp(18px, 2.5vw, 24px)', fontWeight: 400, lineHeight: 1.5, color: 'var(--ink)', margin: '0 0 16px' }}>
               <E id="company_ci.quote" editMode={editMode}>
-                &ldquo;{ci.quote.split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}&rdquo;
+                &ldquo;{stripHtml(ci.quote).split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}&rdquo;
               </E>
             </blockquote>
             <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 12, fontWeight: 500, letterSpacing: '.1em', color: 'var(--ink2)', margin: 0 }}>
@@ -277,7 +284,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           <p className="reveal" style={{ fontSize: 16, color: 'rgba(255,255,255,.5)', margin: '0 0 32px' }}>
             <E id="company_cta.desc" editMode={editMode}>{cta.desc}</E>
           </p>
-          <Link href="/contact" className="reveal btn" style={{ display: 'inline-block', padding: '16px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>도입문의 하기 →</Link>
+          <Link href="/contact" className="reveal btn" style={{ display: 'inline-block', padding: '16px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="company_buttons.cta" editMode={editMode}>{buttons.cta}</E></Link>
         </div>
       </section>
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -17,6 +17,7 @@ const PARTNERS = [
 
 const DEFAULT_HERO = {
   eyebrow: 'SOFTWARE PARTNERSHIP',
+  title: '글로벌 소프트웨어\n공식 파트너',
   desc: 'Microsoft, Adobe, Autodesk, ESTsoft —\n최적의 라이선스 컨설팅과 기술 지원을 제공합니다.',
 };
 
@@ -34,9 +35,14 @@ const DEFAULT_STATS = [
   { num: '99.9%', label: '고객 만족도' },
 ];
 
+const DEFAULT_LINEUP = { title: '소프트웨어 라인업' };
+const DEFAULT_PROCESS_TITLE = { title: '도입 프로세스' };
+
 const DEFAULT_CTA = {
   title: '어떤 소프트웨어가 필요하신지\n모르셔도 괜찮습니다.',
   desc: '유니온시스템즈가 귀사의 환경을 분석하고 최적의 조합을 찾아드립니다.',
+  btn1: '도입 문의하기',
+  btn2: '견적 요청하기',
 };
 
 export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
@@ -47,6 +53,8 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
   const [process, setProcess] = useState(() => safeParse(ssrContent.software_process, DEFAULT_PROCESS));
   const [stats, setStats] = useState(() => safeParse(ssrContent.software_stats, DEFAULT_STATS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.software_cta, DEFAULT_CTA));
+  const [lineup, setLineup] = useState(() => safeParse(ssrContent.software_lineup, DEFAULT_LINEUP));
+  const [processTitle, setProcessTitle] = useState(() => safeParse(ssrContent.software_processTitle, DEFAULT_PROCESS_TITLE));
 
   const pageRef = useRef<HTMLDivElement>(null);
 
@@ -57,6 +65,8 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
       software_process: setProcess as (v: unknown) => void,
       software_stats: setStats as (v: unknown) => void,
       software_cta: setCta as (v: unknown) => void,
+      software_lineup: setLineup as (v: unknown) => void,
+      software_processTitle: setProcessTitle as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -122,17 +132,21 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
             fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
             lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
           }}>
-            글로벌 소프트웨어<br />
-            <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, letterSpacing: '-.02em' }}>
-              공식 파트너
-            </span>
+            <E id="software_hero.title" editMode={editMode}>
+              {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                <React.Fragment key={i}>
+                  {i > 0 && <br />}
+                  {i > 0 ? <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, letterSpacing: '-.02em' }}>{line}</span> : line}
+                </React.Fragment>
+              ))}
+            </E>
           </h1>
           <p style={{
             fontWeight: 400, fontSize: 16, lineHeight: 1.7,
             color: 'rgba(255,255,255,.45)', maxWidth: 440, margin: 0,
           }}>
             <E id="software_hero.desc" editMode={editMode}>
-              {hero.desc.split('\n').map((line: string, i: number) => (
+              {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -187,7 +201,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              소프트웨어 라인업
+              <E id="software_lineup.title" editMode={editMode}>{lineup.title}</E>
             </h2>
           </div>
 
@@ -237,10 +251,10 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
                   fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
                   lineHeight: 1, letterSpacing: '-.04em', color: '#fff', margin: '0 0 14px',
                 }}>
-                  학교, 회사, 일상<br />어디에서나
+                  <E id="software_bento.ms_title" editMode={editMode}>학교, 회사, 일상<br />어디에서나</E>
                 </h3>
                 <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)', margin: '0 0 20px', maxWidth: 360 }}>
-                  Word, Excel, PowerPoint, Teams 등 업무에 필요한 모든 도구를 클라우드 기반으로 제공합니다.
+                  <E id="software_bento.ms_desc" editMode={editMode}>Word, Excel, PowerPoint, Teams 등 업무에 필요한 모든 도구를 클라우드 기반으로 제공합니다.</E>
                 </p>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
                   {['Office', 'Teams', 'OneDrive', 'Exchange'].map((t) => (
@@ -255,7 +269,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
                   fontFamily: MONO, fontSize: 13, fontWeight: 600,
                   letterSpacing: '.04em', color: 'var(--accent)',
                 }}>
-                  자세히 보기 →
+                  <E id="software_bento.ms_link" editMode={editMode}>자세히 보기 →</E>
                 </span>
               </div>
             </Link>
@@ -290,7 +304,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
                   fontWeight: 900, fontSize: 22, lineHeight: 1.1,
                   letterSpacing: '-.03em', color: '#fff', margin: '0 0 10px',
                 }}>
-                  건축설계<br />3D 디자인
+                  <E id="software_bento.ad_title" editMode={editMode}>건축설계<br />3D 디자인</E>
                 </h3>
                 <span style={{
                   fontFamily: MONO, fontSize: 14, fontWeight: 600,
@@ -325,9 +339,9 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
                   <h3 style={{
                     fontWeight: 800, fontSize: 17, lineHeight: 1.2,
                     letterSpacing: '-.02em', color: 'var(--ink)', margin: '0 0 6px',
-                  }}>알툴즈</h3>
+                  }}><E id="software_bento.est_title" editMode={editMode}>알툴즈</E></h3>
                   <p style={{ fontSize: 14, color: 'var(--ink2)', margin: '0 0 12px', lineHeight: 1.5 }}>
-                    3,000만 사용자의 유틸리티
+                    <E id="software_bento.est_desc" editMode={editMode}>3,000만 사용자의 유틸리티</E>
                   </p>
                   <span style={{
                     fontFamily: MONO, fontSize: 13, fontWeight: 600,
@@ -367,7 +381,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
                     letterSpacing: '-.02em', color: '#fff', margin: '0 0 6px',
                   }}>Creative Cloud</h3>
                   <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', margin: '0 0 12px', lineHeight: 1.5 }}>
-                    디자인, 사진, 영상편집
+                    <E id="software_bento.ab_desc" editMode={editMode}>디자인, 사진, 영상편집</E>
                   </p>
                   <span style={{
                     fontFamily: MONO, fontSize: 13, fontWeight: 600,
@@ -402,7 +416,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              도입 프로세스
+              <E id="software_processTitle.title" editMode={editMode}>{processTitle.title}</E>
             </h2>
           </div>
 
@@ -515,7 +529,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="software_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -531,20 +545,20 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
               display: 'inline-flex', alignItems: 'center', gap: 6,
             }}>
-              도입 문의하기 <span>&rarr;</span>
+              <E id="software_cta.btn1" editMode={editMode}>{cta.btn1}</E> <span>&rarr;</span>
             </Link>
             <Link href="/contact" style={{
               padding: '16px 40px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
               display: 'inline-flex', alignItems: 'center',
             }}>
-              견적 요청하기
+              <E id="software_cta.btn2" editMode={editMode}>{cta.btn2}</E>
             </Link>
           </div>
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .sw-bento-card {
           transition: transform .3s cubic-bezier(.16,.84,.3,1), box-shadow .3s;
         }
@@ -563,7 +577,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
         @media (max-width: 560px) {
           .sw-process { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

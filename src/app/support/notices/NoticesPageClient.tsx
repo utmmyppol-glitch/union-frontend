@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { E, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const UP = '/images/uploads/';
@@ -18,6 +19,8 @@ interface PageData {
 const PER_PAGE = 6;
 
 export default function NoticesPageClient({ initialData }: { initialData: PageData }) {
+  const editMode = useEditMode();
+  useEditableManifest(editMode);
   const [page, setPage] = useState(0);
   const [data, setData] = useState<PageData>(initialData);
 
@@ -62,8 +65,8 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
         <div className="blob blob-lavender" aria-hidden="true" style={{ width: 250, height: 250, left: '10%', bottom: '5%', animationDelay: '8s' }} />
         <div className="wrap" style={{ position: 'relative', zIndex: 1, padding: '120px clamp(20px,4vw,52px) 64px' }}>
           <p style={{ fontFamily: MONO, fontWeight: 500, fontSize: 18, letterSpacing: '.14em', color: 'var(--accent)', margin: '0 0 12px' }}>NOTICES</p>
-          <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: 1.05, letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 8px' }}>공지사항</h1>
-          <p style={{ fontWeight: 400, fontSize: 18, color: 'var(--ink2)', margin: 0 }}>유니온시스템즈의 즐거운 최신 소식들을 만나보세요!</p>
+          <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: 1.05, letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 8px' }}><E id="notices_hero.title" editMode={editMode}>공지사항</E></h1>
+          <p style={{ fontWeight: 400, fontSize: 18, color: 'var(--ink2)', margin: 0 }}><E id="notices_hero.subtitle" editMode={editMode}>유니온시스템즈의 즐거운 최신 소식들을 만나보세요!</E></p>
         </div>
       </section>
 
@@ -108,6 +111,8 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
           )}
         </div>
       </section>
+
+      {editMode && <style>{EDITABLE_STYLES}</style>}
 
       <style>{`
         .ntc-card:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 40px rgba(0,0,0,.08) !important; }

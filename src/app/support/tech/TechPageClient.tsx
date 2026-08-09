@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -47,11 +47,29 @@ const DEFAULT_MID = {
   subtitle: 'IT 솔루션, 도입이 끝이 아닙니다. 체계적인 관리',
 };
 
-const DEFAULT_CTA = { title: '기술지원이 필요하신가요?' };
+const DEFAULT_CTA = { title: '기술지원이 필요하신가요?', btn_call: '전화하기', btn_inquiry: '1:1 문의하기' };
+
+const DEFAULT_SECTIONS = {
+  services_title: '무엇을 도와드릴까요?',
+  services_desc: 'IT 전체 역할 없이 기존 IT 자산 상담, 분석하세요',
+  process_title: '기술지원 프로세스',
+  contact_title: '기술지원 안내',
+  faq_title: '자주 묻는 질문',
+};
+const DEFAULT_LABELS = { tel: '전화 문의', hours: '운영시간', tech_team: '기술지원팀', da_team: 'DA팀' };
 
 const DEFAULT_CONTACT = {
   tel: '02-706-8999',
   hours: '평일 10 – 18시 (점심시간 12:00 – 13:00 제외, 주말 및 공휴일 휴무)',
+};
+
+const DEFAULT_TEAM_INTRO = {
+  title: '유니온시스템즈 서비스',
+  subtitle: '소프트웨어 라이선스 관리, 솔루션 유지보수',
+  support_name: '기술지원 팀',
+  support_desc: '전담 엔지니어 배정, 도입 및 업무 적용 지원, 절차화 된 프로세스, 유지보수, 이슈대응, 원격지원, 장애처리',
+  renewal_name: '리뉴얼 팀',
+  renewal_desc: '벤더(개발사)와 긴밀한 연결, 소프트웨어 라이선스 정책 안내, 갱신관리, 성능 향상을 위한 교육, 세미나',
 };
 
 export default function TechPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
@@ -66,6 +84,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
   const [mid, setMid] = useState(() => safeParse(ssrContent.tech_mid, DEFAULT_MID));
   const [cta, setCta] = useState(() => safeParse(ssrContent.tech_cta, DEFAULT_CTA));
   const [contact, setContact] = useState(() => safeParse(ssrContent.tech_contact, DEFAULT_CONTACT));
+  const [teamIntro, setTeamIntro] = useState(() => safeParse(ssrContent.tech_team_intro, DEFAULT_TEAM_INTRO));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.tech_sections, DEFAULT_SECTIONS));
+  const [labels, setLabels] = useState(() => safeParse(ssrContent.tech_labels, DEFAULT_LABELS));
 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -83,6 +104,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
       tech_mid: setMid as (v: unknown) => void,
       tech_cta: setCta as (v: unknown) => void,
       tech_contact: setContact as (v: unknown) => void,
+      tech_team_intro: setTeamIntro as (v: unknown) => void,
+      tech_sections: setSections as (v: unknown) => void,
+      tech_labels: setLabels as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -146,7 +170,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
               lineHeight: 1.05, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
               <E id="tech_hero.title" editMode={editMode}>
-                {hero.title.split('\n').map((line: string, i: number) => (
+                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -167,9 +191,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 40 }}>
             <p className="eyebrow" style={{ margin: '0 0 10px' }}>OUR TEAMS</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: 0 }}>
-              유니온시스템즈 서비스
+              <E id="tech_team_intro.title" editMode={editMode}>{teamIntro.title}</E>
             </h2>
-            <p style={{ fontSize: 18, color: 'var(--ink2)', marginTop: 8 }}>소프트웨어 라이선스 관리, 솔루션 유지보수</p>
+            <p style={{ fontSize: 18, color: 'var(--ink2)', marginTop: 8 }}><E id="tech_team_intro.subtitle" editMode={editMode}>{teamIntro.subtitle}</E></p>
           </div>
 
           {/* 기술지원팀 */}
@@ -190,9 +214,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             </div>
             <div style={{ padding: 'clamp(26px, 3.5vw, 40px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <p style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, letterSpacing: '.1em', color: 'var(--accent)', margin: '0 0 8px' }}>SUPPORT TEAM</p>
-              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}>기술지원 팀</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}><E id="tech_team_intro.support_name" editMode={editMode}>{teamIntro.support_name}</E></h3>
               <p style={{ fontSize: 18, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
-                전담 엔지니어 배정, 도입 및 업무 적용 지원, 절차화 된 프로세스, 유지보수, 이슈대응, 원격지원, 장애처리
+                <E id="tech_team_intro.support_desc" editMode={editMode}>{teamIntro.support_desc}</E>
               </p>
             </div>
           </div>
@@ -204,9 +228,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
           }}>
             <div style={{ padding: 'clamp(26px, 3.5vw, 40px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <p style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, letterSpacing: '.1em', color: 'var(--accent)', margin: '0 0 8px' }}>RENEWAL TEAM</p>
-              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}>리뉴얼 팀</h3>
+              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}><E id="tech_team_intro.renewal_name" editMode={editMode}>{teamIntro.renewal_name}</E></h3>
               <p style={{ fontSize: 18, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
-                벤더(개발사)와 긴밀한 연결, 소프트웨어 라이선스 정책 안내, 갱신관리, 성능 향상을 위한 교육, 세미나
+                <E id="tech_team_intro.renewal_desc" editMode={editMode}>{teamIntro.renewal_desc}</E>
               </p>
             </div>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
@@ -266,8 +290,8 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
 
         <div className="wrap">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 36 }}>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 8px' }}>무엇을 도와드릴까요?</h2>
-            <p style={{ fontSize: 18, color: 'var(--ink2)', margin: 0 }}>IT 전체 역할 없이 기존 IT 자산 상담, 분석하세요</p>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 8px' }}><E id="tech_sections.services_title" editMode={editMode}>{sections.services_title}</E></h2>
+            <p style={{ fontSize: 18, color: 'var(--ink2)', margin: 0 }}><E id="tech_sections.services_desc" editMode={editMode}>{sections.services_desc}</E></p>
           </div>
           <div className="tech-svc" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
             {services.map((s: { title: string; desc: string }, i: number) => (
@@ -300,7 +324,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
         <div className="wrap">
           <div className="reveal" style={{ marginBottom: 32 }}>
             <p className="eyebrow" style={{ margin: '0 0 10px' }}>PROCESS</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: 0 }}>기술지원 프로세스</h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: 0 }}><E id="tech_sections.process_title" editMode={editMode}>{sections.process_title}</E></h2>
           </div>
           <div className="tech-process" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
             {process.map((s: { num: string; title: string; desc: string }, i: number) => (
@@ -338,14 +362,14 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
         <div className="blob blob-graphite" aria-hidden="true" style={{ width: 250, height: 250, left: '5%', bottom: '10%', animationDelay: '6s' }} />
         <div className="wrap" style={{ position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 24 }}>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 12px' }}>기술지원 안내</h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 12px' }}><E id="tech_sections.contact_title" editMode={editMode}>{sections.contact_title}</E></h2>
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', fontSize: 18, color: 'var(--ink2)' }}>
               <span>
-                <strong style={{ color: 'var(--ink)' }}>전화 문의</strong>{' '}
+                <strong style={{ color: 'var(--ink)' }}><E id="tech_labels.tel" editMode={editMode}>{labels.tel}</E></strong>{' '}
                 <E id="tech_contact.tel" editMode={editMode}>{contact.tel}</E>
               </span>
               <span>
-                <strong style={{ color: 'var(--ink)' }}>운영시간</strong>{' '}
+                <strong style={{ color: 'var(--ink)' }}><E id="tech_labels.hours" editMode={editMode}>{labels.hours}</E></strong>{' '}
                 <E id="tech_contact.hours" editMode={editMode}>{contact.hours}</E>
               </span>
             </div>
@@ -364,7 +388,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                         padding: '28px 36px', fontWeight: 800, fontSize: 18, color: 'var(--ink)',
                         borderRight: '1px solid var(--line)', verticalAlign: 'middle',
                         width: 180, background: 'var(--soft)',
-                      }}>기술지원팀</td>
+                      }}><E id="tech_labels.tech_team" editMode={editMode}>{labels.tech_team}</E></td>
                     )}
                     <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220 }}>
                       <E id={`tech_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
@@ -387,7 +411,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                         padding: '28px 36px', fontWeight: 800, fontSize: 18, color: 'var(--ink)',
                         borderRight: '1px solid var(--line)', verticalAlign: 'middle',
                         width: 180, background: 'var(--soft)', borderTop: '1px solid var(--line)',
-                      }}>DA팀</td>
+                      }}><E id="tech_labels.da_team" editMode={editMode}>{labels.da_team}</E></td>
                     )}
                     <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220, borderTop: i === 0 ? '1px solid var(--line)' : 'none' }}>
                       <E id={`tech_da_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
@@ -422,7 +446,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
         <div className="wrap" style={{ position: 'relative', zIndex: 1, maxWidth: 800 }}>
           <div className="reveal" style={{ marginBottom: 28 }}>
             <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 10px' }}>FAQ</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', color: '#fff', margin: 0 }}>자주 묻는 질문</h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', color: '#fff', margin: 0 }}><E id="tech_sections.faq_title" editMode={editMode}>{sections.faq_title}</E></h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {faq.map((item: { category: string; question: string; answer: string }, idx: number) => (
@@ -476,16 +500,16 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             <a href="tel:027068999" className="btn" style={{
               padding: '14px 32px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',
-            }}>전화하기 <E id="tech_contact.tel" editMode={editMode}>{contact.tel}</E></a>
+            }}><E id="tech_cta.btn_call" editMode={editMode}>{cta.btn_call}</E> <E id="tech_cta.tel" editMode={editMode}>{contact.tel}</E></a>
             <Link href="/support/inquiry" style={{
               padding: '14px 32px', border: '1px solid var(--ink)', color: 'var(--ink)',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',
-            }}>1:1 문의하기</Link>
+            }}><E id="tech_cta.btn_inquiry" editMode={editMode}>{cta.btn_inquiry}</E></Link>
           </div>
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .tech-team-row { transition: transform .3s cubic-bezier(.16,.84,.3,1), box-shadow .3s; }
         .tech-team-row:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,.08); }
         .tech-proc-card:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 36px rgba(0,0,0,.07) !important; border-color: var(--accent) !important; }
@@ -500,7 +524,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
         @media (max-width: 560px) {
           .tech-process { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

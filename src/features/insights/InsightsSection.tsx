@@ -26,7 +26,7 @@ function mapInsight(item: Insight) {
     cat: item.sourceName ?? '',
     title: item.title ?? '',
     date: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '') : '',
-    url: item.sourceUrl ?? '/insights',
+    url: item.id ? `/insights/${item.id}` : '/insights',
   };
 }
 

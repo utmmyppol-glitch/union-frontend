@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { CustomerStory } from '@/types';
+import { E, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -16,6 +17,8 @@ interface PageData {
 }
 
 export default function CasesPageClient({ initialData }: { initialData: PageData }) {
+  const editMode = useEditMode();
+  useEditableManifest(editMode);
   const [industry, setIndustry] = useState('전체');
   const [page, setPage] = useState(0);
   const [data, setData] = useState<PageData>(initialData);
@@ -62,15 +65,15 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
         <div className="blob blob-graphite" aria-hidden="true" style={{ width: 250, height: 250, left: '8%', bottom: '5%', animationDelay: '6s' }} />
         <div className="wrap" style={{ position: 'relative', zIndex: 1, padding: '120px clamp(20px,4vw,52px) 64px' }}>
           <p style={{ fontFamily: MONO, fontWeight: 500, fontSize: 18, letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 12px' }}>CUSTOMER STORIES</p>
-          <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: 1.05, letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 8px' }}>고객사례</h1>
-          <p style={{ fontWeight: 400, fontSize: 18, color: 'var(--ink2)', margin: 0 }}>유니온시스템즈와 함께한 기업들의 성공 사례</p>
+          <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: 1.05, letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 8px' }}><E id="cases_hero.title" editMode={editMode}>고객사례</E></h1>
+          <p style={{ fontWeight: 400, fontSize: 18, color: 'var(--ink2)', margin: 0 }}><E id="cases_hero.subtitle" editMode={editMode}>유니온시스템즈와 함께한 기업들의 성공 사례</E></p>
         </div>
         <div className="wrap" style={{ position: 'relative', zIndex: 1, paddingBottom: 32 }}>
           <div style={{ display: 'flex', gap: 32, marginTop: 0 }}>
-            {[{ num: '200+', label: '도입 기업' }, { num: '98%', label: '재계약률' }].map(s => (
+            {[{ num: '200+', label: '도입 기업' }, { num: '98%', label: '재계약률' }].map((s, i) => (
               <div key={s.label}>
-                <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 28, fontWeight: 400, color: '#fff', lineHeight: 1 }}>{s.num}</span>
-                <span style={{ fontFamily: MONO, fontSize: 18, letterSpacing: '.06em', color: 'rgba(255,255,255,.3)', marginLeft: 8 }}>{s.label}</span>
+                <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 28, fontWeight: 400, color: '#fff', lineHeight: 1 }}><E id={`cases_stats.${i}.num`} editMode={editMode}>{s.num}</E></span>
+                <span style={{ fontFamily: MONO, fontSize: 18, letterSpacing: '.06em', color: 'rgba(255,255,255,.3)', marginLeft: 8 }}><E id={`cases_stats.${i}.label`} editMode={editMode}>{s.label}</E></span>
               </div>
             ))}
           </div>
@@ -92,7 +95,7 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
           </div>
 
           {filtered.length === 0 ? (
-            <div style={{ padding: '80px 0', textAlign: 'center', color: 'var(--ink2)', fontSize: 18 }}>해당 산업군의 고객사례가 없습니다.</div>
+            <div style={{ padding: '80px 0', textAlign: 'center', color: 'var(--ink2)', fontSize: 18 }}><E id="cases_empty.text" editMode={editMode}>해당 산업군의 고객사례가 없습니다.</E></div>
           ) : (
             <div className="case-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
               {filtered.map((story: CustomerStory, idx: number) => {
@@ -111,7 +114,7 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
                       <div aria-hidden="true" style={{ position: 'absolute', right: 4, bottom: -6, fontFamily: SERIF, fontStyle: 'italic', fontSize: 64, fontWeight: 300, lineHeight: 1, color: isDark ? 'rgba(255,255,255,.04)' : 'rgba(20,18,16,.03)', pointerEvents: 'none' }}>{String(idx + 1).padStart(2, '0')}</div>
                       <h3 className="case-title" style={{ fontWeight: 800, fontSize: 18, color: isDark ? '#fff' : 'var(--ink)', margin: '0 0 6px', letterSpacing: '-.02em', transition: 'color .2s' }}>{story.company}</h3>
                       <p style={{ fontSize: 18, lineHeight: 1.6, color: isDark ? 'rgba(255,255,255,.45)' : 'var(--ink2)', margin: '0 0 16px' }}>{story.title}</p>
-                      <span className="case-arrow" style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, color: isDark ? 'var(--accent)' : 'var(--ink2)', letterSpacing: '.04em', opacity: 0, transition: 'opacity .2s' }}>자세히 보기 →</span>
+                      <span className="case-arrow" style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, color: isDark ? 'var(--accent)' : 'var(--ink2)', letterSpacing: '.04em', opacity: 0, transition: 'opacity .2s' }}><E id="cases_buttons.detail" editMode={editMode}>자세히 보기 →</E></span>
                     </div>
                   </div>
                 );
@@ -139,11 +142,13 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
         <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 80%, rgba(148,53,67,.06) 0%, transparent 50%)', pointerEvents: 'none' }} />
         <div className="wrap" style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 600 }}>
           <div className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 48, fontWeight: 300, color: 'var(--accent)', lineHeight: 1, marginBottom: 16, opacity: .35 }}>&ldquo;</div>
-          <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: 1.35, color: '#fff', margin: '0 0 12px' }}>다음 성공 사례의<br />주인공이 되세요.</h2>
-          <p className="reveal" style={{ fontSize: 18, color: 'rgba(255,255,255,.45)', margin: '0 0 28px' }}>유니온시스템즈와 함께 IT 환경을 혁신하세요.</p>
-          <Link href="/contact" className="reveal btn" style={{ display: 'inline-block', padding: '16px 36px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 18, textDecoration: 'none' }}>도입 문의하기 →</Link>
+          <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: 1.35, color: '#fff', margin: '0 0 12px' }}><E id="cases_cta.title1" editMode={editMode}>다음 성공 사례의</E><br /><E id="cases_cta.title2" editMode={editMode}>주인공이 되세요.</E></h2>
+          <p className="reveal" style={{ fontSize: 18, color: 'rgba(255,255,255,.45)', margin: '0 0 28px' }}><E id="cases_cta.desc" editMode={editMode}>유니온시스템즈와 함께 IT 환경을 혁신하세요.</E></p>
+          <Link href="/contact" className="reveal btn" style={{ display: 'inline-block', padding: '16px 36px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 18, textDecoration: 'none' }}><E id="cases_buttons.cta" editMode={editMode}>도입 문의하기 →</E></Link>
         </div>
       </section>
+
+      {editMode && <style>{EDITABLE_STYLES}</style>}
 
       <style>{`
         .case-card:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 40px rgba(0,0,0,.08) !important; }

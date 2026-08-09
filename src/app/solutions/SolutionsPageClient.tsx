@@ -311,21 +311,21 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
                     <span style={{
                       fontWeight: 400, fontSize: 16, color: isDark ? 'rgba(255,255,255,.35)' : 'var(--ink2)',
                       marginLeft: 10,
-                    }}>{sol.subtitle}</span>
+                    }}><E id={`solutions_lineup.${idx}.subtitle`} editMode={editMode}>{sol.subtitle}</E></span>
                   </h3>
                   <p style={{
                     fontSize: 16, lineHeight: 1.6,
                     color: isDark ? 'rgba(255,255,255,.4)' : 'var(--ink2)',
                     margin: '6px 0 0', maxWidth: 480,
-                  }}>{sol.desc}</p>
+                  }}><E id={`solutions_lineup.${idx}.desc`} editMode={editMode}>{sol.desc}</E></p>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
-                    {sol.tags.map((t) => (
+                    {sol.tags.map((t, ti) => (
                       <span key={t} style={{
                         fontFamily: MONO, fontSize: 12, fontWeight: 500, letterSpacing: '.04em',
                         padding: '3px 8px',
                         color: isDark ? 'rgba(255,255,255,.25)' : 'var(--ink2)',
                         border: isDark ? '1px solid rgba(255,255,255,.06)' : '1px solid var(--line)',
-                      }}>{t}</span>
+                      }}><E id={`solutions_lineup.${idx}.tag_${ti}`} editMode={editMode}>{t}</E></span>
                     ))}
                   </div>
                 </div>
@@ -395,7 +395,7 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .sol-row:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,.08); }
         .sol-row:hover .sol-row-arrow { opacity: 1 !important; transform: translateX(4px); }
         .sol-row:hover .sol-row-title { color: var(--accent) !important; }
@@ -404,7 +404,7 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
           .sol-row > div:first-child { display: none !important; }
           .sol-stats { grid-template-columns: repeat(3, 1fr) !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
