@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 const PRODUCTS = [
@@ -16,6 +16,8 @@ const PRODUCTS = [
 const DEFAULT_HERO = {
   subtitle: '삶을 더 편리하게',
   title: 'PC 사용을 편리하게\n이스트소프트',
+  btn_contact: '도입 문의하기',
+  btn_quote: '견적 요청',
 };
 
 const DEFAULT_STRENGTHS = [
@@ -27,6 +29,8 @@ const DEFAULT_STRENGTHS = [
 const DEFAULT_CTA = {
   title: '이스트소프트 기업용 라이선스가\n필요하신가요?',
   desc: '유니온시스템즈가 볼륨 라이선스와\n중앙 관리 환경을 안내해 드립니다.',
+  btn_contact: '도입 문의하기',
+  btn_quote: '견적 요청하기',
 };
 const ICONS = [
   { name: '알집', img: 'software_estsoft_icon_alzip_109.jpg' }, { name: '알씨', img: 'software_estsoft_icon_alsee_110.jpg' },
@@ -47,6 +51,20 @@ const STATS = [
   { num: '10+', label: '제품' },
 ];
 
+const DEFAULT_STATS_DATA = STATS.map(s => ({ num: s.num, label: s.label }));
+const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
+const DEFAULT_PLANS_DATA = PLANS.map(p => ({ name: p.name, desc: p.desc, apps: p.apps }));
+const DEFAULT_SECTIONS = {
+  products_title: '주요 제품',
+  strengths_title: '이스트소프트의 강점',
+  lineup_title: '전체 제품 라인업',
+  plans_title: '환경에 맞는 패키지를 선택하세요',
+  plans_desc: '개인부터 기업·교육기관까지. 유니온시스템즈가 최적 볼륨 라이선스를 안내합니다.',
+  plan_cta: '견적 요청',
+  phone: '전화 상담 02-706-8999',
+};
+const DEFAULT_TRUST = ['ESTsoft 공인 리셀러', '즉시 발급', '세금계산서 발행', '볼륨 라이선스 전문'];
+
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 
@@ -57,6 +75,11 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
   const [hero, setHero] = useState(() => safeParse(ssrContent.estsoft_hero, DEFAULT_HERO));
   const [strengths, setStrengths] = useState(() => safeParse(ssrContent.estsoft_strengths, DEFAULT_STRENGTHS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.estsoft_cta, DEFAULT_CTA));
+  const [statsData, setStatsData] = useState(() => safeParse(ssrContent.estsoft_stats, DEFAULT_STATS_DATA));
+  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.estsoft_products, DEFAULT_PRODUCTS_DATA));
+  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.estsoft_plans, DEFAULT_PLANS_DATA));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.estsoft_sections, DEFAULT_SECTIONS));
+  const [trust, setTrust] = useState(() => safeParse(ssrContent.estsoft_trust, DEFAULT_TRUST));
 
   useEffect(() => {
     if (!editMode) return;
@@ -64,6 +87,11 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
       estsoft_hero: setHero as (v: unknown) => void,
       estsoft_strengths: setStrengths as (v: unknown) => void,
       estsoft_cta: setCta as (v: unknown) => void,
+      estsoft_stats: setStatsData as (v: unknown) => void,
+      estsoft_products: setProductsData as (v: unknown) => void,
+      estsoft_plans: setPlansData as (v: unknown) => void,
+      estsoft_sections: setSections as (v: unknown) => void,
+      estsoft_trust: setTrust as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -151,20 +179,20 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               lineHeight: 0.92, letterSpacing: '-.045em', margin: '0 0 22px',
             }}>
               <E id="estsoft_hero.title" editMode={editMode}>
-                {hero.title.split('\n').map((line: string, i: number) => (
+                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
             </h1>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>
-              {['랜섬웨어차단', '압축해제', '스마트폰호환'].map((t) => (
+              {['랜섬웨어차단', '압축해제', '스마트폰호환'].map((t, i) => (
                 <span key={t} style={{
                   fontFamily: MONO,
                   fontSize: 12, fontWeight: 500, letterSpacing: '.06em',
                   color: 'rgba(255,255,255,.35)', border: '1px solid rgba(255,255,255,.08)',
                   padding: '5px 12px', textTransform: 'uppercase',
                 }}>
-                  {t}
+                  <E id={`estsoft_badge.hero_${i}`} editMode={editMode}>{t}</E>
                 </span>
               ))}
             </div>
@@ -190,14 +218,14 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s, box-shadow .2s',
               }}>
-                도입 문의하기
+                <E id="estsoft_hero.btn_contact" editMode={editMode}>{hero.btn_contact}</E>
               </Link>
               <Link href="/contact" className="btn" style={{
                 padding: '16px 34px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s',
               }}>
-                견적 요청
+                <E id="estsoft_hero.btn_quote" editMode={editMode}>{hero.btn_quote}</E>
               </Link>
             </div>
           </div>
@@ -210,10 +238,10 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="es-stats reveal" style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0,
           }}>
-            {STATS.map((s, i) => (
-              <div key={s.label} style={{
+            {statsData.map((s: { num: string; label: string }, i: number) => (
+              <div key={i} style={{
                 textAlign: 'center', padding: '20px 16px',
-                borderRight: i < STATS.length - 1 ? '1px solid var(--line)' : 'none',
+                borderRight: i < statsData.length - 1 ? '1px solid var(--line)' : 'none',
               }}>
                 <span style={{
                   fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400,
@@ -221,13 +249,13 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                   letterSpacing: '-.03em', display: 'block', lineHeight: 1.1,
                   fontVariantNumeric: 'tabular-nums',
                 }}>
-                  {s.num}
+                  <E id={`estsoft_stats${i}.num`} editMode={editMode}>{s.num}</E>
                 </span>
                 <span style={{
                   fontWeight: 700, fontSize: 16, color: 'var(--ink2)',
                   display: 'block', margin: '8px 0 0',
                 }}>
-                  {s.label}
+                  <E id={`estsoft_stats${i}.label`} editMode={editMode}>{s.label}</E>
                 </span>
               </div>
             ))}
@@ -248,7 +276,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               letterSpacing: '-.04em', margin: 0,
             }}>
-              주요 제품
+              <E id="estsoft_sections.products_title" editMode={editMode}>{sections.products_title}</E>
             </h2>
           </div>
           <div className="es-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 22 }}>
@@ -287,8 +315,8 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                   />
                 </div>
                 <div style={{ padding: '20px 22px' }}>
-                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px', letterSpacing: '-.02em' }}>{p.name}</h3>
-                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.6 }}>{p.desc}</p>
+                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px', letterSpacing: '-.02em' }}><E id={`estsoft_products${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
+                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.6 }}><E id={`estsoft_products${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
                 </div>
               </div>
             ))}
@@ -328,7 +356,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               letterSpacing: '-.04em', margin: 0,
             }}>
-              이스트소프트의 강점
+              <E id="estsoft_sections.strengths_title" editMode={editMode}>{sections.strengths_title}</E>
             </h2>
           </div>
           {strengths.map((s: { num: string; img: string; title: string; desc: string }, i: number) => {
@@ -413,7 +441,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     paddingBottom: 4,
                     transition: 'border-color .2s',
                   }}>
-                    자세히 보기
+                    <E id="estsoft_ui.detail_link" editMode={editMode}>자세히 보기</E>
                   </Link>
                 </div>
               </div>
@@ -446,7 +474,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               letterSpacing: '-.04em', margin: 0,
             }}>
-              전체 제품 라인업
+              <E id="estsoft_sections.lineup_title" editMode={editMode}>{sections.lineup_title}</E>
             </h2>
           </div>
           <div className="es-grid-icon" style={{
@@ -531,9 +559,9 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
-            }}>환경에 맞는 패키지를 선택하세요</h2>
+            }}><E id="estsoft_sections.plans_title" editMode={editMode}>{sections.plans_title}</E></h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              개인부터 기업·교육기관까지. 유니온시스템즈가 최적 볼륨 라이선스를 안내합니다.
+              <E id="estsoft_sections.plans_desc" editMode={editMode}>{sections.plans_desc}</E>
             </p>
           </div>
 
@@ -568,13 +596,13 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     fontSize: 48, fontWeight: 300, lineHeight: 1,
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
-                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}>{pl.name}</h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}>{pl.desc}</p>
+                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`estsoft_plans${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E></h3>
+                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`estsoft_plans${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></p>
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
-                  }}>{pl.apps}</p>
+                  }}><E id={`estsoft_plans${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? pl.apps}</E></p>
                   <Link href="/contact" style={{
                     marginTop: 'auto',
                     display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -585,7 +613,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     fontWeight: 700, fontSize: 14,
                     textDecoration: 'none', transition: 'all .2s',
                     textAlign: 'center', justifyContent: 'center',
-                  }}>견적 요청 <span>&rarr;</span></Link>
+                  }}><E id="estsoft_sections.plan_cta" editMode={editMode}>{sections.plan_cta}</E> <span>&rarr;</span></Link>
                 </div>
               </div>
             ))}
@@ -597,18 +625,18 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
             flexWrap: 'wrap',
           }}>
             <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-              {['ESTsoft 공인 리셀러', '즉시 발급', '세금계산서 발행', '볼륨 라이선스 전문'].map((t) => (
-                <span key={t} style={{
+              {trust.map((t: string, i: number) => (
+                <span key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: 14, fontWeight: 500, color: 'var(--ink2)',
                 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  {t}
+                  <E id={`estsoft_trust.${i}`} editMode={editMode}>{t}</E>
                 </span>
               ))}
             </div>
             <a href="tel:02-706-8999" style={{ marginLeft: 'auto', fontWeight: 600, fontSize: 14, color: 'var(--ink)', textDecoration: 'none' }}>
-              전화 상담 02-706-8999
+              <E id="estsoft_sections.phone" editMode={editMode}>{sections.phone}</E>
             </a>
           </div>
         </Container>
@@ -646,7 +674,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               lineHeight: 1.2,
             }}>
               <E id="estsoft_cta.title" editMode={editMode}>
-                {cta.title.split('\n').map((line: string, i: number) => (
+                {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -656,7 +684,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               lineHeight: 1.7, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto',
             }}>
               <E id="estsoft_cta.desc" editMode={editMode}>
-                {cta.desc.split('\n').map((line: string, i: number) => (
+                {stripHtml(cta.desc).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -667,21 +695,21 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s, box-shadow .2s',
               }}>
-                도입 문의하기
+                <E id="estsoft_cta.btn_contact" editMode={editMode}>{cta.btn_contact}</E>
               </Link>
               <Link href="/contact" className="btn" style={{
                 padding: '17px 38px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s',
               }}>
-                견적 요청하기
+                <E id="estsoft_cta.btn_quote" editMode={editMode}>{cta.btn_quote}</E>
               </Link>
             </div>
           </div>
         </Container>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         /* ── Reveal animation ── */
         .reveal {
           opacity: 0;
@@ -710,7 +738,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
           .es-stats > div { border-right: none !important; border-bottom: 1px solid var(--line); }
           .es-stats > div:last-child { border-bottom: none !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

@@ -112,6 +112,15 @@ const DEFAULT_CTA = {
   btn_tel: '02-706-8999',
 };
 
+const DEFAULT_UI = {
+  step1_label: '회사 규모',
+  step2_label: '관심 분야',
+  step2_hint: '· 복수 선택',
+  step3_label: '문의 유형',
+  builder_btn: '이 구성으로 상담 요청',
+  builder_note: '당일 내 담당 컨설턴트가 연락드립니다.',
+};
+
 export default function EstimatePageClient({
   ssrContent,
 }: {
@@ -125,6 +134,7 @@ export default function EstimatePageClient({
   const [sample, setSample] = useState(() => safeParse(ssrContent.estimate_sample, DEFAULT_SAMPLE));
   const [configs, setConfigs] = useState(() => safeParse(ssrContent.estimate_configs, DEFAULT_CONFIGS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.estimate_cta, DEFAULT_CTA));
+  const [ui, setUi] = useState(() => safeParse(ssrContent.estimate_ui, DEFAULT_UI));
 
   /* ── content-update 메시지 수신 ── */
   useEffect(() => {
@@ -134,6 +144,7 @@ export default function EstimatePageClient({
       estimate_sample: setSample as (v: unknown) => void,
       estimate_configs: setConfigs as (v: unknown) => void,
       estimate_cta: setCta as (v: unknown) => void,
+      estimate_ui: setUi as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -365,7 +376,7 @@ export default function EstimatePageClient({
                   STEP 01
                 </span>
                 <p style={{ fontSize: 16, fontWeight: 800, fontFamily: "'Pretendard', sans-serif" }}>
-                  회사 규모
+                  <E id="estimate_ui.step1_label" editMode={editMode}>{ui.step1_label}</E>
                 </p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 8 }}>
@@ -392,9 +403,9 @@ export default function EstimatePageClient({
                   STEP 02
                 </span>
                 <p style={{ fontSize: 16, fontWeight: 800, fontFamily: "'Pretendard', sans-serif" }}>
-                  관심 분야{' '}
+                  <E id="estimate_ui.step2_label" editMode={editMode}>{ui.step2_label}</E>{' '}
                   <span style={{ fontSize: 13, color: 'var(--ink2)', fontWeight: 500 }}>
-                    · 복수 선택
+                    <E id="estimate_ui.step2_hint" editMode={editMode}>{ui.step2_hint}</E>
                   </span>
                 </p>
               </div>
@@ -422,7 +433,7 @@ export default function EstimatePageClient({
                   STEP 03
                 </span>
                 <p style={{ fontSize: 16, fontWeight: 800, fontFamily: "'Pretendard', sans-serif" }}>
-                  문의 유형
+                  <E id="estimate_ui.step3_label" editMode={editMode}>{ui.step3_label}</E>
                 </p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
@@ -533,7 +544,7 @@ export default function EstimatePageClient({
                   textAlign: 'center',
                 }}
               >
-                이 구성으로 상담 요청
+                <E id="estimate_ui.builder_btn" editMode={editMode}>{ui.builder_btn}</E>
               </Link>
               <span
                 style={{
@@ -543,7 +554,7 @@ export default function EstimatePageClient({
                   fontFamily: "'Pretendard', sans-serif",
                 }}
               >
-                당일 내 담당 컨설턴트가 연락드립니다.
+                <E id="estimate_ui.builder_note" editMode={editMode}>{ui.builder_note}</E>
               </span>
             </div>
           </div>

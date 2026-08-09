@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 
@@ -47,6 +47,32 @@ const PLANS = [
   { name: '교육', img: 'software_microsoft_plan_education_75.jpg', highlight: false, desc: '학교·학생 무료 또는 할인 라이선스. A1/A3/A5 플랜.', apps: 'Office 앱 + Teams + Intune for Education', price: '교육기관 인증' },
 ];
 
+const DEFAULT_SECTIONS = {
+  hero_title1: '학교, 회사, 일상',
+  hero_title2: '어디에서나',
+  products_title: '주요 제품',
+  strengths_title: 'Microsoft 365의 강점',
+  plans_title: '환경에 맞는 플랜을 선택하세요',
+  plans_desc: '개인부터 기업 팀까지. 유니온시스템즈가 최적 견적과 마이그레이션을 지원합니다.',
+};
+const DEFAULT_ACCENTS = [
+  { num: '15+', label: '디바이스', sub: '동시 접속' },
+  { num: '1TB', label: '클라우드', sub: '사용자당 저장' },
+  { num: '99.9%', label: '가동률', sub: 'SLA 보장' },
+  { num: '300+', label: '기업 고객', sub: '유니온 구축' },
+];
+const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
+const DEFAULT_PLANS_DATA = PLANS.map(p => ({ name: p.name, desc: p.desc, apps: p.apps, price: p.price }));
+const DEFAULT_BUTTONS = {
+  hero_cta: '도입 문의하기 →',
+  hero_quote: '견적 요청',
+  detail: '자세히 보기',
+  plan_quote: '견적 요청',
+  cta_primary: '도입 문의하기',
+  cta_secondary: '견적 요청하기',
+};
+const DEFAULT_TRUST = ['Microsoft CSP 파트너', '즉시 활성화', '마이그레이션 지원', '세금계산서'];
+
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 
@@ -57,6 +83,12 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
   const [hero, setHero] = useState(() => safeParse(ssrContent.microsoft_hero, DEFAULT_HERO));
   const [strengths, setStrengths] = useState(() => safeParse(ssrContent.microsoft_strengths, DEFAULT_STRENGTHS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.microsoft_cta, DEFAULT_CTA));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.microsoft_sections, DEFAULT_SECTIONS));
+  const [accents, setAccents] = useState(() => safeParse(ssrContent.microsoft_accents, DEFAULT_ACCENTS));
+  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.microsoft_products, DEFAULT_PRODUCTS_DATA));
+  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.microsoft_plans, DEFAULT_PLANS_DATA));
+  const [buttons, setButtons] = useState(() => safeParse(ssrContent.microsoft_buttons, DEFAULT_BUTTONS));
+  const [trust, setTrust] = useState(() => safeParse(ssrContent.microsoft_trust, DEFAULT_TRUST));
 
   useEffect(() => {
     if (!editMode) return;
@@ -64,6 +96,12 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
       microsoft_hero: setHero as (v: unknown) => void,
       microsoft_strengths: setStrengths as (v: unknown) => void,
       microsoft_cta: setCta as (v: unknown) => void,
+      microsoft_sections: setSections as (v: unknown) => void,
+      microsoft_accents: setAccents as (v: unknown) => void,
+      microsoft_products: setProductsData as (v: unknown) => void,
+      microsoft_plans: setPlansData as (v: unknown) => void,
+      microsoft_buttons: setButtons as (v: unknown) => void,
+      microsoft_trust: setTrust as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -140,9 +178,9 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
             }}>
-              학교, 회사, 일상<br />
+              <E id="microsoft_sections.hero_title1" editMode={editMode}>{sections.hero_title1}</E><br />
               <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, letterSpacing: '-.02em' }}>
-                어디에서나
+                <E id="microsoft_sections.hero_title2" editMode={editMode}>{sections.hero_title2}</E>
               </span>
             </h1>
             <p style={{
@@ -156,13 +194,13 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}>
-                도입 문의하기 →
+                <E id="microsoft_buttons.hero_cta" editMode={editMode}>{buttons.hero_cta}</E>
               </Link>
               <Link href="/contact" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
               }}>
-                견적 요청
+                <E id="microsoft_buttons.hero_quote" editMode={editMode}>{buttons.hero_quote}</E>
               </Link>
             </div>
           </div>
@@ -219,13 +257,8 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
           <div className="ms-stats" style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0,
           }}>
-            {[
-              { num: '15+', label: '디바이스', sub: '동시 접속' },
-              { num: '1TB', label: '클라우드', sub: '사용자당 저장' },
-              { num: '99.9%', label: '가동률', sub: 'SLA 보장' },
-              { num: '300+', label: '기업 고객', sub: '유니온 구축' },
-            ].map((stat, i) => (
-              <div key={stat.label} style={{
+            {accents.map((stat: { num: string; label: string; sub: string }, i: number) => (
+              <div key={i} style={{
                 textAlign: 'center', padding: '0 20px',
                 borderRight: i < 3 ? '1px solid rgba(255,255,255,.15)' : 'none',
               }}>
@@ -234,16 +267,16 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                   fontSize: 'clamp(36px, 5.5vw, 64px)', fontWeight: 400,
                   color: '#fff', margin: '0 0 8px', lineHeight: 1,
                 }}>
-                  {stat.num}
+                  <E id={`microsoft_accents.${i}.num`} editMode={editMode}>{stat.num}</E>
                 </p>
                 <p style={{
                   fontWeight: 700, fontSize: 16, color: 'rgba(255,255,255,.9)',
                   margin: '0 0 2px',
-                }}>{stat.label}</p>
+                }}><E id={`microsoft_accents.${i}.label`} editMode={editMode}>{stat.label}</E></p>
                 <p style={{
                   fontFamily: MONO, fontSize: 12, fontWeight: 500,
                   letterSpacing: '.06em', color: 'rgba(255,255,255,.5)', margin: 0,
-                }}>{stat.sub}</p>
+                }}><E id={`microsoft_accents.${i}.sub`} editMode={editMode}>{stat.sub}</E></p>
               </div>
             ))}
           </div>
@@ -259,7 +292,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              주요 제품
+              <E id="microsoft_sections.products_title" editMode={editMode}>{sections.products_title}</E>
             </h2>
           </div>
           <div className="ms-products" style={{
@@ -279,8 +312,8 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                   }} />
                 </div>
                 <div style={{ padding: 20 }}>
-                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}>{p.name}</h3>
-                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.5 }}>{p.desc}</p>
+                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}><E id={`microsoft_products.${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
+                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.5 }}><E id={`microsoft_products.${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
                 </div>
               </div>
             ))}
@@ -314,7 +347,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              Microsoft 365의 강점
+              <E id="microsoft_sections.strengths_title" editMode={editMode}>{sections.strengths_title}</E>
             </h2>
           </div>
 
@@ -346,14 +379,14 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                   color: activeStrength === i ? '#fff' : 'rgba(255,255,255,.35)',
                   display: 'block', transition: 'color .2s',
                 }}>
-                  {st.title}
+                  <E id={`microsoft_strengths[${i}].title`} editMode={editMode}>{st.title}</E>
                 </span>
                 <span style={{
                   fontFamily: MONO, fontSize: 12, letterSpacing: '.04em',
                   color: activeStrength === i ? 'rgba(255,255,255,.4)' : 'rgba(255,255,255,.15)',
                   display: 'block', marginTop: 4, transition: 'color .2s',
                 }}>
-                  {st.sub}
+                  <E id={`microsoft_strengths[${i}].sub`} editMode={editMode}>{st.sub}</E>
                 </span>
               </button>
             ))}
@@ -401,7 +434,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                 letterSpacing: '.04em', color: 'var(--accent)',
                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8,
               }}>
-                자세히 보기 <span>→</span>
+                <E id="microsoft_buttons.detail" editMode={editMode}>{buttons.detail}</E> <span>→</span>
               </Link>
             </div>
           </div>
@@ -446,10 +479,10 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 12px',
             }}>
-              환경에 맞는 플랜을 선택하세요
+              <E id="microsoft_sections.plans_title" editMode={editMode}>{sections.plans_title}</E>
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              개인부터 기업 팀까지. 유니온시스템즈가 최적 견적과 마이그레이션을 지원합니다.
+              <E id="microsoft_sections.plans_desc" editMode={editMode}>{sections.plans_desc}</E>
             </p>
           </div>
 
@@ -492,21 +525,21 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
 
-                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}>{pl.name}</h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 14px' }}>{pl.desc}</p>
+                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`microsoft_plans.${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E></h3>
+                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 14px' }}><E id={`microsoft_plans.${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></p>
 
                   {/* Apps */}
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 8px', lineHeight: 1.5,
-                  }}>{pl.apps}</p>
+                  }}><E id={`microsoft_plans.${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? pl.apps}</E></p>
 
                   {/* Price type */}
                   <p style={{
                     fontSize: 13, fontWeight: 600, color: 'var(--ink)',
                     margin: '0 0 20px',
-                  }}>{pl.price}</p>
+                  }}><E id={`microsoft_plans.${i}.price`} editMode={editMode}>{plansData[i]?.price ?? pl.price}</E></p>
 
                   {/* CTA */}
                   <Link href="/contact" style={{
@@ -519,7 +552,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                     fontWeight: 700, fontSize: 14,
                     textDecoration: 'none', transition: 'all .2s',
                   }}>
-                    견적 요청 <span>&rarr;</span>
+                    <E id="microsoft_buttons.plan_quote" editMode={editMode}>{buttons.plan_quote}</E> <span>&rarr;</span>
                   </Link>
                 </div>
               </div>
@@ -533,13 +566,13 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
             flexWrap: 'wrap',
           }}>
             <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-              {['Microsoft CSP 파트너', '즉시 활성화', '마이그레이션 지원', '세금계산서'].map((t) => (
-                <span key={t} style={{
+              {trust.map((t: string, i: number) => (
+                <span key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: 14, fontWeight: 500, color: 'var(--ink2)',
                 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  {t}
+                  <E id={`microsoft_trust.${i}`} editMode={editMode}>{t}</E>
                 </span>
               ))}
             </div>
@@ -576,7 +609,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
             lineHeight: 1.3, color: '#fff', margin: '0 0 16px', letterSpacing: '-.01em',
           }}>
             <E id="microsoft_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -591,13 +624,13 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}>
-              도입 문의하기
+              <E id="microsoft_buttons.cta_primary" editMode={editMode}>{buttons.cta_primary}</E>
             </Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid rgba(255,255,255,.45)',
               color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}>
-              견적 요청하기
+              <E id="microsoft_buttons.cta_secondary" editMode={editMode}>{buttons.cta_secondary}</E>
             </Link>
           </div>
         </div>

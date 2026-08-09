@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -18,7 +18,10 @@ const PRODUCTS = [
 
 const DEFAULT_HERO = {
   badge: 'Adobe Creative Cloud',
+  title: '디자인, 사진,\n영상편집',
   desc: 'Photoshop, Illustrator, Premiere Pro 등 크리에이티브 분야의 필수 소프트웨어.',
+  heroBtn1: '도입 문의하기 →',
+  heroBtn2: '견적 요청',
 };
 
 const DEFAULT_STRENGTHS = [
@@ -30,6 +33,8 @@ const DEFAULT_STRENGTHS = [
 const DEFAULT_CTA = {
   title: '크리에이티브 팀의\n생산성을 높여드립니다.',
   desc: 'Adobe 공식 리셀러 유니온시스템즈',
+  btn1: '도입 문의하기',
+  btn2: '견적 요청하기',
 };
 
 const ICONS = [
@@ -53,6 +58,19 @@ const PLANS = [
   { name: '교육', img: 'software_adobe_plan_education_173.jpg', desc: '학교·학생 대상 최대 60% 할인 라이선스', badge: null, apps: '전 앱 동일 · 교육기관 인증 필요' },
 ];
 
+const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
+const DEFAULT_PLANS_DATA = PLANS.map(p => ({ name: p.name, desc: p.desc, apps: p.apps }));
+
+const DEFAULT_SECTIONS = {
+  productsTitle: '주요 제품',
+  strengthsTitle: 'Adobe CC의 강점',
+  plansTitle: '환경에 맞는 라이선스를 선택하세요',
+  plansDesc: '개인 크리에이터부터 기업 팀까지. 유니온시스템즈가 최적 견적을 안내합니다.',
+  plansCta: '견적 요청',
+  phone: '전화 상담 02-706-8999',
+};
+const DEFAULT_TRUST = ['Adobe 공인 리셀러', '즉시 발급', '세금계산서 발행'];
+
 export default function AdobePageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
   useEditableManifest(editMode);
@@ -60,6 +78,10 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
   const [hero, setHero] = useState(() => safeParse(ssrContent.adobe_hero, DEFAULT_HERO));
   const [strengths, setStrengths] = useState(() => safeParse(ssrContent.adobe_strengths, DEFAULT_STRENGTHS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.adobe_cta, DEFAULT_CTA));
+  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.adobe_products, DEFAULT_PRODUCTS_DATA));
+  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.adobe_plans, DEFAULT_PLANS_DATA));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.adobe_sections, DEFAULT_SECTIONS));
+  const [trust, setTrust] = useState(() => safeParse(ssrContent.adobe_trust, DEFAULT_TRUST));
 
   useEffect(() => {
     if (!editMode) return;
@@ -67,6 +89,10 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
       adobe_hero: setHero as (v: unknown) => void,
       adobe_strengths: setStrengths as (v: unknown) => void,
       adobe_cta: setCta as (v: unknown) => void,
+      adobe_products: setProductsData as (v: unknown) => void,
+      adobe_plans: setPlansData as (v: unknown) => void,
+      adobe_sections: setSections as (v: unknown) => void,
+      adobe_trust: setTrust as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -136,8 +162,14 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 16px',
             }}>
-              디자인, 사진,<br />
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>영상편집</span>
+              <E id="adobe_hero.title" editMode={editMode}>
+                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && <br />}
+                    {i > 0 ? <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>{line}</span> : line}
+                  </React.Fragment>
+                ))}
+              </E>
             </h1>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
@@ -164,11 +196,11 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}>도입 문의하기 →</Link>
+              }}><E id="adobe_hero.heroBtn1" editMode={editMode}>{hero.heroBtn1}</E></Link>
               <Link href="/contact" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-              }}>견적 요청</Link>
+              }}><E id="adobe_hero.heroBtn2" editMode={editMode}>{hero.heroBtn2}</E></Link>
             </div>
           </div>
         </div>
@@ -182,7 +214,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}>주요 제품</h2>
+            }}><E id="adobe_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
           </div>
 
           <div className="ab-bento" style={{
@@ -208,8 +240,8 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                   fontFamily: SERIF, fontStyle: 'italic',
                   fontSize: 18, color: 'var(--accent)', marginRight: 10,
                 }}>01</span>
-                <span style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-.02em' }}>{PRODUCTS[0].name}</span>
-                <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '8px 0 0' }}>{PRODUCTS[0].desc}</p>
+                <span style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-.02em' }}><E id="adobe_product0.name" editMode={editMode}>{productsData[0]?.name ?? PRODUCTS[0].name}</E></span>
+                <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '8px 0 0' }}><E id="adobe_product0.desc" editMode={editMode}>{productsData[0]?.desc ?? PRODUCTS[0].desc}</E></p>
               </div>
             </div>
 
@@ -232,8 +264,8 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     fontFamily: SERIF, fontStyle: 'italic',
                     fontSize: 18, color: 'var(--ink2)', marginRight: 8,
                   }}>{String(i + 2).padStart(2, '0')}</span>
-                  <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-.02em' }}>{p.name}</span>
-                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '4px 0 0' }}>{p.desc}</p>
+                  <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-.02em' }}><E id={`adobe_product${i + 1}.name`} editMode={editMode}>{productsData[i + 1]?.name ?? p.name}</E></span>
+                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '4px 0 0' }}><E id={`adobe_product${i + 1}.desc`} editMode={editMode}>{productsData[i + 1]?.desc ?? p.desc}</E></p>
                 </div>
               </div>
             ))}
@@ -298,7 +330,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}>Adobe CC의 강점</h2>
+            }}><E id="adobe_sections.strengthsTitle" editMode={editMode}>{sections.strengthsTitle}</E></h2>
           </div>
 
           <div className="ab-str-grid" style={{
@@ -394,10 +426,10 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
             }}>
-              환경에 맞는 라이선스를 선택하세요
+              <E id="adobe_sections.plansTitle" editMode={editMode}>{sections.plansTitle}</E>
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              개인 크리에이터부터 기업 팀까지. 유니온시스템즈가 최적 견적을 안내합니다.
+              <E id="adobe_sections.plansDesc" editMode={editMode}>{sections.plansDesc}</E>
             </p>
           </div>
 
@@ -441,10 +473,10 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                   }}>{String(i + 1).padStart(2, '0')}</div>
 
                   <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}>
-                    {pl.name}
+                    <E id={`adobe_plan${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E>
                   </h3>
                   <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}>
-                    {pl.desc}
+                    <E id={`adobe_plan${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E>
                   </p>
 
                   {/* Apps included */}
@@ -452,7 +484,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
-                  }}>{pl.apps}</p>
+                  }}><E id={`adobe_plan${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? pl.apps}</E></p>
 
                   {/* CTA */}
                   <Link href="/contact" style={{
@@ -466,7 +498,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     textDecoration: 'none', transition: 'all .2s',
                     textAlign: 'center', justifyContent: 'center',
                   }}>
-                    견적 요청 <span>&rarr;</span>
+                    <E id={`adobe_sections.plansCta`} editMode={editMode}>{sections.plansCta}</E> <span>&rarr;</span>
                   </Link>
                 </div>
               </div>
@@ -480,13 +512,13 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             flexWrap: 'wrap',
           }}>
             <div style={{ display: 'flex', gap: 20 }}>
-              {['Adobe 공인 리셀러', '즉시 발급', '세금계산서 발행'].map((t) => (
-                <span key={t} style={{
+              {trust.map((t: string, i: number) => (
+                <span key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: 14, fontWeight: 500, color: 'var(--ink2)',
                 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  {t}
+                  <E id={`adobe_trust.${i}`} editMode={editMode}>{t}</E>
                 </span>
               ))}
             </div>
@@ -495,7 +527,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                 fontWeight: 600, fontSize: 14, color: 'var(--ink)',
                 textDecoration: 'none',
               }}>
-                전화 상담 02-706-8999
+                <E id="adobe_sections.phone" editMode={editMode}>{sections.phone}</E>
               </a>
             </div>
           </div>
@@ -530,7 +562,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="adobe_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -544,16 +576,16 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}>도입 문의하기</Link>
+            }}><E id="adobe_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}>견적 요청하기</Link>
+            }}><E id="adobe_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
           </div>
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes abMarquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -577,7 +609,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
           .ab-bento > div:not(:first-child) { flex-direction: column !important; }
           .ab-bento > div:not(:first-child) > div:first-child { width: 100% !important; height: 160px !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

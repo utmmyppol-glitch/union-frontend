@@ -44,18 +44,34 @@ const DEFAULT_CTA = {
   contact_btn: '정확한 견적 받기',
 };
 
+const DEFAULT_UI = {
+  step1_title: '기본 정보를 입력하세요',
+  step1_emp_label: '직원 수:',
+  step1_industry: '업종',
+  step1_next: '다음 단계로',
+  step2_title: '필요한 솔루션을 선택하세요',
+  step2_hint: '복수 선택 가능합니다.',
+  step2_prev: '이전',
+  step2_calc: '비용 계산하기',
+  result_detail_title: '솔루션별 상세 비용',
+  result_chart_title: '비용 비중',
+  result_chart_unit: '솔루션',
+};
+
 export default function CalculatorPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
   useEditableManifest(editMode);
 
   const [hero, setHero] = useState(() => safeParse(ssrContent.calculator_hero, DEFAULT_HERO));
   const [cta, setCta] = useState(() => safeParse(ssrContent.calculator_cta, DEFAULT_CTA));
+  const [ui, setUi] = useState(() => safeParse(ssrContent.calculator_ui, DEFAULT_UI));
 
   useEffect(() => {
     if (!editMode) return;
     const setters: Record<string, (v: unknown) => void> = {
       calculator_hero: setHero as (v: unknown) => void,
       calculator_cta: setCta as (v: unknown) => void,
+      calculator_ui: setUi as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -154,10 +170,10 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
         {/* STEP 1 */}
         {step === 1 && (
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, padding: 'clamp(24px,4vw,40px)' }}>
-            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 32 }}>기본 정보를 입력하세요</h2>
+            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 32 }}><E id="calculator_ui.step1_title" editMode={editMode}>{ui.step1_title}</E></h2>
 
             <label style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, color: 'var(--ink)', display: 'block', marginBottom: 12 }}>
-              직원 수: <span style={{ color: 'var(--accent)', fontSize: 24, fontWeight: 900 }}>{employees}</span>명
+              <E id="calculator_ui.step1_emp_label" editMode={editMode}>{ui.step1_emp_label}</E> <span style={{ color: 'var(--accent)', fontSize: 24, fontWeight: 900 }}>{employees}</span>명
             </label>
             <input type="range" min={5} max={500} step={5} value={employees}
               onChange={e => setEmployees(Number(e.target.value))}
@@ -169,7 +185,7 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
               onChange={e => setEmployees(Math.max(1, Number(e.target.value)))}
               style={{ width: 120, padding: '10px 14px', borderRadius: 0, border: '1px solid var(--line)', background: 'var(--bg)', fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 18, color: 'var(--ink)', marginBottom: 32, textAlign: 'center' }} />
 
-            <label style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, color: 'var(--ink)', display: 'block', marginBottom: 12 }}>업종</label>
+            <label style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, color: 'var(--ink)', display: 'block', marginBottom: 12 }}><E id="calculator_ui.step1_industry" editMode={editMode}>{ui.step1_industry}</E></label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
               {INDUSTRIES.map(ind => (
                 <button key={ind} onClick={() => setIndustry(ind)}
@@ -182,7 +198,7 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
             <button onClick={() => { if (industry) setStep(2); }}
               disabled={!industry}
               style={{ width: '100%', padding: '14px 0', borderRadius: 0, background: industry ? 'var(--accent)' : 'var(--line)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, border: 'none', cursor: industry ? 'pointer' : 'not-allowed', transition: 'background .2s' }}>
-              다음 단계로
+              <E id="calculator_ui.step1_next" editMode={editMode}>{ui.step1_next}</E>
             </button>
           </div>
         )}
@@ -190,8 +206,8 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
         {/* STEP 2 */}
         {step === 2 && (
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, padding: 'clamp(24px,4vw,40px)' }}>
-            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 8 }}>필요한 솔루션을 선택하세요</h2>
-            <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, color: 'var(--ink2)', marginBottom: 32 }}>복수 선택 가능합니다.</p>
+            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 8 }}><E id="calculator_ui.step2_title" editMode={editMode}>{ui.step2_title}</E></h2>
+            <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, color: 'var(--ink2)', marginBottom: 32 }}><E id="calculator_ui.step2_hint" editMode={editMode}>{ui.step2_hint}</E></p>
 
             <div style={{ display: 'grid', gap: 12 }}>
               {SOLUTIONS.map(s => (
@@ -225,10 +241,10 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
 
             <div style={{ display: 'flex', gap: 12, marginTop: 32 }}>
               <button onClick={() => setStep(1)}
-                style={{ flex: 1, padding: '14px 0', borderRadius: 0, border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, cursor: 'pointer' }}>이전</button>
+                style={{ flex: 1, padding: '14px 0', borderRadius: 0, border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, cursor: 'pointer' }}><E id="calculator_ui.step2_prev" editMode={editMode}>{ui.step2_prev}</E></button>
               <button onClick={() => { if (Object.values(selected).some(v => v)) setStep(3); }}
                 disabled={!Object.values(selected).some(v => v)}
-                style={{ flex: 2, padding: '14px 0', borderRadius: 0, background: Object.values(selected).some(v => v) ? 'var(--accent)' : 'var(--line)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, border: 'none', cursor: Object.values(selected).some(v => v) ? 'pointer' : 'not-allowed' }}>비용 계산하기</button>
+                style={{ flex: 2, padding: '14px 0', borderRadius: 0, background: Object.values(selected).some(v => v) ? 'var(--accent)' : 'var(--line)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, border: 'none', cursor: Object.values(selected).some(v => v) ? 'pointer' : 'not-allowed' }}><E id="calculator_ui.step2_calc" editMode={editMode}>{ui.step2_calc}</E></button>
             </div>
           </div>
         )}
@@ -253,7 +269,7 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
             {/* Detail table */}
             <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, overflow: 'hidden', marginBottom: 24 }}>
               <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--line)' }}>
-                <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: 'var(--ink)' }}>솔루션별 상세 비용</h3>
+                <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: 'var(--ink)' }}><E id="calculator_ui.result_detail_title" editMode={editMode}>{ui.result_detail_title}</E></h3>
               </div>
               {results.map((r, i) => {
                 const pct = totalAnnual > 0 ? (r.annual / totalAnnual) * 100 : 0;
@@ -275,7 +291,7 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
 
             {/* Donut chart */}
             <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, padding: 'clamp(24px,4vw,40px)', marginBottom: 24, textAlign: 'center' }}>
-              <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: 'var(--ink)', marginBottom: 24 }}>비용 비중</h3>
+              <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 18, color: 'var(--ink)', marginBottom: 24 }}><E id="calculator_ui.result_chart_title" editMode={editMode}>{ui.result_chart_title}</E></h3>
               <div style={{ position: 'relative', width: 200, height: 200, margin: '0 auto' }}>
                 <svg viewBox="0 0 200 200" style={{ transform: 'rotate(-90deg)' }}>
                   {(() => {
@@ -292,7 +308,7 @@ export default function CalculatorPageClient({ ssrContent }: { ssrContent: Recor
                 </svg>
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <span style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 22, color: 'var(--ink)' }}>{results.length}개</span>
-                  <span style={{ fontFamily: "'Pretendard'", fontWeight: 500, fontSize: 18, color: 'var(--ink2)' }}>솔루션</span>
+                  <span style={{ fontFamily: "'Pretendard'", fontWeight: 500, fontSize: 18, color: 'var(--ink2)' }}><E id="calculator_ui.result_chart_unit" editMode={editMode}>{ui.result_chart_unit}</E></span>
                 </div>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px 16px', marginTop: 20 }}>

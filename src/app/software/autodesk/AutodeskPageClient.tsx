@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -18,7 +18,11 @@ const PRODUCTS = [
 
 const DEFAULT_HERO = {
   badge: 'Autodesk',
+  title1: '건축설계,',
+  title2: '3D 디자인',
   desc: 'AutoCAD, Revit, 3ds Max 등 건축·설계·디자인 분야의 글로벌 표준 소프트웨어.',
+  btn1: '도입 문의하기 →',
+  btn2: '견적 요청',
 };
 
 const DEFAULT_STRENGTHS = [
@@ -30,7 +34,27 @@ const DEFAULT_STRENGTHS = [
 const DEFAULT_CTA = {
   title: '산업별 맞춤 제품 구성을\n안내해 드립니다.',
   desc: 'Autodesk 공인 리셀러 유니온시스템즈',
+  btn1: '도입 문의하기',
+  btn2: '견적 요청하기',
 };
+
+const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, desc: p.desc }));
+
+const DEFAULT_SECTIONS = {
+  productsTitle: '주요 제품',
+  strengthsTitle: 'Autodesk의 강점',
+  collectionsTitle: '컬렉션',
+  plansTitle: '환경에 맞는 라이선스를 선택하세요',
+  plansDesc: '개인·팀·교육기관까지. 유니온시스템즈가 최적 구성과 견적을 안내합니다.',
+  plansCta: '견적 요청',
+};
+const DEFAULT_TRUST = ['Autodesk 공인 리셀러', '즉시 발급', '세금계산서 발행'];
+
+const DEFAULT_PLANS = [
+  { name: '단일 제품', desc: '특정 제품 하나를 집중 사용하는 개인·소규모 팀', apps: 'AutoCAD · Revit · Inventor · 3ds Max 중 1개' },
+  { name: '컬렉션', desc: '업무 분야에 최적화된 제품 묶음 — AEC·제품설계·M&E', apps: 'AEC · Product Design · M&E Collection' },
+  { name: '교육 기관', desc: '학생·교직원 대상 무상/할인 라이선스', apps: '전 제품 · 비상업적 사용 · 교육기관 인증' },
+];
 
 const COLLECTIONS = [
   { name: 'AEC Collection', desc: '건축, 엔지니어링, 시공', icons: [
@@ -57,6 +81,10 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
   const [hero, setHero] = useState(() => safeParse(ssrContent.autodesk_hero, DEFAULT_HERO));
   const [strengths, setStrengths] = useState(() => safeParse(ssrContent.autodesk_strengths, DEFAULT_STRENGTHS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.autodesk_cta, DEFAULT_CTA));
+  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.autodesk_products, DEFAULT_PRODUCTS_DATA));
+  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.autodesk_plans, DEFAULT_PLANS));
+  const [sections, setSections] = useState(() => safeParse(ssrContent.autodesk_sections, DEFAULT_SECTIONS));
+  const [trust, setTrust] = useState(() => safeParse(ssrContent.autodesk_trust, DEFAULT_TRUST));
 
   useEffect(() => {
     if (!editMode) return;
@@ -64,6 +92,10 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
       autodesk_hero: setHero as (v: unknown) => void,
       autodesk_strengths: setStrengths as (v: unknown) => void,
       autodesk_cta: setCta as (v: unknown) => void,
+      autodesk_products: setProductsData as (v: unknown) => void,
+      autodesk_plans: setPlansData as (v: unknown) => void,
+      autodesk_sections: setSections as (v: unknown) => void,
+      autodesk_trust: setTrust as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'content-update') {
@@ -149,8 +181,8 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
             }}>
-              건축설계,<br />
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>3D 디자인</span>
+              <E id="autodesk_hero.title1" editMode={editMode}>{hero.title1}</E><br />
+              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}><E id="autodesk_hero.title2" editMode={editMode}>{hero.title2}</E></span>
             </h1>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
@@ -162,11 +194,11 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}>도입 문의하기 →</Link>
+              }}><E id="autodesk_hero.btn1" editMode={editMode}>{hero.btn1}</E></Link>
               <Link href="/contact" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-              }}>견적 요청</Link>
+              }}><E id="autodesk_hero.btn2" editMode={editMode}>{hero.btn2}</E></Link>
             </div>
           </div>
         </div>
@@ -181,7 +213,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}>주요 제품</h2>
+            }}><E id="autodesk_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
           </div>
 
           {PRODUCTS.map((p, i) => (
@@ -214,8 +246,8 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                 <span className="ad-prod-title" style={{
                   fontWeight: 800, fontSize: 22, color: 'var(--ink)',
                   transition: 'color .2s', letterSpacing: '-.02em',
-                }}>{p.name}</span>
-                <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '6px 0 0' }}>{p.desc}</p>
+                }}><E id={`autodesk_product${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></span>
+                <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '6px 0 0' }}><E id={`autodesk_product${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
               </div>
               {/* Arrow */}
               <span className="ad-prod-arrow" style={{
@@ -244,7 +276,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}>Autodesk의 강점</h2>
+            }}><E id="autodesk_sections.strengthsTitle" editMode={editMode}>{sections.strengthsTitle}</E></h2>
           </div>
 
           <div className="ad-str-grid" style={{
@@ -318,7 +350,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}>컬렉션</h2>
+            }}><E id="autodesk_sections.collectionsTitle" editMode={editMode}>{sections.collectionsTitle}</E></h2>
           </div>
 
           {/* Collection tabs */}
@@ -412,9 +444,9 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
-            }}>환경에 맞는 라이선스를 선택하세요</h2>
+            }}><E id="autodesk_sections.plansTitle" editMode={editMode}>{sections.plansTitle}</E></h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              개인·팀·교육기관까지. 유니온시스템즈가 최적 구성과 견적을 안내합니다.
+              <E id="autodesk_sections.plansDesc" editMode={editMode}>{sections.plansDesc}</E>
             </p>
           </div>
 
@@ -422,11 +454,11 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20,
           }}>
             {[
-              { name: '단일 제품', img: `${CRAWL}software_autodesk_plan_01_148.jpg`, desc: '특정 제품 하나를 집중 사용하는 개인·소규모 팀', badge: null, apps: 'AutoCAD · Revit · Inventor · 3ds Max 중 1개' },
-              { name: '컬렉션', img: `${CRAWL}software_autodesk_plan_02_149.jpg`, desc: '업무 분야에 최적화된 제품 묶음 — AEC·제품설계·M&E', badge: 'RECOMMENDED', apps: 'AEC · Product Design · M&E Collection' },
-              { name: '교육 기관', img: `${CRAWL}software_autodesk_plan_03_150.jpg`, desc: '학생·교직원 대상 무상/할인 라이선스', badge: null, apps: '전 제품 · 비상업적 사용 · 교육기관 인증' },
+              { img: `${CRAWL}software_autodesk_plan_01_148.jpg`, badge: null },
+              { img: `${CRAWL}software_autodesk_plan_02_149.jpg`, badge: 'RECOMMENDED' },
+              { img: `${CRAWL}software_autodesk_plan_03_150.jpg`, badge: null },
             ].map((pl, i) => (
-              <div key={pl.name} className="reveal" style={{
+              <div key={i} className="reveal" style={{
                 position: 'relative', overflow: 'hidden',
                 border: pl.badge ? '2px solid var(--ink)' : '1px solid var(--line)',
                 background: 'var(--surface)',
@@ -441,7 +473,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                   }}>{pl.badge}</div>
                 )}
                 <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
-                  <Image src={pl.img} alt={pl.name} fill style={{
+                  <Image src={pl.img} alt={plansData[i]?.name ?? DEFAULT_PLANS[i].name} fill style={{
                     objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
@@ -452,13 +484,13 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     fontSize: 48, fontWeight: 300, lineHeight: 1,
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
-                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}>{pl.name}</h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}>{pl.desc}</p>
+                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`autodesk_plan${i}.name`} editMode={editMode}>{plansData[i]?.name ?? DEFAULT_PLANS[i].name}</E></h3>
+                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`autodesk_plan${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? DEFAULT_PLANS[i].desc}</E></p>
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
-                  }}>{pl.apps}</p>
+                  }}><E id={`autodesk_plan${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? DEFAULT_PLANS[i].apps}</E></p>
                   <Link href="/contact" style={{
                     marginTop: 'auto',
                     display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -469,7 +501,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     fontWeight: 700, fontSize: 14,
                     textDecoration: 'none', transition: 'all .2s',
                     justifyContent: 'center',
-                  }}>견적 요청 <span>&rarr;</span></Link>
+                  }}><E id="autodesk_sections.plansCta" editMode={editMode}>{sections.plansCta}</E> <span>&rarr;</span></Link>
                 </div>
               </div>
             ))}
@@ -479,10 +511,10 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             marginTop: 40, display: 'flex', alignItems: 'center', gap: 24,
             padding: '20px 28px', border: '1px solid var(--line)', background: 'var(--surface)', flexWrap: 'wrap',
           }}>
-            {['Autodesk 공인 리셀러', '즉시 발급', '세금계산서 발행'].map((t) => (
-              <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500, color: 'var(--ink2)' }}>
+            {trust.map((t: string, i: number) => (
+              <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500, color: 'var(--ink2)' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                {t}
+                <E id={`autodesk_trust.${i}`} editMode={editMode}>{t}</E>
               </span>
             ))}
             <a href="tel:02-706-8999" style={{ marginLeft: 'auto', fontWeight: 600, fontSize: 14, color: 'var(--ink)', textDecoration: 'none' }}>02-706-8999</a>
@@ -513,7 +545,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="autodesk_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -527,16 +559,16 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}>도입 문의하기</Link>
+            }}><E id="autodesk_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}>견적 요청하기</Link>
+            }}><E id="autodesk_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
           </div>
         </div>
       </section>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .ad-prod-row:hover { padding-left: 12px !important; }
         .ad-prod-row:hover .ad-prod-title { color: var(--accent) !important; }
         .ad-prod-row:hover .ad-prod-arrow { opacity: 1 !important; transform: translateX(4px); }
@@ -552,7 +584,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
           .ad-prod-row { grid-template-columns: 1fr !important; }
           .ad-prod-row > div:first-child { display: none; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

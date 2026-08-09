@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -23,6 +23,9 @@ const DEFAULT_PRODUCTS_DATA = PRODUCTS.map(p => ({ name: p.name, cat: p.cat, des
 const DEFAULT_CTA = {
   title: '보안은 선택이 아닌\n필수입니다.',
   desc: '유니온시스템즈가 최적의 보안 솔루션을 제안합니다.',
+  btn1: '도입 문의하기',
+  btn2: '견적 요청하기',
+  detail: '자세히 보기',
 };
 
 export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
@@ -97,7 +100,7 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
             maxWidth: 620, margin: '0 0 24px',
           }}>
             <E id="security_hero.desc" editMode={editMode}>
-              {hero.desc.split('\n').map((line: string, i: number) => (
+              {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -189,7 +192,7 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
                     letterSpacing: '.04em', color: 'var(--accent)',
                     display: 'inline-flex', alignItems: 'center', gap: 8,
                   }}>
-                    자세히 보기 <span style={{ fontSize: 16, transition: 'transform .2s' }}>→</span>
+                    <E id="security_cta.detail" editMode={editMode}>{cta.detail}</E> <span style={{ fontSize: 16, transition: 'transform .2s' }}>→</span>
                   </span>
                 </div>
               </Link>
@@ -225,7 +228,7 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
             lineHeight: 1.35, color: '#fff', margin: '0 0 12px',
           }}>
             <E id="security_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -233,17 +236,17 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
           <p className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.45)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            유니온시스템즈가 기업 환경에 맞는 보안 체계를 설계합니다.
+            <E id="security_cta.desc" editMode={editMode}>{cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}>도입 문의하기</Link>
+            }}><E id="security_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid rgba(255,255,255,.45)',
               color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}>견적 요청하기</Link>
+            }}><E id="security_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
           </div>
         </div>
       </section>

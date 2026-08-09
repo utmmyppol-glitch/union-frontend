@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -60,14 +60,27 @@ const FAQS = [
    COMPONENT
    ════════════════════════════════════════════════════════════════════ */
 
-const DEFAULT_HERO = { desc: '매체 · 네트워크 · 출력물까지 모든 유출 경로를 차단하는 통합 DLP. 도입부터 운영까지 유니온시스템즈가 책임집니다.' };
+const DEFAULT_HERO = { title1: '정보유출방지', title2: 'DLP 솔루션', desc: '매체 · 네트워크 · 출력물까지 모든 유출 경로를 차단하는 통합 DLP. 도입부터 운영까지 유니온시스템즈가 책임집니다.', btn: '도입 문의하기 →' };
 const DEFAULT_PROBLEMS_DATA = PROBLEMS.map(p => ({ title: p.title, stat: p.stat, statLabel: p.statLabel, desc: p.desc }));
 const DEFAULT_FEATURES_MAIN_DATA = FEATURES_MAIN.map(f => ({ title: f.title, desc: f.desc, tag: f.tag }));
 const DEFAULT_FEATURES_SUB_DATA = FEATURES_SUB.map(f => ({ title: f.title, desc: f.desc }));
 const DEFAULT_PROCESS_DATA = PROCESS.map(p => ({ title: p.title, desc: p.desc }));
 const DEFAULT_METRICS_DATA = METRICS.map(m => ({ num: m.num, label: m.label }));
 const DEFAULT_FAQS_DATA = FAQS.map(f => ({ q: f.q, a: f.a }));
-const DEFAULT_CTA = { title: '정보는 기업의\n가장 중요한 자산입니다.', desc: '유니온시스템즈가 OfficeKeeper로 기업 데이터를 보호합니다.' };
+const DEFAULT_CTA = { title: '정보는 기업의\n가장 중요한 자산입니다.', desc: '유니온시스템즈가 OfficeKeeper로 기업 데이터를 보호합니다.', btn: '도입 문의하기 →' };
+const DEFAULT_HERO_TRUST = ['GS 인증', '국내 DLP 1위', '200+ 기업'];
+const DEFAULT_CTA_TRUST = ['GS 인증 1등급', '국내 DLP 점유율 1위', '200+ 기업 도입'];
+
+const DEFAULT_SECTIONS = {
+  whyTitle: '정보유출, 왜\n사전 차단이 필요한가?',
+  whyDesc: '기업 데이터 유출의 대부분은 내부에서 발생합니다. 사후 대응이 아닌, 실시간 차단만이 유일한 해답입니다.',
+  solutionTitle: '3대 유출 경로 완전 차단',
+  solutionDesc: '매체·네트워크·출력물 — 모든 데이터 반출 경로를 실시간으로 통제합니다.',
+  featuresTitle: '9가지 통합 모듈',
+  featuresDesc: '하나의 에이전트로 모든 정보보안 기능을 통합 관리합니다.',
+  processTitle: '도입 프로세스',
+  faqTitle: '자주 묻는 질문',
+};
 
 export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
@@ -80,6 +93,9 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
   const [metricsData, setMetricsData] = useState(() => safeParse(ssrContent.officekeeper_metrics, DEFAULT_METRICS_DATA));
   const [faqsData, setFaqsData] = useState(() => safeParse(ssrContent.officekeeper_faqs, DEFAULT_FAQS_DATA));
   const [cta, setCta] = useState(() => safeParse(ssrContent.officekeeper_cta, DEFAULT_CTA));
+  const [sectionsData, setSectionsData] = useState(() => safeParse(ssrContent.officekeeper_sections, DEFAULT_SECTIONS));
+  const [heroTrust, setHeroTrust] = useState(() => safeParse(ssrContent.officekeeper_hero_trust, DEFAULT_HERO_TRUST));
+  const [ctaTrust, setCtaTrust] = useState(() => safeParse(ssrContent.officekeeper_cta_trust, DEFAULT_CTA_TRUST));
   useEffect(() => {
     if (!editMode) return;
     const setters: Record<string, (v: unknown) => void> = {
@@ -91,6 +107,9 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
       officekeeper_metrics: setMetricsData as (v: unknown) => void,
       officekeeper_faqs: setFaqsData as (v: unknown) => void,
       officekeeper_cta: setCta as (v: unknown) => void,
+      officekeeper_sections: setSectionsData as (v: unknown) => void,
+      officekeeper_hero_trust: setHeroTrust as (v: unknown) => void,
+      officekeeper_cta_trust: setCtaTrust as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
     window.addEventListener('message', handler);
@@ -152,21 +171,21 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
             <div style={{ padding: '120px 0 80px' }}>
               <p style={{ fontFamily: MONO, fontWeight: 500, fontSize: 12, letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 20px' }}>OfficeKeeper · DLP</p>
               <h1 style={{ fontWeight: 900, fontSize: 'clamp(40px, 6vw, 72px)', lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 24px' }}>
-                정보유출방지<br />
-                <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>DLP 솔루션</span>
+                <E id="officekeeper_hero.title1" editMode={editMode}>{hero.title1}</E><br />
+                <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}><E id="officekeeper_hero.title2" editMode={editMode}>{hero.title2}</E></span>
               </h1>
               <p style={{ fontSize: 16, lineHeight: 1.75, color: 'rgba(255,255,255,.5)', maxWidth: 400, margin: '0 0 36px' }}>
                 <E id="officekeeper_hero.desc" editMode={editMode}>{hero.desc}</E>
               </p>
               <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
-                <Link href="/contact" style={{ padding: '16px 36px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>도입 문의하기 &rarr;</Link>
+                <Link href="/contact" style={{ padding: '16px 36px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="officekeeper_hero.btn" editMode={editMode}>{hero.btn}</E></Link>
                 <a href="tel:02-706-8999" style={{ padding: '16px 28px', border: '1px solid rgba(255,255,255,.2)', color: 'rgba(255,255,255,.7)', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>02-706-8999</a>
               </div>
               {/* Trust strip */}
               <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-                {['GS 인증', '국내 DLP 1위', '200+ 기업'].map((t) => (
-                  <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.4)' }}>
-                    <span style={{ color: '#34d399' }}>✓</span>{t}
+                {heroTrust.map((t: string, i: number) => (
+                  <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.4)' }}>
+                    <span style={{ color: '#34d399' }}>✓</span><E id={`officekeeper_hero_trust.${i}`} editMode={editMode}>{t}</E>
                   </span>
                 ))}
               </div>
@@ -220,10 +239,14 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
           <div className="reveal" style={{ maxWidth: 700, marginBottom: 64 }}>
             <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.14em', color: 'var(--ink2)', textTransform: 'uppercase', margin: '0 0 16px' }}>WHY DLP</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(30px,4.5vw,52px)', lineHeight: 1.1, letterSpacing: '-.04em', margin: '0 0 20px' }}>
-              정보유출, 왜<br />사전 차단이 필요한가?
+              <E id="officekeeper_sections.whyTitle" editMode={editMode}>
+                {stripHtml(sectionsData.whyTitle).split('\n').map((line: string, i: number) => (
+                  <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
+                ))}
+              </E>
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.75, color: 'var(--ink2)', maxWidth: 500 }}>
-              기업 데이터 유출의 대부분은 내부에서 발생합니다. 사후 대응이 아닌, 실시간 차단만이 유일한 해답입니다.
+              <E id="officekeeper_sections.whyDesc" editMode={editMode}>{sectionsData.whyDesc}</E>
             </p>
           </div>
 
@@ -268,8 +291,8 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
         <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 clamp(20px,4vw,52px)', position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 56 }}>
             <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.14em', color: 'rgba(255,255,255,.4)', margin: '0 0 14px' }}>SOLUTION</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', color: '#fff', margin: '0 0 14px' }}>3대 유출 경로 완전 차단</h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)', maxWidth: 440 }}>매체·네트워크·출력물 — 모든 데이터 반출 경로를 실시간으로 통제합니다.</p>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', color: '#fff', margin: '0 0 14px' }}><E id="officekeeper_sections.solutionTitle" editMode={editMode}>{sectionsData.solutionTitle}</E></h2>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)', maxWidth: 440 }}><E id="officekeeper_sections.solutionDesc" editMode={editMode}>{sectionsData.solutionDesc}</E></p>
           </div>
 
           {/* 비대칭 bento: 큰 카드 1개 + 작은 2개 */}
@@ -281,9 +304,9 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
               position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column',
             }}>
               <div aria-hidden="true" style={{ position: 'absolute', right: -10, bottom: -20, fontFamily: SERIF, fontStyle: 'italic', fontSize: 160, fontWeight: 300, color: 'rgba(255,255,255,.03)', pointerEvents: 'none' }}>01</div>
-              <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'var(--accent)', marginBottom: 16, display: 'block' }}>{FEATURES_MAIN[0].tag}</span>
-              <h3 style={{ fontWeight: 900, fontSize: 28, color: '#fff', margin: '0 0 14px', letterSpacing: '-.02em' }}>{FEATURES_MAIN[0].title}</h3>
-              <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.55)', margin: '0 0 24px', maxWidth: 400 }}>{FEATURES_MAIN[0].desc}</p>
+              <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'var(--accent)', marginBottom: 16, display: 'block' }}><E id="officekeeper_features_main.0.tag" editMode={editMode}>{featMainData[0]?.tag ?? FEATURES_MAIN[0].tag}</E></span>
+              <h3 style={{ fontWeight: 900, fontSize: 28, color: '#fff', margin: '0 0 14px', letterSpacing: '-.02em' }}><E id="officekeeper_features_main.0.title" editMode={editMode}>{featMainData[0]?.title ?? FEATURES_MAIN[0].title}</E></h3>
+              <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.55)', margin: '0 0 24px', maxWidth: 400 }}><E id="officekeeper_features_main.0.desc" editMode={editMode}>{featMainData[0]?.desc ?? FEATURES_MAIN[0].desc}</E></p>
               <div style={{ marginTop: 'auto', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 {['USB', '외장HDD', '블루투스', 'CD/DVD', 'SD카드'].map((t) => (
                   <span key={t} style={{ padding: '5px 12px', border: '1px solid rgba(255,255,255,.12)', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,.5)' }}>{t}</span>
@@ -297,9 +320,9 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 background: 'rgba(255,255,255,.02)', position: 'relative', overflow: 'hidden',
               }}>
                 <div aria-hidden="true" style={{ position: 'absolute', right: 8, bottom: -8, fontFamily: SERIF, fontStyle: 'italic', fontSize: 80, fontWeight: 300, color: 'rgba(255,255,255,.03)', pointerEvents: 'none' }}>{String(i + 2).padStart(2, '0')}</div>
-                <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginBottom: 12, display: 'block' }}><E id={`officekeeper_features_main.${i}.tag`} editMode={editMode}>{featMainData[i]?.tag ?? f.tag}</E></span>
-                <h3 style={{ fontWeight: 800, fontSize: 20, color: '#fff', margin: '0 0 8px' }}><E id={`officekeeper_features_main.${i}.title`} editMode={editMode}>{featMainData[i]?.title ?? f.title}</E></h3>
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: 'rgba(255,255,255,.45)', margin: 0 }}><E id={`officekeeper_features_main.${i}.desc`} editMode={editMode}>{featMainData[i]?.desc ?? f.desc}</E></p>
+                <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginBottom: 12, display: 'block' }}><E id={`officekeeper_features_main.${i + 1}.tag`} editMode={editMode}>{featMainData[i + 1]?.tag ?? f.tag}</E></span>
+                <h3 style={{ fontWeight: 800, fontSize: 20, color: '#fff', margin: '0 0 8px' }}><E id={`officekeeper_features_main.${i + 1}.title`} editMode={editMode}>{featMainData[i + 1]?.title ?? f.title}</E></h3>
+                <p style={{ fontSize: 15, lineHeight: 1.6, color: 'rgba(255,255,255,.45)', margin: 0 }}><E id={`officekeeper_features_main.${i + 1}.desc`} editMode={editMode}>{featMainData[i + 1]?.desc ?? f.desc}</E></p>
               </div>
             ))}
           </div>
@@ -322,8 +345,8 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
         <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 clamp(20px,4vw,52px)', position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.14em', color: 'var(--ink2)', textTransform: 'uppercase', margin: '0 0 14px' }}>FEATURES</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 12px' }}>9가지 통합 모듈</h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 400 }}>하나의 에이전트로 모든 정보보안 기능을 통합 관리합니다.</p>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="officekeeper_sections.featuresTitle" editMode={editMode}>{sectionsData.featuresTitle}</E></h2>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 400 }}><E id="officekeeper_sections.featuresDesc" editMode={editMode}>{sectionsData.featuresDesc}</E></p>
           </div>
 
           {/* Magazine layout: 2 big + 4 small */}
@@ -372,7 +395,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
         <div style={{ maxWidth: 1300, margin: '0 auto', padding: '0 clamp(20px,4vw,52px)', position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 56 }}>
             <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.14em', color: 'var(--ink2)', textTransform: 'uppercase', margin: '0 0 14px' }}>PROCESS</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', margin: 0 }}>도입 프로세스</h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', margin: 0 }}><E id="officekeeper_sections.processTitle" editMode={editMode}>{sectionsData.processTitle}</E></h2>
           </div>
 
           {/* Timeline — vertical left line + steps */}
@@ -443,7 +466,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
         <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 clamp(20px,4vw,52px)', position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.14em', color: 'var(--ink2)', textTransform: 'uppercase', margin: '0 0 14px' }}>FAQ</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', margin: 0 }}>자주 묻는 질문</h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', margin: 0 }}><E id="officekeeper_sections.faqTitle" editMode={editMode}>{sectionsData.faqTitle}</E></h2>
           </div>
 
           {FAQS.map((faq, i) => (
@@ -485,7 +508,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
           <div className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 56, fontWeight: 300, color: 'var(--accent)', lineHeight: 1, marginBottom: 20, opacity: .4 }}>&ldquo;</div>
           <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(28px,4vw,48px)', lineHeight: 1.3, color: '#fff', margin: '0 0 16px' }}>
             <E id="officekeeper_cta.title" editMode={editMode}>
-              {cta.title.split('\n').map((line: string, i: number) => (
+              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -494,13 +517,13 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
             <E id="officekeeper_cta.desc" editMode={editMode}>{cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 32 }}>
-            <Link href="/contact" style={{ padding: '18px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>도입 문의하기 &rarr;</Link>
+            <Link href="/contact" style={{ padding: '18px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="officekeeper_cta.btn" editMode={editMode}>{cta.btn}</E></Link>
             <a href="tel:02-706-8999" style={{ padding: '18px 36px', border: '1px solid rgba(255,255,255,.2)', color: 'rgba(255,255,255,.7)', fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>02-706-8999</a>
           </div>
           <div className="reveal" style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
-            {['GS 인증 1등급', '국내 DLP 점유율 1위', '200+ 기업 도입'].map((t) => (
-              <span key={t} style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.35)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ color: '#34d399' }}>✓</span>{t}
+            {ctaTrust.map((t: string, i: number) => (
+              <span key={i} style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,.35)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: '#34d399' }}>✓</span><E id={`officekeeper_cta_trust.${i}`} editMode={editMode}>{t}</E>
               </span>
             ))}
           </div>

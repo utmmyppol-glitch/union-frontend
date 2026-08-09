@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems';
 
@@ -48,11 +48,12 @@ const ICONS = [
   { label: '리포트' },
 ];
 
-const DEFAULT_HERO = { desc: 'PC 자산 관리(DMS), 패치 관리(PMS), 근로시간 관리(PC-OFF),\n하드웨어 보안(HSM) — 4대 모듈로 IT 자산을 통합 관리합니다.' };
+const DEFAULT_HERO = { title: 'IT 자산\n통합 관리', desc: 'PC 자산 관리(DMS), 패치 관리(PMS), 근로시간 관리(PC-OFF),\n하드웨어 보안(HSM) — 4대 모듈로 IT 자산을 통합 관리합니다.', btn_contact: '도입 문의 →' };
 const DEFAULT_MODULES_DATA = MODULES.map(m => ({ name: m.name, desc: m.desc }));
 const DEFAULT_POINTS_DATA = POINTS.map(p => ({ title: p.title, desc: p.desc }));
 const DEFAULT_ICONS_DATA = ICONS.map(ic => ({ label: ic.label }));
-const DEFAULT_CTA = { title: 'NetClient 도입 상담', desc: '전문 컨설턴트가 귀사 환경에 맞는 최적의 구성을 안내합니다.' };
+const DEFAULT_SECTIONS = { modules_title: '주요 모듈', why_title: '도입 효과', features_title: '주요 기능' };
+const DEFAULT_CTA = { title: 'NetClient 도입 상담', desc: '전문 컨설턴트가 귀사 환경에 맞는 최적의 구성을 안내합니다.', btn_contact: '도입 문의하기 →' };
 
 export default function NetclientPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
@@ -61,6 +62,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
   const [modulesData, setModulesData] = useState(() => safeParse(ssrContent.netclient_modules, DEFAULT_MODULES_DATA));
   const [pointsData, setPointsData] = useState(() => safeParse(ssrContent.netclient_points, DEFAULT_POINTS_DATA));
   const [iconsData, setIconsData] = useState(() => safeParse(ssrContent.netclient_icons, DEFAULT_ICONS_DATA));
+  const [sectionsData, setSectionsData] = useState(() => safeParse(ssrContent.netclient_sections, DEFAULT_SECTIONS));
   const [cta, setCta] = useState(() => safeParse(ssrContent.netclient_cta, DEFAULT_CTA));
   useEffect(() => {
     if (!editMode) return;
@@ -69,6 +71,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
       netclient_modules: setModulesData as (v: unknown) => void,
       netclient_points: setPointsData as (v: unknown) => void,
       netclient_icons: setIconsData as (v: unknown) => void,
+      netclient_sections: setSectionsData as (v: unknown) => void,
       netclient_cta: setCta as (v: unknown) => void,
     };
     const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
@@ -138,18 +141,21 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 20px',
             }}>
-              IT 자산<br />통합 관리
+              <E id="netclient_hero.title" editMode={editMode}>
+                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                  <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
+                ))}
+              </E>
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 16, lineHeight: 1.7,
               color: 'rgba(255,255,255,.5)', maxWidth: 620, margin: '0 0 12px',
             }}>
               <E id="netclient_hero.desc" editMode={editMode}>
-                {hero.desc.split('\n').map((line: string, i: number) => (
+                {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
-              </E><br />
-              보안 관리(HSM)를 하나의 에이전트로 통합 운영합니다.
+              </E>
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
               {['DMS', 'PMS', 'PC-OFF', 'HSM'].map((t) => (
@@ -168,7 +174,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}>
-                도입 문의 →
+                <E id="netclient_hero.btn_contact" editMode={editMode}>{hero.btn_contact}</E>
               </Link>
               <a href="tel:02-706-8999" style={{
                 padding: '16px 32px', background: 'transparent',
@@ -208,7 +214,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              주요 모듈
+              <E id="netclient_sections.modules_title" editMode={editMode}>{sectionsData.modules_title}</E>
             </h2>
           </div>
 
@@ -291,7 +297,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              도입 효과
+              <E id="netclient_sections.why_title" editMode={editMode}>{sectionsData.why_title}</E>
             </h2>
           </div>
 
@@ -345,7 +351,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              주요 기능
+              <E id="netclient_sections.features_title" editMode={editMode}>{sectionsData.features_title}</E>
             </h2>
           </div>
 
@@ -411,7 +417,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
           <p className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.5)', margin: '0 0 32px',
           }}>
-            IT 자산을 체계적으로 관리하고 운영 비용을 절감하세요.
+            <E id="netclient_cta.desc" editMode={editMode}>{cta.desc}</E>
           </p>
           <Link
             href="/contact"
@@ -422,7 +428,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}
           >
-            도입 문의하기 →
+            <E id="netclient_cta.btn_contact" editMode={editMode}>{cta.btn_contact}</E>
           </Link>
         </div>
       </section>
