@@ -72,14 +72,122 @@ const DEFAULT_TEAM_INTRO = {
   renewal_desc: '벤더(개발사)와 긴밀한 연결, 소프트웨어 라이선스 정책 안내, 갱신관리, 성능 향상을 위한 교육, 세미나',
 };
 
+/* 담당자 문자열 "이름 | 직책 | 이메일" 줄 파싱/합치기 */
+function parseMembers(str: string): { name: string; position: string; email: string }[] {
+  return (str || '').split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+    const parts = l.split('|').map((x) => x.trim());
+    return { name: parts[0] || '', position: parts[1] || '', email: parts[2] || '' };
+  });
+}
+function joinMembers(rows: { name: string; position: string; email: string }[]): string {
+  return rows.map((r) => `${r.name} | ${r.position} | ${r.email}`).join('\n');
+}
+
+/* 담당자 테이블: 로컬 상태 + 통째 저장(field-set 전체 배열). array-action 미사용 → 중복추가 원천 차단 */
+function TechTeamsTable({ initial, editMode }: { initial: { label: string; members: string }[]; editMode: boolean }) {
+  const [groups, setGroups] = useState(initial);
+  const commit = (g: { label: string; members: string }[]) => {
+    setGroups(g);
+    window.parent.postMessage({ type: 'field-set', id: 'tech_teams', value: g }, '*');
+  };
+  const addTeam = () => commit([...groups, { label: '', members: '' }]);
+  const delTeam = (gi: number) => commit(groups.filter((_, i) => i !== gi));
+  const setLabel = (gi: number, v: string) => commit(groups.map((g, i) => (i === gi ? { ...g, label: v } : g)));
+  const setMembers = (gi: number, rows: { name: string; position: string; email: string }[]) =>
+    commit(groups.map((g, i) => (i === gi ? { ...g, members: joinMembers(rows) } : g)));
+
+  const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', border: '1px dashed var(--line)', background: '#fff', font: 'inherit', color: 'inherit', padding: '5px 7px', borderRadius: 3 };
+
+  return (
+    <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 18 }}>
+        <tbody>
+          {groups.map((g, gi) => {
+            const rows = parseMembers(g.members);
+            const shown = editMode ? rows : rows.filter((m) => m.name || m.position || m.email);
+            const span = (editMode ? rows.length + 1 : shown.length) || 1;
+            const border = gi > 0 ? '1px solid var(--line)' : undefined;
+            const setField = (mi: number, k: 'name' | 'position' | 'email', v: string) => setMembers(gi, rows.map((r, j) => (j === mi ? { ...r, [k]: v } : r)));
+            const delMember = (mi: number) => setMembers(gi, rows.filter((_, j) => j !== mi));
+            const addMember = () => setMembers(gi, [...rows, { name: '', position: '', email: '' }]);
+            const labelCell = (
+              <td rowSpan={span} style={{ padding: '18px 24px', fontWeight: 800, fontSize: 18, color: 'var(--ink)', borderRight: '1px solid var(--line)', borderTop: border, verticalAlign: 'top', width: 190, background: 'var(--soft)' }}>
+                {editMode ? (
+                  <>
+                    <input value={g.label} placeholder="팀 이름" onChange={(e) => setLabel(gi, e.target.value)} style={{ ...inputStyle, fontWeight: 800 }} />
+                    <button type="button" onClick={() => delTeam(gi)} style={{ marginTop: 8, fontSize: 12, color: '#e5484d', background: 'none', border: '1px solid #f3c0c2', borderRadius: 4, padding: '3px 8px', cursor: 'pointer' }}>✕ 팀 삭제</button>
+                  </>
+                ) : g.label}
+              </td>
+            );
+
+            if (!editMode) {
+              return shown.map((m, i) => (
+                <tr key={i} style={{ borderBottom: '1px solid var(--line)' }}>
+                  {i === 0 && labelCell}
+                  <td style={{ padding: '0 24px', height: 64, fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 260, borderTop: i === 0 ? border : undefined }}>{m.name} {m.position}</td>
+                  <td style={{ padding: '0 24px', height: 64, borderTop: i === 0 ? border : undefined }}><a href={`mailto:${m.email}`} style={{ color: 'var(--ink2)', textDecoration: 'none', fontSize: 18 }}>{m.email}</a></td>
+                </tr>
+              ));
+            }
+            return (
+              <React.Fragment key={gi}>
+                {rows.map((m, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--line)' }}>
+                    {i === 0 && labelCell}
+                    <td style={{ padding: '8px 16px', height: 60, width: 320, borderTop: i === 0 ? border : undefined }}>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <input value={m.name} placeholder="이름" onChange={(e) => setField(i, 'name', e.target.value)} style={inputStyle} />
+                        <input value={m.position} placeholder="직책" onChange={(e) => setField(i, 'position', e.target.value)} style={inputStyle} />
+                        <button type="button" title="담당자 삭제" onClick={() => delMember(i)} style={{ flexShrink: 0, width: 24, height: 24, border: '1px solid #f3c0c2', background: '#fff', color: '#e5484d', borderRadius: 4, cursor: 'pointer' }}>✕</button>
+                      </div>
+                    </td>
+                    <td style={{ padding: '8px 16px', height: 60, borderTop: i === 0 ? border : undefined }}>
+                      <input value={m.email} placeholder="이메일" onChange={(e) => setField(i, 'email', e.target.value)} style={inputStyle} />
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  {rows.length === 0 && labelCell}
+                  <td colSpan={2} style={{ padding: 0, borderTop: rows.length === 0 ? border : undefined }}>
+                    <button type="button" onClick={addMember} style={{ width: '100%', border: 'none', borderTop: '1px dashed rgba(226,58,58,.4)', background: 'rgba(226,58,58,.05)', color: 'var(--accent)', fontWeight: 700, fontSize: 13, padding: '10px', cursor: 'pointer' }}>+ 담당자 추가</button>
+                  </td>
+                </tr>
+              </React.Fragment>
+            );
+          })}
+          {editMode && (
+            <tr>
+              <td style={{ padding: 8, width: 190, borderRight: '1px solid var(--line)', borderTop: '1px solid var(--line)', background: 'var(--soft)', verticalAlign: 'top' }}>
+                <button type="button" onClick={addTeam} style={{ width: '100%', border: '1px dashed var(--accent)', background: 'rgba(226,58,58,.06)', color: 'var(--accent)', fontWeight: 700, fontSize: 13, padding: '9px', cursor: 'pointer', borderRadius: 4 }}>+ 팀 추가</button>
+              </td>
+              <td colSpan={2} style={{ borderTop: '1px solid var(--line)' }}></td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function TechPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const editMode = useEditMode();
 
   const [hero, setHero] = useState(() => safeParse(ssrContent.tech_hero, DEFAULT_HERO));
   const [services, setServices] = useState(() => safeParse(ssrContent.tech_services, DEFAULT_SERVICES));
   const [process, setProcess] = useState(() => safeParse(ssrContent.tech_process, DEFAULT_PROCESS));
-  const [techTeam, setTechTeam] = useState(() => safeParse(ssrContent.tech_team, DEFAULT_TECH_TEAM));
-  const [daTeam, setDaTeam] = useState(() => safeParse(ssrContent.tech_da_team, DEFAULT_DA_TEAM));
+  const [techTeams, setTechTeams] = useState<{ label: string; members: string }[]>(() => {
+    const existing = safeParse<{ label: string; members: string }[] | null>(ssrContent.tech_teams, null);
+    if (Array.isArray(existing)) return existing;
+    const lbl = safeParse(ssrContent.tech_labels, DEFAULT_LABELS);
+    const toStr = (arr: { name: string; position?: string; title?: string; email: string }[]) =>
+      arr.map((m) => `${m.name} | ${m.position ?? m.title ?? ''} | ${m.email}`).join('\n');
+    const t1 = safeParse(ssrContent.tech_team, DEFAULT_TECH_TEAM);
+    const t2 = safeParse(ssrContent.tech_da_team, DEFAULT_DA_TEAM);
+    const groups = [{ label: lbl.tech_team, members: toStr(t1) }];
+    if (Array.isArray(t2) && t2.length) groups.push({ label: lbl.da_team, members: toStr(t2) });
+    return groups;
+  });
   const [faq, setFaq] = useState(() => safeParse(ssrContent.tech_faq, DEFAULT_FAQ));
   const [mid, setMid] = useState(() => safeParse(ssrContent.tech_mid, DEFAULT_MID));
   const [cta, setCta] = useState(() => safeParse(ssrContent.tech_cta, DEFAULT_CTA));
@@ -98,8 +206,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
       tech_hero: setHero as (v: unknown) => void,
       tech_services: setServices as (v: unknown) => void,
       tech_process: setProcess as (v: unknown) => void,
-      tech_team: setTechTeam as (v: unknown) => void,
-      tech_da_team: setDaTeam as (v: unknown) => void,
+      tech_teams: setTechTeams as (v: unknown) => void,
       tech_faq: setFaq as (v: unknown) => void,
       tech_mid: setMid as (v: unknown) => void,
       tech_cta: setCta as (v: unknown) => void,
@@ -131,6 +238,12 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       {editMode && <style>{EDITABLE_STYLES}</style>}
+      {editMode && (
+        <button type="button" onClick={() => window.parent.postMessage({ type: 'save-all' }, '*')}
+          style={{ position: 'fixed', right: 20, bottom: 20, zIndex: 99999, background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 26px', fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.28)' }}>
+          💾 저장하기
+        </button>
+      )}
 
       {/* ═══ Hero — 기존 사이트 구조 (일러스트 포함) ═══ */}
       <section style={{
@@ -375,59 +488,8 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             </div>
           </div>
 
-          {/* 담당자 테이블 — 넓고 깔끔한 table */}
-          <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 18 }}>
-              <tbody>
-                {techTeam.map((m: { name: string; position?: string; title?: string; email: string }, i: number) => {
-                  const pos = m.position ?? m.title ?? '';
-                  return (
-                  <tr key={i} style={{ borderBottom: '1px solid var(--line)' }}>
-                    {i === 0 && (
-                      <td rowSpan={techTeam.length} style={{
-                        padding: '28px 36px', fontWeight: 800, fontSize: 18, color: 'var(--ink)',
-                        borderRight: '1px solid var(--line)', verticalAlign: 'middle',
-                        width: 180, background: 'var(--soft)',
-                      }}><E id="tech_labels.tech_team" editMode={editMode}>{labels.tech_team}</E></td>
-                    )}
-                    <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220 }}>
-                      <E id={`tech_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
-                      <E id={`tech_team.${i}.position`} editMode={editMode}>{pos}</E>
-                    </td>
-                    <td style={{ padding: '22px 28px' }}>
-                      <a href={`mailto:${m.email}`} style={{ color: 'var(--ink2)', textDecoration: 'none', fontSize: 18 }}>
-                        <E id={`tech_team.${i}.email`} editMode={editMode}>{m.email}</E>
-                      </a>
-                    </td>
-                  </tr>
-                  );
-                })}
-                {daTeam.length > 0 && daTeam.map((m: { name: string; position?: string; title?: string; email: string }, i: number) => {
-                  const pos = m.position ?? m.title ?? '';
-                  return (
-                  <tr key={i} style={{ borderBottom: i < daTeam.length - 1 ? '1px solid var(--line)' : 'none' }}>
-                    {i === 0 && (
-                      <td rowSpan={daTeam.length} style={{
-                        padding: '28px 36px', fontWeight: 800, fontSize: 18, color: 'var(--ink)',
-                        borderRight: '1px solid var(--line)', verticalAlign: 'middle',
-                        width: 180, background: 'var(--soft)', borderTop: '1px solid var(--line)',
-                      }}><E id="tech_labels.da_team" editMode={editMode}>{labels.da_team}</E></td>
-                    )}
-                    <td style={{ padding: '22px 28px', fontWeight: 600, fontSize: 18, color: 'var(--ink)', width: 220, borderTop: i === 0 ? '1px solid var(--line)' : 'none' }}>
-                      <E id={`tech_da_team.${i}.name`} editMode={editMode}>{m.name}</E>{' '}
-                      <E id={`tech_da_team.${i}.position`} editMode={editMode}>{pos}</E>
-                    </td>
-                    <td style={{ padding: '18px 24px', borderTop: i === 0 ? '1px solid var(--line)' : 'none' }}>
-                      <a href={`mailto:${m.email}`} style={{ color: 'var(--ink2)', textDecoration: 'none', fontSize: 18 }}>
-                        <E id={`tech_da_team.${i}.email`} editMode={editMode}>{m.email}</E>
-                      </a>
-                    </td>
-                  </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          {/* 담당자 테이블 — 팀 그룹(추가/삭제) + 담당자(추가/삭제) */}
+          <TechTeamsTable initial={techTeams} editMode={editMode} />
         </div>
       </section>
 

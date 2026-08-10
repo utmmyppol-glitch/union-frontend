@@ -98,6 +98,12 @@ function containsHtml(v: React.ReactNode): v is string {
   return typeof v === 'string' && /<[a-z][\s\S]*>/i.test(v);
 }
 
+/* ── 블록 레벨 HTML 태그 포함 여부 (hydration 안전 래퍼 선택용) ── */
+const BLOCK_RE = /<(?:p|div|ul|ol|table|h[1-6]|blockquote|section|article|header|footer|nav|pre|hr|dl|figure)[\s>/]/i;
+function hasBlockHtml(html: string): boolean {
+  return BLOCK_RE.test(html);
+}
+
 /* ── EditableText (HTML 서식 지원) ── */
 export function E({ id, editMode, children }: { id: string; editMode: boolean; children: React.ReactNode }) {
   const sanitized = useMemo(
@@ -105,16 +111,21 @@ export function E({ id, editMode, children }: { id: string; editMode: boolean; c
     [children],
   );
 
+  /* 블록 HTML이 포함된 경우 <div>로 래핑해야 hydration 오류 방지 */
+  const useDiv = sanitized !== null && hasBlockHtml(sanitized);
+
   if (!editMode) {
     if (sanitized !== null) {
-      return <span className="rich-html" style={{ whiteSpace: 'pre-wrap' }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: sanitized }} />;
+      const Tag = useDiv ? 'div' : 'span';
+      return <Tag className="rich-html" style={{ whiteSpace: 'pre-wrap' }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: sanitized }} />;
     }
     return <span style={{ whiteSpace: 'pre-wrap' }}>{children}</span>;
   }
 
   if (sanitized !== null) {
+    const Tag = useDiv ? 'div' : 'span';
     return (
-      <span data-editable={id} className="editable-field rich-html" style={{ cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap' }}
+      <Tag data-editable={id} className="editable-field rich-html" style={{ cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap' }}
         suppressHydrationWarning dangerouslySetInnerHTML={{ __html: sanitized }}
         onClick={(e) => {
           e.stopPropagation();

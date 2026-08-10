@@ -31,20 +31,53 @@ const DEFAULT_VALUES = [
   { num: '02', title: '전문성', desc: '소프트웨어, 보안, 데이터, 자산관리 각 분야 전문가로 구성된 소수정예 팀이 최적의 솔루션을 제공합니다.' },
   { num: '03', title: '파트너십', desc: '단순 공급이 아닌 도입부터 운영, 유지보수까지 전 과정을 함께하는 진정한 IT 파트너가 되겠습니다.' },
 ];
-const DEFAULT_DEPTS = [
-  { name: '솔루션사업부', desc: 'DATA / SW / SI 사업팀', team: '' }, { name: '영업부', desc: '공공영업 / 기업영업 / 교육영업', team: '' },
-  { name: '서비스사업부', desc: '기술지원 팀', team: '' }, { name: '사업지원부', desc: '리뉴얼 / 마케팅 / 영업지원', team: '' },
+const DEFAULT_DEPTS: { name: string; desc?: string; team?: string; members?: string }[] = [
+  { name: '경영관리부', desc: '경영지원과 운영으로 조직을 뒷받침합니다.', members: '경리 팀\n회계 팀' },
+  { name: '솔루션사업부', desc: 'DATA·SW·SI 사업을 수행합니다.', members: 'DATA 사업 팀\nSW 사업 팀\nSI 사업 팀' },
+  { name: '영업부', desc: '공공·기업·교육 시장을 아우르는 영업을 수행합니다.', members: '공공영업 팀\n기업영업 팀\n교육영업 팀' },
+  { name: '서비스사업부', desc: '설치부터 유지보수까지 안정 운영을 책임집니다.', members: '기술지원 팀' },
+  { name: '사업지원부', desc: '리뉴얼·마케팅·영업지원을 담당합니다.', members: '리뉴얼 팀\n마케팅 팀\n영업지원 팀' },
 ];
-const DEFAULT_ORG = { img: '/images/crawl/unionsystems/about_organization_chart_30.jpg', title: '소수정예 전문가 조직', text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.' };
+const DEFAULT_ORG = { img: '/images/crawl/unionsystems/about_organization_chart_30.jpg', title: '소수정예 전문가 조직', text: '각 분야의 전문가들이 고객의 IT 환경을 책임집니다.', ceo: 'CEO', advisor: '기술자문' };
 const DEFAULT_CI = { img: '/images/crawl/unionsystems/about_ci_31.jpg', title: '기업 아이덴티티', subtitle: 'UNION RED는 고객을 향한 열정을 담고 있습니다', quote: '고객과 신뢰로 만들어진 유니온시스템즈,\n함께 구축하겠다는 열정을 담고 있습니다.', ceo: 'CEO 홍민석' };
 const DEFAULT_CTA = { title: '유니온시스템즈와 함께 시작하세요', desc: '귀사의 IT 환경에 최적화된 솔루션을 제안해 드립니다.' };
 const DEFAULT_SECTIONS = { strengths_title: '유니온시스템즈가\n선택받는 이유', values_title: '핵심 가치' };
 const DEFAULT_BUTTONS = { cta: '도입문의 하기 →' };
 
+/* 팀 박스 목록: 균일한 칸, 밑으로 '+ 팀 추가'. members(줄바꿈 문자열)로 저장 */
+function DeptTeams({ deptIdx, value, editMode }: { deptIdx: number; value: string; editMode: boolean }) {
+  const [teams, setTeams] = useState<string[]>(() => {
+    const arr = stripHtml(value || '').split('\n').map((x) => x.trim()).filter(Boolean);
+    return arr.length ? arr : (editMode ? [''] : []);
+  });
+  const sync = (arr: string[]) =>
+    window.parent.postMessage({ type: 'field-set', id: `company_depts.${deptIdx}.members`, value: arr.join('\n') }, '*');
+  const update = (i: number, v: string) => { const n = teams.slice(); n[i] = v; setTeams(n); sync(n); };
+  const add = () => { const n = [...teams, '']; setTeams(n); sync(n); };
+  const del = (i: number) => { const n = teams.filter((_, j) => j !== i); setTeams(n.length ? n : ['']); sync(n); };
+
+  if (!editMode) {
+    return <>{teams.map((t, i) => <div key={i} className="org-teamcell">{t}</div>)}</>;
+  }
+  return (
+    <>
+      {teams.map((t, i) => (
+        <div key={i} className="org-teamcell-edit">
+          <input className="org-teaminput" value={t} placeholder="팀 이름" onClick={(e) => e.stopPropagation()} onChange={(e) => update(i, e.target.value)} />
+          <button type="button" className="org-teamdel" title="팀 삭제" onClick={(e) => { e.stopPropagation(); del(i); }}>✕</button>
+        </div>
+      ))}
+      <button type="button" className="org-teamadd" onClick={(e) => { e.stopPropagation(); add(); }}>+ 팀 추가</button>
+    </>
+  );
+}
+
 export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const editMode = useEditMode();
+  const deptAction = (action: 'add' | 'delete' | 'up' | 'down', idx?: number) =>
+    window.parent.postMessage({ type: 'array-action', section: 'company_depts', action, idx }, '*');
 
   // SSR에서 받은 데이터로 초기화 (hydration 즉시)
   const [hero, setHero] = useState(() => safeParse(ssrContent.company_hero, DEFAULT_HERO));
@@ -120,9 +153,9 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
               <E id="company_hero.title" editMode={editMode}>{hero.title}</E><br />
               <span style={{ color: 'var(--accent)' }}><E id="company_hero.accent" editMode={editMode}>{hero.accent}</E></span><E id="company_hero.suffix" editMode={editMode}>{hero.suffix ?? '합니다'}</E>
             </h1>
-            <p style={{ fontWeight: 400, fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0 }}>
+            <div style={{ fontWeight: 400, fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0 }}>
               <E id="company_hero.desc" editMode={editMode}>{hero.desc}</E>
-            </p>
+            </div>
             <div style={{ display: 'flex', gap: 4, marginTop: 32 }}>
               {COMPANY_TABS.map((tab) => {
                 const isActive = pathname === tab.href;
@@ -185,7 +218,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
                 </div>
                 <div style={{ padding: 28 }}>
                   <h3 style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 8px' }}><E id={`company_strengths.${idx}.title`} editMode={editMode}>{item.title}</E></h3>
-                  <p style={{ fontSize: 16, lineHeight: 1.65, color: 'var(--ink2)', margin: 0 }}><E id={`company_strengths.${idx}.desc`} editMode={editMode}>{item.desc}</E></p>
+                  <div style={{ fontSize: 16, lineHeight: 1.65, color: 'var(--ink2)', margin: 0 }}><E id={`company_strengths.${idx}.desc`} editMode={editMode}>{item.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -209,7 +242,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
               <div key={idx} className="reveal about-val-card" style={{ border: '1px solid rgba(255,255,255,.08)', padding: 32, transition: 'border-color .3s, transform .25s', transitionDelay: `${idx * 0.06}s` }}>
                 <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic', fontSize: 32, fontWeight: 300, color: 'rgba(255,255,255,.1)', display: 'block', marginBottom: 20, lineHeight: 1 }}>{v.num}</span>
                 <h3 style={{ fontWeight: 700, fontSize: 17, color: '#fff', margin: '0 0 10px' }}><E id={`company_values.${idx}.title`} editMode={editMode}>{v.title}</E></h3>
-                <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)', margin: 0 }}><E id={`company_values.${idx}.desc`} editMode={editMode}>{v.desc}</E></p>
+                <div style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)', margin: 0 }}><E id={`company_values.${idx}.desc`} editMode={editMode}>{v.desc}</E></div>
               </div>
             ))}
           </div>
@@ -226,17 +259,91 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>ORGANIZATION</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_org.title" editMode={editMode}>{org.title}</E></h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{org.text}</E></p>
+            <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{org.text}</E></div>
           </div>
-          <div className="reveal" style={{ border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 32 }}>
-            <OptImg id="company_org.img" editMode={editMode} src={org.img} alt="유니온시스템즈 조직도" width={1200} height={600} style={{ width: '100%', height: 'auto' }} />
+          <div className={`reveal org-chart${editMode ? ' editing' : ''}`}>
+            <style dangerouslySetInnerHTML={{ __html: `
+.org-chart{background:var(--charcoal);border:1px solid rgba(255,255,255,.08);padding:40px 20px 46px;text-align:center;overflow:hidden}
+.org-ceo-wrap{display:flex;justify-content:center}
+.org-mid{position:relative;height:92px}
+.org-mid::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--accent);opacity:.55;transform:translateX(-50%)}
+.org-ceo{display:inline-block;background:var(--accent);color:#fff;font-weight:800;letter-spacing:.06em;padding:14px 46px;font-size:17px}
+.org-advisor{position:absolute;top:50%;right:50%;transform:translateY(-50%);margin-right:64px;display:inline-block;border:1px solid var(--accent);color:#fff;padding:9px 22px;font-size:14px;background:var(--charcoal);white-space:nowrap;z-index:1}
+.org-advisor::after{content:'';position:absolute;left:100%;top:50%;width:64px;height:2px;background:var(--accent);opacity:.55}
+.org-vline{width:2px;background:var(--accent);opacity:.55;margin:0 auto}
+.org-depts{display:flex;justify-content:center;align-items:flex-start;position:relative;flex-wrap:wrap}
+.org-dept{position:relative;flex:1 1 0;min-width:160px;max-width:216px;padding:24px 9px 0}
+.org-dept::before{content:'';position:absolute;top:0;left:0;right:0;height:24px;border-top:2px solid var(--accent);opacity:.55}
+.org-dept:first-child::before{left:50%}
+.org-dept:last-child::before{right:50%}
+.org-dept::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:2px;height:24px;background:var(--accent);opacity:.55}
+.org-dept-head{background:var(--accent);color:#fff;font-weight:700;padding:12px 8px;font-size:15px}
+.org-teambox{border:1px solid rgba(255,255,255,.15);border-top:none}
+.org-teamcell{color:rgba(255,255,255,.85);padding:12px 8px;font-size:14px;min-height:46px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-top:1px solid rgba(226,58,58,.3)}
+.org-teamcell:first-child{border-top:none}
+.org-teamcell-edit{position:relative;display:flex;align-items:center;min-height:46px;border-top:1px solid rgba(226,58,58,.3)}
+.org-teamcell-edit:first-child{border-top:none}
+.org-teaminput{flex:1;background:transparent;border:none;color:#fff;font-size:14px;text-align:center;padding:12px 26px 12px 10px;box-sizing:border-box;font-family:inherit;min-width:0}
+.org-teaminput:focus{outline:none;background:rgba(255,255,255,.06)}
+.org-teaminput::placeholder{color:rgba(255,255,255,.3)}
+.org-teamdel{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:18px;height:18px;border:none;background:transparent;color:#ff6b6b;cursor:pointer;font-size:11px;opacity:.55;padding:0}
+.org-teamdel:hover{opacity:1}
+.org-teamadd{display:block;width:100%;box-sizing:border-box;border:none;border-top:1px dashed rgba(255,255,255,.3);background:rgba(255,255,255,.04);color:rgba(255,255,255,.75);padding:9px;font-size:13px;cursor:pointer;font-family:inherit}
+.org-teamadd:hover{background:rgba(255,255,255,.1)}
+.org-teamgroup{border-top:1px solid rgba(226,58,58,.3)}
+.org-teamgroup:first-child{border-top:none}
+.org-teamrow{color:rgba(255,255,255,.85);padding:10px 8px 6px;font-size:14px;font-weight:600}
+.org-memberrow{color:rgba(255,255,255,.55);padding:3px 8px;font-size:12px}
+.org-teamgroup .org-teamrow:only-child{padding:11px 8px;font-weight:600}
+.org-teamedit{padding:8px}
+.org-teamedit .editable-field{color:rgba(255,255,255,.9);white-space:pre-line;display:block;min-height:20px;text-align:center}
+.org-teamedit .editable-field:empty::before{content:'팀명 입력 (담당자는 앞에 - )';color:rgba(255,255,255,.4);font-weight:400}
+.org-teamin{width:100%;box-sizing:border-box;min-height:64px;resize:vertical;background:rgba(0,0,0,.35);border:1px dashed rgba(255,255,255,.4);color:#fff;font-size:13px;line-height:1.6;padding:8px 10px;font-family:inherit;text-align:left;white-space:pre-wrap;display:block}
+.org-teamin::placeholder{color:rgba(255,255,255,.3)}
+.org-teamin:focus{outline:2px solid var(--accent);border-color:transparent}
+.org-ctrl{position:absolute;top:1px;right:2px;display:flex;gap:3px;z-index:4}
+.org-ctrl-btn{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;line-height:1;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.55);color:#fff;border-radius:4px;cursor:pointer;padding:0}
+.org-ctrl-btn.del{color:#ff6b6b;border-color:rgba(255,107,107,.5)}
+.org-add{display:flex;align-items:stretch;justify-content:center}
+.org-add::before{display:none}
+.org-addbtn{border:2px dashed var(--accent);color:#fff;background:rgba(226,58,58,.1);padding:12px 26px;font-weight:700;font-size:14px;cursor:pointer}
+.org-addrow{display:flex;justify-content:center;margin-top:20px}
+.org-chart .editable-field:empty::before{content:'입력';color:rgba(255,255,255,.35);font-weight:400}
+.about-depts .editable-field:empty::before{content:'입력';color:#cbd5e1;font-weight:400}
+@media(max-width:768px){.org-dept::before,.org-dept::after{display:none}.org-dept{max-width:none;flex-basis:100%;padding-top:8px}.org-mid{height:auto;padding:10px 0;display:flex;justify-content:center}.org-mid::before{display:none}.org-advisor{position:static;transform:none;margin:0}.org-advisor::after{display:none}}
+            ` }} />
+            <div className="org-ceo-wrap"><span className="org-ceo"><E id="company_org.ceo" editMode={editMode}>{org.ceo || 'CEO'}</E></span></div>
+            <div className="org-mid"><span className="org-advisor"><E id="company_org.advisor" editMode={editMode}>{org.advisor || '기술자문'}</E></span></div>
+            <div className="org-depts">
+              {depts.map((d, idx) => (
+                <div key={idx} className="org-dept">
+                  {editMode && (
+                    <div className="org-ctrl">
+                      <button type="button" title="왼쪽으로" className="org-ctrl-btn" onClick={(e) => { e.stopPropagation(); deptAction('up', idx); }}>←</button>
+                      <button type="button" title="오른쪽으로" className="org-ctrl-btn" onClick={(e) => { e.stopPropagation(); deptAction('down', idx); }}>→</button>
+                      <button type="button" title="이 부서 삭제" className="org-ctrl-btn del" onClick={(e) => { e.stopPropagation(); if (window.confirm('이 부서를 삭제할까요?')) deptAction('delete', idx); }}>✕</button>
+                    </div>
+                  )}
+                  <div className="org-dept-head"><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></div>
+                  <div className="org-teambox">
+                    <DeptTeams key={`${idx}-${depts.length}-${d.name || ''}`} deptIdx={idx} value={d.members || ''} editMode={editMode} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            {editMode && (
+              <div className="org-addrow">
+                <button type="button" className="org-addbtn" onClick={() => deptAction('add')}>+ 부서 추가</button>
+              </div>
+            )}
           </div>
-          <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+          <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginTop: 40 }}>
             {depts.map((d, idx) => (
-              <div key={idx} className="reveal" style={{ borderTop: '2px solid var(--accent)', padding: '20px 0 0', transitionDelay: `${idx * 0.06}s` }}>
-                <h3 style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></h3>
-                <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: 'var(--ink2)', margin: 0, letterSpacing: '.02em' }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc}</E></p>
-                {d.team && <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 12, color: 'var(--ink2)', margin: '4px 0 0', letterSpacing: '.02em', opacity: .7 }}><E id={`company_depts.${idx}.team`} editMode={editMode}>{d.team}</E></p>}
+              <div key={idx} style={{ borderTop: '2px solid var(--accent)', padding: '20px 0 0' }}>
+                <div style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></div>
+                {(editMode || d.desc) && (
+                  <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink2)', margin: 0 }}><E id={`company_depts.${idx}.desc`} editMode={editMode}>{d.desc || ''}</E></div>
+                )}
               </div>
             ))}
           </div>
@@ -253,7 +360,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="reveal">
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>CORPORATE IDENTITY</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_ci.title" editMode={editMode}>{ci.title}</E></h2>
-            <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '0 0 40px' }}><E id="company_ci.subtitle" editMode={editMode}>{ci.subtitle}</E></p>
+            <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '0 0 40px' }}><E id="company_ci.subtitle" editMode={editMode}>{ci.subtitle}</E></div>
           </div>
           <div className="reveal" style={{ display: 'inline-block', border: '1px solid var(--line)', background: '#fff', padding: 'clamp(24px, 4vw, 48px)' }}>
             <OptImg id="company_ci.img" editMode={editMode} src={ci.img} alt="유니온시스템즈 CI" width={480} height={200} style={{ maxWidth: 480, width: '100%', height: 'auto' }} />
