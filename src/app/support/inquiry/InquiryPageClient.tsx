@@ -95,9 +95,9 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
           }}>
             <E id="inquiry_hero.title" editMode={editMode}>{hero.title}</E>
           </h1>
-          <p style={{ fontSize: 18, color: 'var(--ink2)', margin: '0 0 24px' }}>
+          <div style={{ fontSize: 18, color: 'var(--ink2)', margin: '0 0 24px' }}>
             <E id="inquiry_hero.desc" editMode={editMode}>{hero.desc}</E>
-          </p>
+          </div>
           <a href={`tel:${SITE.tel.replace(/-/g, '')}`} style={{
             display: 'inline-flex', alignItems: 'center', gap: 14,
             padding: '14px 28px', border: '1px solid var(--line)', background: 'var(--surface)',

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, OptImg, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -316,13 +316,8 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             marginBottom: 20,
           }}>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
-              <img src="/images/crawl/unionsystems/customer_header_img-01_5.png" alt="기술지원팀" loading="lazy" style={{
+              <OptImg id="tech_team_intro.img1" editMode={editMode} src="/images/crawl/unionsystems/customer_header_img-01_5.png" alt="기술지원팀" width={640} height={360} style={{
                 width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-              }} onError={(e) => {
-                const el = e.target as HTMLImageElement;
-                el.style.display = 'none';
-                el.parentElement!.style.background = 'var(--charcoal)';
-                el.parentElement!.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><span style="font-family:Newsreader,serif;font-style:italic;font-size:48px;color:rgba(255,255,255,.06)">ST</span></div>';
               }} />
             </div>
             <div style={{ padding: 'clamp(26px, 3.5vw, 40px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -347,13 +342,8 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
               </p>
             </div>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
-              <img src="/images/crawl/unionsystems/customer_header_img-02_99.png" alt="리뉴얼팀" loading="lazy" style={{
+              <OptImg id="tech_team_intro.img2" editMode={editMode} src="/images/crawl/unionsystems/customer_header_img-02_99.png" alt="리뉴얼팀" width={640} height={360} style={{
                 width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-              }} onError={(e) => {
-                const el = e.target as HTMLImageElement;
-                el.style.display = 'none';
-                el.parentElement!.style.background = 'var(--charcoal)';
-                el.parentElement!.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><span style="font-family:Newsreader,serif;font-style:italic;font-size:48px;color:rgba(255,255,255,.06)">RT</span></div>';
               }} />
             </div>
           </div>
@@ -535,9 +525,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
                 </button>
                 {openFaq === idx && (
                   <div style={{ padding: '0 20px 16px', borderTop: '1px solid rgba(255,255,255,.06)' }}>
-                    <p style={{ fontSize: 18, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', margin: '12px 0 0' }}>
+                    <div style={{ fontSize: 18, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', margin: '12px 0 0' }}>
                       <E id={`tech_faq.${idx}.answer`} editMode={editMode}>{item.answer}</E>
-                    </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -562,7 +552,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             <a href="tel:027068999" className="btn" style={{
               padding: '14px 32px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',
-            }}><E id="tech_cta.btn_call" editMode={editMode}>{cta.btn_call}</E> <E id="tech_cta.tel" editMode={editMode}>{contact.tel}</E></a>
+            }}><E id="tech_cta.btn_call" editMode={editMode}>{cta.btn_call}</E> <E id="tech_contact.tel" editMode={editMode}>{contact.tel}</E></a>
             <Link href="/support/inquiry" style={{
               padding: '14px 32px', border: '1px solid var(--ink)', color: 'var(--ink)',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',

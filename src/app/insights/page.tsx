@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['insights_hero_title', 'insights_hero_desc'];
+const CONTENT_KEYS = ['insights_hero_title', 'insights_hero_desc', 'insights_ui'];
 
 async function getInsights() {
   try {

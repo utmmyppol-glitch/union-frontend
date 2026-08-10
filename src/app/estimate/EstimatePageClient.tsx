@@ -721,7 +721,7 @@ export default function EstimatePageClient({
             >
               <E id="estimate_cta.title" editMode={editMode}>{cta.title}</E>
             </h3>
-            <p
+            <div
               style={{
                 color: 'rgba(255,255,255,.55)',
                 fontSize: 15,
@@ -730,7 +730,7 @@ export default function EstimatePageClient({
               }}
             >
               <E id="estimate_cta.desc" editMode={editMode}>{cta.desc}</E>
-            </p>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
             <Link

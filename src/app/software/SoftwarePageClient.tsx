@@ -453,10 +453,10 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
                 <h3 style={{
                   fontWeight: 700, fontSize: 16, color: '#fff', margin: '0 0 6px',
                 }}><E id={`software_process[${i}].title`} editMode={editMode}>{step.title}</E></h3>
-                <p style={{
+                <div style={{
                   fontFamily: MONO, fontSize: 13, letterSpacing: '.02em',
                   color: 'rgba(255,255,255,.35)', margin: 0, padding: '0 8px',
-                }}><E id={`software_process[${i}].desc`} editMode={editMode}>{step.desc}</E></p>
+                }}><E id={`software_process[${i}].desc`} editMode={editMode}>{step.desc}</E></div>
               </div>
             ))}
           </div>

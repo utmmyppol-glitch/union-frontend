@@ -424,11 +424,11 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               }}>
                 <E id={`microsoft_strengths[${activeStrength}].title`} editMode={editMode}>{s.title}</E>
               </h3>
-              <p style={{
+              <div style={{
                 fontSize: 16, lineHeight: 1.75, color: 'rgba(255,255,255,.55)', margin: '0 0 24px',
               }}>
                 <E id={`microsoft_strengths[${activeStrength}].desc`} editMode={editMode}>{s.desc}</E>
-              </p>
+              </div>
               <Link href="/contact" style={{
                 fontFamily: MONO, fontSize: 13, fontWeight: 600,
                 letterSpacing: '.04em', color: 'var(--accent)',
@@ -509,7 +509,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                     background: 'var(--ink)', padding: '4px 10px',
                     fontFamily: MONO, fontSize: 12, fontWeight: 700,
                     letterSpacing: '.06em', color: '#fff',
-                  }}>RECOMMENDED</div>
+                  }}><E id="microsoft_plans.recommended" editMode={editMode}>RECOMMENDED</E></div>
                 )}
                 <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
                   <Image src={`${CRAWL}${pl.img}`} alt={pl.name} className="ms-plan-img" fill style={{
@@ -526,7 +526,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                   }}>{String(i + 1).padStart(2, '0')}</div>
 
                   <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`microsoft_plans.${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E></h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 14px' }}><E id={`microsoft_plans.${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></p>
+                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 14px' }}><E id={`microsoft_plans.${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></div>
 
                   {/* Apps */}
                   <p style={{

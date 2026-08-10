@@ -117,15 +117,15 @@ export default function PrivacyPageClient({ ssrContent }: { ssrContent: Record<s
             background: 'var(--soft)', border: '1px solid var(--line)',
             padding: 'clamp(28px, 4vw, 40px)', marginBottom: 48,
           }}>
-            <p style={{ fontSize: 17, lineHeight: 1.85, color: 'var(--ink)', margin: '0 0 16px', fontWeight: 500 }}>
+            <div style={{ fontSize: 17, lineHeight: 1.85, color: 'var(--ink)', margin: '0 0 16px', fontWeight: 500 }}>
               <E id="privacy_intro.p1" editMode={editMode}>{intro.p1}</E>
-            </p>
-            <p style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--ink2)', margin: '0 0 12px' }}>
+            </div>
+            <div style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--ink2)', margin: '0 0 12px' }}>
               <E id="privacy_intro.p2" editMode={editMode}>{intro.p2}</E>
-            </p>
-            <p style={{ fontSize: 15, color: 'var(--ink2)', margin: 0 }}>
+            </div>
+            <div style={{ fontSize: 15, color: 'var(--ink2)', margin: 0 }}>
               <E id="privacy_intro.p3" editMode={editMode}>{intro.p3}</E>
-            </p>
+            </div>
             <div style={{
               marginTop: 20, paddingTop: 16,
               borderTop: '1px solid var(--line)',

@@ -172,12 +172,12 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
               <E id="solutions_hero.title_line2" editMode={editMode}>{hero.title_line2}</E>
             </span>
           </h1>
-          <p style={{
+          <div style={{
             fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
             maxWidth: 620, margin: '0 0 32px', whiteSpace: 'pre-line',
           }}>
             <E id="solutions_hero.desc" editMode={editMode}>{hero.desc}</E>
-          </p>
+          </div>
           <Link href="/contact" className="btn" style={{
             display: 'inline-block', padding: '16px 36px',
             background: 'var(--accent)', color: '#fff',
@@ -313,11 +313,11 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
                       marginLeft: 10,
                     }}><E id={`solutions_lineup.${idx}.subtitle`} editMode={editMode}>{sol.subtitle}</E></span>
                   </h3>
-                  <p style={{
+                  <div style={{
                     fontSize: 16, lineHeight: 1.6,
                     color: isDark ? 'rgba(255,255,255,.4)' : 'var(--ink2)',
                     margin: '6px 0 0', maxWidth: 480,
-                  }}><E id={`solutions_lineup.${idx}.desc`} editMode={editMode}>{sol.desc}</E></p>
+                  }}><E id={`solutions_lineup.${idx}.desc`} editMode={editMode}>{sol.desc}</E></div>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
                     {sol.tags.map((t, ti) => (
                       <span key={t} style={{
@@ -373,11 +373,11 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
           }}>
             <E id="solutions_cta.title" editMode={editMode}>{cta.title}</E>
           </h2>
-          <p className="reveal" style={{
+          <div className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.45)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
             <E id="solutions_cta.desc" editMode={editMode}>{cta.desc}</E>
-          </p>
+          </div>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',

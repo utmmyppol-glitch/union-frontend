@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
-const CONTENT_KEYS = ['software_hero', 'software_process', 'software_processTitle', 'software_stats', 'software_lineup', 'software_cta'];
+const CONTENT_KEYS = ['software_hero', 'software_process', 'software_processTitle', 'software_stats', 'software_lineup', 'software_cta', 'software_bento'];
 
 async function getContent(): Promise<Record<string, string>> {
   try {

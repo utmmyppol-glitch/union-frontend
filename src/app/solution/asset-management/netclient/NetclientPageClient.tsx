@@ -181,7 +181,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                 border: '1px solid rgba(255,255,255,.45)', color: '#fff',
                 fontWeight: 600, fontSize: 15, textDecoration: 'none',
               }}>
-                02-706-8999
+                <E id="netclient_cta.tel" editMode={editMode}>02-706-8999</E>
               </a>
             </div>
           </div>
@@ -258,9 +258,9 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                   <h3 style={{ fontWeight: 800, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}>
                     <E id={`netclient_modules.${i}.name`} editMode={editMode}>{modulesData[i]?.name ?? m.name}</E>
                   </h3>
-                  <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
+                  <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
                     <E id={`netclient_modules.${i}.desc`} editMode={editMode}>{modulesData[i]?.desc ?? m.desc}</E>
-                  </p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -322,9 +322,9 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                 <h3 style={{ fontWeight: 700, fontSize: 22, color: '#fff', margin: '0 0 12px' }}>
                   <E id={`netclient_points.${i}.title`} editMode={editMode}>{pointsData[i]?.title ?? pt.title}</E>
                 </h3>
-                <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', margin: 0 }}>
+                <div style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', margin: 0 }}>
                   <E id={`netclient_points.${i}.desc`} editMode={editMode}>{pointsData[i]?.desc ?? pt.desc}</E>
-                </p>
+                </div>
               </div>
             ))}
           </div>

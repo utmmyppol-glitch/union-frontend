@@ -247,7 +247,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                   fontWeight: 800, fontSize: 22, color: 'var(--ink)',
                   transition: 'color .2s', letterSpacing: '-.02em',
                 }}><E id={`autodesk_product${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></span>
-                <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '6px 0 0' }}><E id={`autodesk_product${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
+                <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '6px 0 0' }}><E id={`autodesk_product${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></div>
               </div>
               {/* Arrow */}
               <span className="ad-prod-arrow" style={{
@@ -321,11 +321,11 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     color: s.accent ? 'rgba(255,255,255,.5)' : 'var(--ink2)',
                     margin: '0 0 14px',
                   }}><E id={`autodesk_strengths[${i}].ko`} editMode={editMode}>{s.ko}</E></p>
-                  <p style={{
+                  <div style={{
                     fontSize: 16, lineHeight: 1.7,
                     color: s.accent ? 'rgba(255,255,255,.7)' : 'var(--ink2)',
                     margin: 0,
-                  }}><E id={`autodesk_strengths[${i}].desc`} editMode={editMode}>{s.desc}</E></p>
+                  }}><E id={`autodesk_strengths[${i}].desc`} editMode={editMode}>{s.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -485,7 +485,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
                   <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`autodesk_plan${i}.name`} editMode={editMode}>{plansData[i]?.name ?? DEFAULT_PLANS[i].name}</E></h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`autodesk_plan${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? DEFAULT_PLANS[i].desc}</E></p>
+                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`autodesk_plan${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? DEFAULT_PLANS[i].desc}</E></div>
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,

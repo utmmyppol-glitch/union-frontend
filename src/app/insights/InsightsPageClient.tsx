@@ -84,9 +84,9 @@ export default function InsightsPageClient({
           <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 16px' }}>
             <E id="insights_hero_title" editMode={editMode}>{safeParse(ssrContent?.['insights_hero_title'], '인사이트')}</E>
           </h1>
-          <p style={{ fontWeight: 400, fontSize: 18, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0 }}>
+          <div style={{ fontWeight: 400, fontSize: 18, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0 }}>
             <E id="insights_hero_desc" editMode={editMode}>{safeParse(ssrContent?.['insights_hero_desc'], 'IT 업계 최신 뉴스와 트렌드를 한눈에 확인하세요')}</E>
-          </p>
+          </div>
         </div>
       </section>
 

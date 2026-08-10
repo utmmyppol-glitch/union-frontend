@@ -148,9 +148,9 @@ export default function ContactPageClient({ ssrContent }: { ssrContent: Record<s
                 <h3 style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)', margin: '0 0 8px' }}>
                   <E id={`contact_benefits[${idx}].title`} editMode={editMode}>{b.title}</E>
                 </h3>
-                <p style={{ fontSize: 18, lineHeight: 1.65, color: 'var(--ink2)', margin: 0 }}>
+                <div style={{ fontSize: 18, lineHeight: 1.65, color: 'var(--ink2)', margin: 0 }}>
                   <E id={`contact_benefits[${idx}].desc`} editMode={editMode}>{b.desc}</E>
-                </p>
+                </div>
               </div>
             ))}
           </div>

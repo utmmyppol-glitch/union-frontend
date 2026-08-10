@@ -316,7 +316,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                 </div>
                 <div style={{ padding: '20px 22px' }}>
                   <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px', letterSpacing: '-.02em' }}><E id={`estsoft_products${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
-                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.6 }}><E id={`estsoft_products${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
+                  <div style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.6 }}><E id={`estsoft_products${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -597,7 +597,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
                   <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`estsoft_plans${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E></h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`estsoft_plans${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></p>
+                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`estsoft_plans${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></div>
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,

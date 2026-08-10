@@ -163,7 +163,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
               <a href="tel:02-706-8999" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-              }}>02-706-8999</a>
+              }}><E id="ahnlab_cta.tel" editMode={editMode}>02-706-8999</E></a>
             </div>
           </div>
         </div>
@@ -233,11 +233,11 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                     fontWeight: 900, fontSize: 22, letterSpacing: '-.02em',
                     color: p.accent ? '#fff' : 'var(--ink)', margin: '0 0 10px',
                   }}><E id={`ahnlab_products.${i}.name`} editMode={editMode}>{products[i]?.name ?? p.name}</E></h3>
-                  <p style={{
+                  <div style={{
                     fontSize: 16, lineHeight: 1.7,
                     color: p.accent ? 'rgba(255,255,255,.55)' : 'var(--ink2)',
                     margin: 0,
-                  }}><E id={`ahnlab_products.${i}.desc`} editMode={editMode}>{products[i]?.desc ?? p.desc}</E></p>
+                  }}><E id={`ahnlab_products.${i}.desc`} editMode={editMode}>{products[i]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -303,10 +303,10 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                   fontWeight: 800, fontSize: 22, color: '#fff',
                   display: 'inline', letterSpacing: '-.02em', transition: 'color .2s',
                 }}><E id={`ahnlab_points.${i}.title`} editMode={editMode}>{points[i]?.title ?? pt.title}</E></h3>
-                <p style={{
+                <div style={{
                   fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
                   margin: '10px 0 0',
-                }}><E id={`ahnlab_points.${i}.desc`} editMode={editMode}>{points[i]?.desc ?? pt.desc}</E></p>
+                }}><E id={`ahnlab_points.${i}.desc`} editMode={editMode}>{points[i]?.desc ?? pt.desc}</E></div>
               </div>
             </div>
           ))}

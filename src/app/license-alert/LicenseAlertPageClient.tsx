@@ -357,9 +357,9 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
                 <h4 style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, color: 'var(--ink)', marginBottom: 4 }}>
                   <E id={`licensealert_benefits.${i}.title`} editMode={editMode}>{b.title}</E>
                 </h4>
-                <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 14, color: 'var(--ink2)', lineHeight: 1.6 }}>
+                <div style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 14, color: 'var(--ink2)', lineHeight: 1.6 }}>
                   <E id={`licensealert_benefits.${i}.desc`} editMode={editMode}>{b.desc}</E>
-                </p>
+                </div>
               </div>
             ))}
           </div>
@@ -367,9 +367,9 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
             <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 800, letterSpacing: '.12em', color: 'var(--accent)', marginBottom: 8 }}>
               <E id="licensealert_sam.label" editMode={editMode}>{samBox.label}</E>
             </p>
-            <p style={{ fontFamily: "'Pretendard'", fontSize: 13, color: 'rgba(255,255,255,.7)', lineHeight: 1.7 }}>
+            <div style={{ fontFamily: "'Pretendard'", fontSize: 13, color: 'rgba(255,255,255,.7)', lineHeight: 1.7 }}>
               <E id="licensealert_sam.desc" editMode={editMode}>{samBox.desc}</E>
-            </p>
+            </div>
           </div>
         </div>
       </div>

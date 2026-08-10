@@ -143,7 +143,7 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
         <div className="wrap" style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 600 }}>
           <div className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 48, fontWeight: 300, color: 'var(--accent)', lineHeight: 1, marginBottom: 16, opacity: .35 }}>&ldquo;</div>
           <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: 1.35, color: '#fff', margin: '0 0 12px' }}><E id="cases_cta.title1" editMode={editMode}>다음 성공 사례의</E><br /><E id="cases_cta.title2" editMode={editMode}>주인공이 되세요.</E></h2>
-          <p className="reveal" style={{ fontSize: 18, color: 'rgba(255,255,255,.45)', margin: '0 0 28px' }}><E id="cases_cta.desc" editMode={editMode}>유니온시스템즈와 함께 IT 환경을 혁신하세요.</E></p>
+          <div className="reveal" style={{ fontSize: 18, color: 'rgba(255,255,255,.45)', margin: '0 0 28px' }}><E id="cases_cta.desc" editMode={editMode}>유니온시스템즈와 함께 IT 환경을 혁신하세요.</E></div>
           <Link href="/contact" className="reveal btn" style={{ display: 'inline-block', padding: '16px 36px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 18, textDecoration: 'none' }}><E id="cases_buttons.cta" editMode={editMode}>도입 문의하기 →</E></Link>
         </div>
       </section>

@@ -183,9 +183,9 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
                     letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 12px',
                   }}><E id={`security_products.${idx}.name`} editMode={editMode}>{productsData[idx]?.name ?? s.name}</E></h2>
 
-                  <p style={{
+                  <div style={{
                     fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: '0 0 24px',
-                  }}><E id={`security_products.${idx}.desc`} editMode={editMode}>{productsData[idx]?.desc ?? s.desc}</E></p>
+                  }}><E id={`security_products.${idx}.desc`} editMode={editMode}>{productsData[idx]?.desc ?? s.desc}</E></div>
 
                   <span className="sec-row-arrow" style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 600,

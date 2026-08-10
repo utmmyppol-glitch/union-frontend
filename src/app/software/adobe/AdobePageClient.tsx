@@ -241,7 +241,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                   fontSize: 18, color: 'var(--accent)', marginRight: 10,
                 }}>01</span>
                 <span style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-.02em' }}><E id="adobe_product0.name" editMode={editMode}>{productsData[0]?.name ?? PRODUCTS[0].name}</E></span>
-                <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '8px 0 0' }}><E id="adobe_product0.desc" editMode={editMode}>{productsData[0]?.desc ?? PRODUCTS[0].desc}</E></p>
+                <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '8px 0 0' }}><E id="adobe_product0.desc" editMode={editMode}>{productsData[0]?.desc ?? PRODUCTS[0].desc}</E></div>
               </div>
             </div>
 
@@ -265,7 +265,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     fontSize: 18, color: 'var(--ink2)', marginRight: 8,
                   }}>{String(i + 2).padStart(2, '0')}</span>
                   <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-.02em' }}><E id={`adobe_product${i + 1}.name`} editMode={editMode}>{productsData[i + 1]?.name ?? p.name}</E></span>
-                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: '4px 0 0' }}><E id={`adobe_product${i + 1}.desc`} editMode={editMode}>{productsData[i + 1]?.desc ?? p.desc}</E></p>
+                  <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '4px 0 0' }}><E id={`adobe_product${i + 1}.desc`} editMode={editMode}>{productsData[i + 1]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -377,11 +377,11 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     color: s.accent ? 'rgba(255,255,255,.35)' : 'var(--ink2)',
                     margin: '0 0 12px',
                   }}><E id={`adobe_strengths[${i}].ko`} editMode={editMode}>{s.ko}</E></p>
-                  <p style={{
+                  <div style={{
                     fontSize: 16, lineHeight: 1.7,
                     color: s.accent ? 'rgba(255,255,255,.55)' : 'var(--ink2)',
                     margin: 0,
-                  }}><E id={`adobe_strengths[${i}].desc`} editMode={editMode}>{s.desc}</E></p>
+                  }}><E id={`adobe_strengths[${i}].desc`} editMode={editMode}>{s.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -452,7 +452,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     position: 'absolute', top: 16, right: 16, zIndex: 2,
                     padding: '4px 10px', background: 'var(--ink)', color: '#fff',
                     fontFamily: MONO, fontSize: 12, fontWeight: 700, letterSpacing: '.06em',
-                  }}>{pl.badge}</div>
+                  }}><E id="adobe_plans.recommended" editMode={editMode}>{pl.badge}</E></div>
                 )}
 
                 {/* Image */}

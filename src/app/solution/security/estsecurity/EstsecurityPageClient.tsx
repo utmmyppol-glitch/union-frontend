@@ -224,9 +224,9 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                     fontWeight: 900, fontSize: 22, letterSpacing: '-.02em',
                     margin: '0 0 10px',
                   }}><E id={`estsecurity_products.${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
-                  <p style={{
+                  <div style={{
                     fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0,
-                  }}><E id={`estsecurity_products.${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
+                  }}><E id={`estsecurity_products.${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -299,9 +299,9 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                 <h3 style={{
                   fontWeight: 700, fontSize: 18, color: '#fff', margin: '0 0 8px',
                 }}><E id={`estsecurity_points.${i}.title`} editMode={editMode}>{pointsData[i]?.title ?? pt.title}</E></h3>
-                <p style={{
+                <div style={{
                   fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.6)', margin: 0,
-                }}><E id={`estsecurity_points.${i}.desc`} editMode={editMode}>{pointsData[i]?.desc ?? pt.desc}</E></p>
+                }}><E id={`estsecurity_points.${i}.desc`} editMode={editMode}>{pointsData[i]?.desc ?? pt.desc}</E></div>
               </div>
             ))}
           </div>
@@ -365,9 +365,9 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                 <h3 style={{
                   fontWeight: 700, fontSize: 18, color: '#fff', margin: '0 0 8px',
                 }}><E id={`estsecurity_features.${i}.label`} editMode={editMode}>{featuresData[i]?.label ?? f.label}</E></h3>
-                <p style={{
+                <div style={{
                   fontSize: 16, lineHeight: 1.6, color: 'rgba(255,255,255,.4)', margin: 0,
-                }}><E id={`estsecurity_features.${i}.desc`} editMode={editMode}>{featuresData[i]?.desc ?? f.desc}</E></p>
+                }}><E id={`estsecurity_features.${i}.desc`} editMode={editMode}>{featuresData[i]?.desc ?? f.desc}</E></div>
               </div>
             ))}
           </div>

@@ -180,9 +180,9 @@ export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<
                     <E id={`glossary_terms.${idx}.full`} editMode={editMode}>{t.full}</E>
                   </p>
                 )}
-                <p style={{ fontSize: 13.5, lineHeight: 1.7, color: 'var(--ink2)' }}>
+                <div style={{ fontSize: 13.5, lineHeight: 1.7, color: 'var(--ink2)' }}>
                   <E id={`glossary_terms.${idx}.def`} editMode={editMode}>{t.def}</E>
-                </p>
+                </div>
               </div>
             );
           })}

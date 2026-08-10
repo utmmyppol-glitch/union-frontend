@@ -266,7 +266,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 {/* Text */}
                 <div>
                   <h3 style={{ fontWeight: 800, fontSize: 20, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`officekeeper_problems.${pi}.title`} editMode={editMode}>{problemsData[pi]?.title ?? p.title}</E></h3>
-                  <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 500 }}><E id={`officekeeper_problems.${pi}.desc`} editMode={editMode}>{problemsData[pi]?.desc ?? p.desc}</E></p>
+                  <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 500 }}><E id={`officekeeper_problems.${pi}.desc`} editMode={editMode}>{problemsData[pi]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -292,7 +292,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
           <div className="reveal" style={{ marginBottom: 56 }}>
             <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.14em', color: 'rgba(255,255,255,.4)', margin: '0 0 14px' }}>SOLUTION</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', color: '#fff', margin: '0 0 14px' }}><E id="officekeeper_sections.solutionTitle" editMode={editMode}>{sectionsData.solutionTitle}</E></h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)', maxWidth: 440 }}><E id="officekeeper_sections.solutionDesc" editMode={editMode}>{sectionsData.solutionDesc}</E></p>
+            <div style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)', maxWidth: 440 }}><E id="officekeeper_sections.solutionDesc" editMode={editMode}>{sectionsData.solutionDesc}</E></div>
           </div>
 
           {/* 비대칭 bento: 큰 카드 1개 + 작은 2개 */}
@@ -306,7 +306,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
               <div aria-hidden="true" style={{ position: 'absolute', right: -10, bottom: -20, fontFamily: SERIF, fontStyle: 'italic', fontSize: 160, fontWeight: 300, color: 'rgba(255,255,255,.03)', pointerEvents: 'none' }}>01</div>
               <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'var(--accent)', marginBottom: 16, display: 'block' }}><E id="officekeeper_features_main.0.tag" editMode={editMode}>{featMainData[0]?.tag ?? FEATURES_MAIN[0].tag}</E></span>
               <h3 style={{ fontWeight: 900, fontSize: 28, color: '#fff', margin: '0 0 14px', letterSpacing: '-.02em' }}><E id="officekeeper_features_main.0.title" editMode={editMode}>{featMainData[0]?.title ?? FEATURES_MAIN[0].title}</E></h3>
-              <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.55)', margin: '0 0 24px', maxWidth: 400 }}><E id="officekeeper_features_main.0.desc" editMode={editMode}>{featMainData[0]?.desc ?? FEATURES_MAIN[0].desc}</E></p>
+              <div style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.55)', margin: '0 0 24px', maxWidth: 400 }}><E id="officekeeper_features_main.0.desc" editMode={editMode}>{featMainData[0]?.desc ?? FEATURES_MAIN[0].desc}</E></div>
               <div style={{ marginTop: 'auto', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 {['USB', '외장HDD', '블루투스', 'CD/DVD', 'SD카드'].map((t) => (
                   <span key={t} style={{ padding: '5px 12px', border: '1px solid rgba(255,255,255,.12)', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,.5)' }}>{t}</span>
@@ -322,7 +322,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 <div aria-hidden="true" style={{ position: 'absolute', right: 8, bottom: -8, fontFamily: SERIF, fontStyle: 'italic', fontSize: 80, fontWeight: 300, color: 'rgba(255,255,255,.03)', pointerEvents: 'none' }}>{String(i + 2).padStart(2, '0')}</div>
                 <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginBottom: 12, display: 'block' }}><E id={`officekeeper_features_main.${i + 1}.tag`} editMode={editMode}>{featMainData[i + 1]?.tag ?? f.tag}</E></span>
                 <h3 style={{ fontWeight: 800, fontSize: 20, color: '#fff', margin: '0 0 8px' }}><E id={`officekeeper_features_main.${i + 1}.title`} editMode={editMode}>{featMainData[i + 1]?.title ?? f.title}</E></h3>
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: 'rgba(255,255,255,.45)', margin: 0 }}><E id={`officekeeper_features_main.${i + 1}.desc`} editMode={editMode}>{featMainData[i + 1]?.desc ?? f.desc}</E></p>
+                <div style={{ fontSize: 15, lineHeight: 1.6, color: 'rgba(255,255,255,.45)', margin: 0 }}><E id={`officekeeper_features_main.${i + 1}.desc`} editMode={editMode}>{featMainData[i + 1]?.desc ?? f.desc}</E></div>
               </div>
             ))}
           </div>
@@ -346,7 +346,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.14em', color: 'var(--ink2)', textTransform: 'uppercase', margin: '0 0 14px' }}>FEATURES</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px,3.5vw,40px)', lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="officekeeper_sections.featuresTitle" editMode={editMode}>{sectionsData.featuresTitle}</E></h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 400 }}><E id="officekeeper_sections.featuresDesc" editMode={editMode}>{sectionsData.featuresDesc}</E></p>
+            <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 400 }}><E id="officekeeper_sections.featuresDesc" editMode={editMode}>{sectionsData.featuresDesc}</E></div>
           </div>
 
           {/* Magazine layout: 2 big + 4 small */}
@@ -366,7 +366,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                   <div aria-hidden="true" style={{ position: 'absolute', right: 6, bottom: -6, fontFamily: SERIF, fontStyle: 'italic', fontSize: isBig ? 72 : 48, fontWeight: 300, color: 'var(--line)', opacity: .3, pointerEvents: 'none' }}>{String(i + 4).padStart(2, '0')}</div>
                   <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: isBig ? 22 : 16, fontWeight: 300, color: isBig ? 'var(--accent)' : 'var(--line)', display: 'block', marginBottom: isBig ? 12 : 8 }}>{String(i + 4).padStart(2, '0')}</span>
                   <h3 style={{ fontWeight: 700, fontSize: isBig ? 18 : 16, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`officekeeper_features_sub.${i}.title`} editMode={editMode}>{featSubData[i]?.title ?? f.title}</E></h3>
-                  <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink2)', margin: 0 }}><E id={`officekeeper_features_sub.${i}.desc`} editMode={editMode}>{featSubData[i]?.desc ?? f.desc}</E></p>
+                  <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink2)', margin: 0 }}><E id={`officekeeper_features_sub.${i}.desc`} editMode={editMode}>{featSubData[i]?.desc ?? f.desc}</E></div>
                 </div>
               );
             })}
@@ -417,7 +417,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                   <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 28, fontWeight: 400, color: 'var(--accent)', opacity: .6 }}>{s.num}</span>
                   <div>
                     <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}><E id={`officekeeper_process.${i}.title`} editMode={editMode}>{processData[i]?.title ?? s.title}</E></h3>
-                    <p style={{ fontSize: 15, color: 'var(--ink2)', margin: 0 }}><E id={`officekeeper_process.${i}.desc`} editMode={editMode}>{processData[i]?.desc ?? s.desc}</E></p>
+                    <div style={{ fontSize: 15, color: 'var(--ink2)', margin: 0 }}><E id={`officekeeper_process.${i}.desc`} editMode={editMode}>{processData[i]?.desc ?? s.desc}</E></div>
                   </div>
                 </div>
               </div>
