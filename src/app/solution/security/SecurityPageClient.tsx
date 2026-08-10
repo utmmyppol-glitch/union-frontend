@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, stripHtml, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -28,19 +28,14 @@ const DEFAULT_CTA = {
   detail: '자세히 보기',
 };
 
+const DEFAULTS = {
+  security_hero: DEFAULT_HERO,
+  security_products: DEFAULT_PRODUCTS_DATA,
+  security_cta: DEFAULT_CTA,
+} as const;
+
 export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-  const [hero, setHero] = useState(() => safeParse(ssrContent.security_hero, DEFAULT_HERO));
-  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.security_products, DEFAULT_PRODUCTS_DATA));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.security_cta, DEFAULT_CTA));
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = { security_hero: setHero as (v: unknown) => void, security_products: setProductsData as (v: unknown) => void, security_cta: setCta as (v: unknown) => void };
-    const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
     if (!els.length) return;
@@ -93,14 +88,14 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
             fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
             lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
           }}>
-            <E id="security_hero.title" editMode={editMode}>{hero.title}</E>
+            <E id="security_hero.title" editMode={editMode}>{content.security_hero.title}</E>
           </h1>
           <p style={{
             fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
             maxWidth: 620, margin: '0 0 24px',
           }}>
             <E id="security_hero.desc" editMode={editMode}>
-              {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.security_hero.desc).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -176,23 +171,23 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 600, letterSpacing: '.12em',
                     color: 'var(--accent)', margin: '0 0 10px',
-                  }}><E id={`security_products.${idx}.cat`} editMode={editMode}>{(productsData[idx]?.cat ?? s.cat).toUpperCase()}</E></p>
+                  }}><E id={`security_products.${idx}.cat`} editMode={editMode}>{(content.security_products[idx]?.cat ?? s.cat).toUpperCase()}</E></p>
 
                   <h2 style={{
                     fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
                     letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 12px',
-                  }}><E id={`security_products.${idx}.name`} editMode={editMode}>{productsData[idx]?.name ?? s.name}</E></h2>
+                  }}><E id={`security_products.${idx}.name`} editMode={editMode}>{content.security_products[idx]?.name ?? s.name}</E></h2>
 
                   <div style={{
                     fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: '0 0 24px',
-                  }}><E id={`security_products.${idx}.desc`} editMode={editMode}>{productsData[idx]?.desc ?? s.desc}</E></div>
+                  }}><E id={`security_products.${idx}.desc`} editMode={editMode}>{content.security_products[idx]?.desc ?? s.desc}</E></div>
 
                   <span className="sec-row-arrow" style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 600,
                     letterSpacing: '.04em', color: 'var(--accent)',
                     display: 'inline-flex', alignItems: 'center', gap: 8,
                   }}>
-                    <E id="security_cta.detail" editMode={editMode}>{cta.detail}</E> <span style={{ fontSize: 16, transition: 'transform .2s' }}>→</span>
+                    <E id="security_cta.detail" editMode={editMode}>{content.security_cta.detail}</E> <span style={{ fontSize: 16, transition: 'transform .2s' }}>→</span>
                   </span>
                 </div>
               </Link>
@@ -228,7 +223,7 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
             lineHeight: 1.35, color: '#fff', margin: '0 0 12px',
           }}>
             <E id="security_cta.title" editMode={editMode}>
-              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.security_cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -236,17 +231,17 @@ export default function SecurityPageClient({ ssrContent }: { ssrContent: Record<
           <p className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.45)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            <E id="security_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="security_cta.desc" editMode={editMode}>{content.security_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}><E id="security_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
+            }}><E id="security_cta.btn1" editMode={editMode}>{content.security_cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid rgba(255,255,255,.45)',
               color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}><E id="security_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
+            }}><E id="security_cta.btn2" editMode={editMode}>{content.security_cta.btn2}</E></Link>
           </div>
         </div>
       </section>

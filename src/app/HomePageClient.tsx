@@ -11,7 +11,7 @@ import { InsightsSection } from "@/features/insights";
 
 import Link from "next/link";
 import { gsap } from "@/lib/gsap-init";
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from "@/lib/editable";
+import { E, useEditableContent, EDITABLE_STYLES } from "@/lib/editable";
 
 /* ─── CountUp Hook ─── */
 function useCountUp(end: number, duration = 1800) {
@@ -81,6 +81,15 @@ const DEFAULT_VIDEO = {
   eyebrow: "Company Introduction",
   title: "유니온시스템즈를 소개합니다",
 };
+
+/* ── useEditableContent DEFAULTS ── */
+const DEFAULTS = {
+  home_stats: DEFAULT_STATS_HEADER,
+  home_stats_items: DEFAULT_STATS_ITEMS,
+  home_cta: DEFAULT_CTA,
+  home_cta_mini_stats: DEFAULT_CTA_MINI_STATS,
+  home_video: DEFAULT_VIDEO,
+} as const;
 
 /* ═══════════════════════════════════════════════════════════
    Stats Section
@@ -643,33 +652,7 @@ function CtaBanner({ editMode, cta, ctaMiniStats }: { editMode: boolean; cta: ty
    Main Page
    ═══════════════════════════════════════════════════════════ */
 export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent: Record<string, string>; ssrInsights?: Record<string, unknown>[] }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [statsHeader, setStatsHeader] = useState(() => safeParse(ssrContent.home_stats, DEFAULT_STATS_HEADER));
-  const [statsItems, setStatsItems] = useState(() => safeParse(ssrContent.home_stats_items, DEFAULT_STATS_ITEMS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.home_cta, DEFAULT_CTA));
-  const [ctaMiniStats, setCtaMiniStats] = useState(() => safeParse(ssrContent.home_cta_mini_stats, DEFAULT_CTA_MINI_STATS));
-  const [video, setVideo] = useState(() => safeParse(ssrContent.home_video, DEFAULT_VIDEO));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      home_stats: setStatsHeader as (v: unknown) => void,
-      home_stats_items: setStatsItems as (v: unknown) => void,
-      home_cta: setCta as (v: unknown) => void,
-      home_cta_mini_stats: setCtaMiniStats as (v: unknown) => void,
-      home_video: setVideo as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -722,7 +705,7 @@ export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent
 
       {/* 4. Stats */}
       <div className="gsap-scale">
-        <StatsSection editMode={editMode} statsHeader={statsHeader} statsItems={statsItems} />
+        <StatsSection editMode={editMode} statsHeader={content.home_stats} statsItems={content.home_stats_items} />
       </div>
 
       {/* 5. Video */}
@@ -745,7 +728,7 @@ export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
             }}>
               <span style={{ width: 20, height: 1.5, background: 'var(--accent)' }} />
-              <E id="home_video.eyebrow" editMode={editMode}>{video.eyebrow}</E>
+              <E id="home_video.eyebrow" editMode={editMode}>{content.home_video.eyebrow}</E>
               <span style={{ width: 20, height: 1.5, background: 'var(--accent)' }} />
             </p>
             <h2 style={{
@@ -753,7 +736,7 @@ export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent
               lineHeight: 1.1, letterSpacing: '-.04em',
               color: 'var(--ink)', margin: '0 0 36px',
             }}>
-              <E id="home_video.title" editMode={editMode}>{video.title}</E>
+              <E id="home_video.title" editMode={editMode}>{content.home_video.title}</E>
             </h2>
             <div style={{
               position: 'relative', width: '100%', maxWidth: 900,
@@ -794,7 +777,7 @@ export default function HomePageClient({ ssrContent, ssrInsights }: { ssrContent
 
       {/* 8. CTA */}
       <div className="gsap-scale">
-        <CtaBanner editMode={editMode} cta={cta} ctaMiniStats={ctaMiniStats} />
+        <CtaBanner editMode={editMode} cta={content.home_cta} ctaMiniStats={content.home_cta_mini_stats} />
       </div>
     </div>
   );

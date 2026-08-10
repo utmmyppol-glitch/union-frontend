@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 const PRODUCTS = [
@@ -65,43 +65,22 @@ const DEFAULT_SECTIONS = {
 };
 const DEFAULT_TRUST = ['ESTsoft 공인 리셀러', '즉시 발급', '세금계산서 발행', '볼륨 라이선스 전문'];
 
+const DEFAULTS = {
+  estsoft_hero: DEFAULT_HERO,
+  estsoft_strengths: DEFAULT_STRENGTHS,
+  estsoft_cta: DEFAULT_CTA,
+  estsoft_stats: DEFAULT_STATS_DATA,
+  estsoft_products: DEFAULT_PRODUCTS_DATA,
+  estsoft_plans: DEFAULT_PLANS_DATA,
+  estsoft_sections: DEFAULT_SECTIONS,
+  estsoft_trust: DEFAULT_TRUST,
+} as const;
+
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 
 export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.estsoft_hero, DEFAULT_HERO));
-  const [strengths, setStrengths] = useState(() => safeParse(ssrContent.estsoft_strengths, DEFAULT_STRENGTHS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.estsoft_cta, DEFAULT_CTA));
-  const [statsData, setStatsData] = useState(() => safeParse(ssrContent.estsoft_stats, DEFAULT_STATS_DATA));
-  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.estsoft_products, DEFAULT_PRODUCTS_DATA));
-  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.estsoft_plans, DEFAULT_PLANS_DATA));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.estsoft_sections, DEFAULT_SECTIONS));
-  const [trust, setTrust] = useState(() => safeParse(ssrContent.estsoft_trust, DEFAULT_TRUST));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      estsoft_hero: setHero as (v: unknown) => void,
-      estsoft_strengths: setStrengths as (v: unknown) => void,
-      estsoft_cta: setCta as (v: unknown) => void,
-      estsoft_stats: setStatsData as (v: unknown) => void,
-      estsoft_products: setProductsData as (v: unknown) => void,
-      estsoft_plans: setPlansData as (v: unknown) => void,
-      estsoft_sections: setSections as (v: unknown) => void,
-      estsoft_trust: setTrust as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
@@ -172,14 +151,14 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 400, fontSize: 16, lineHeight: 1.75,
               color: 'rgba(255,255,255,.5)', margin: '0 0 8px',
             }}>
-              <E id="estsoft_hero.subtitle" editMode={editMode}>{hero.subtitle}</E>
+              <E id="estsoft_hero.subtitle" editMode={editMode}>{content.estsoft_hero.subtitle}</E>
             </p>
             <h1 style={{
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: 0.92, letterSpacing: '-.045em', margin: '0 0 22px',
             }}>
               <E id="estsoft_hero.title" editMode={editMode}>
-                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.estsoft_hero.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -218,14 +197,14 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s, box-shadow .2s',
               }}>
-                <E id="estsoft_hero.btn_contact" editMode={editMode}>{hero.btn_contact}</E>
+                <E id="estsoft_hero.btn_contact" editMode={editMode}>{content.estsoft_hero.btn_contact}</E>
               </Link>
               <Link href="/contact" className="btn" style={{
                 padding: '16px 34px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s',
               }}>
-                <E id="estsoft_hero.btn_quote" editMode={editMode}>{hero.btn_quote}</E>
+                <E id="estsoft_hero.btn_quote" editMode={editMode}>{content.estsoft_hero.btn_quote}</E>
               </Link>
             </div>
           </div>
@@ -238,10 +217,10 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="es-stats reveal" style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0,
           }}>
-            {statsData.map((s: { num: string; label: string }, i: number) => (
+            {content.estsoft_stats.map((s: { num: string; label: string }, i: number) => (
               <div key={i} style={{
                 textAlign: 'center', padding: '20px 16px',
-                borderRight: i < statsData.length - 1 ? '1px solid var(--line)' : 'none',
+                borderRight: i < content.estsoft_stats.length - 1 ? '1px solid var(--line)' : 'none',
               }}>
                 <span style={{
                   fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400,
@@ -276,7 +255,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="estsoft_sections.products_title" editMode={editMode}>{sections.products_title}</E>
+              <E id="estsoft_sections.products_title" editMode={editMode}>{content.estsoft_sections.products_title}</E>
             </h2>
           </div>
           <div className="es-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 22 }}>
@@ -315,8 +294,8 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                   />
                 </div>
                 <div style={{ padding: '20px 22px' }}>
-                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px', letterSpacing: '-.02em' }}><E id={`estsoft_products${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
-                  <div style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.6 }}><E id={`estsoft_products${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></div>
+                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px', letterSpacing: '-.02em' }}><E id={`estsoft_products${i}.name`} editMode={editMode}>{content.estsoft_products[i]?.name ?? p.name}</E></h3>
+                  <div style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.6 }}><E id={`estsoft_products${i}.desc`} editMode={editMode}>{content.estsoft_products[i]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -356,10 +335,10 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="estsoft_sections.strengths_title" editMode={editMode}>{sections.strengths_title}</E>
+              <E id="estsoft_sections.strengths_title" editMode={editMode}>{content.estsoft_sections.strengths_title}</E>
             </h2>
           </div>
-          {strengths.map((s: { num: string; img: string; title: string; desc: string }, i: number) => {
+          {content.estsoft_strengths.map((s: { num: string; img: string; title: string; desc: string }, i: number) => {
             const imgFirst = i % 2 === 0;
             return (
               <div
@@ -370,7 +349,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                   gridTemplateColumns: imgFirst ? '1.15fr 0.85fr' : '0.85fr 1.15fr',
                   gap: 'clamp(36px, 5vw, 72px)',
                   alignItems: 'center',
-                  marginBottom: i < strengths.length - 1 ? 80 : 0,
+                  marginBottom: i < content.estsoft_strengths.length - 1 ? 80 : 0,
                   position: 'relative',
                 }}
               >
@@ -474,7 +453,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="estsoft_sections.lineup_title" editMode={editMode}>{sections.lineup_title}</E>
+              <E id="estsoft_sections.lineup_title" editMode={editMode}>{content.estsoft_sections.lineup_title}</E>
             </h2>
           </div>
           <div className="es-grid-icon" style={{
@@ -559,9 +538,9 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
-            }}><E id="estsoft_sections.plans_title" editMode={editMode}>{sections.plans_title}</E></h2>
+            }}><E id="estsoft_sections.plans_title" editMode={editMode}>{content.estsoft_sections.plans_title}</E></h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              <E id="estsoft_sections.plans_desc" editMode={editMode}>{sections.plans_desc}</E>
+              <E id="estsoft_sections.plans_desc" editMode={editMode}>{content.estsoft_sections.plans_desc}</E>
             </p>
           </div>
 
@@ -596,13 +575,13 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     fontSize: 48, fontWeight: 300, lineHeight: 1,
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
-                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`estsoft_plans${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E></h3>
-                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`estsoft_plans${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></div>
+                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`estsoft_plans${i}.name`} editMode={editMode}>{content.estsoft_plans[i]?.name ?? pl.name}</E></h3>
+                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`estsoft_plans${i}.desc`} editMode={editMode}>{content.estsoft_plans[i]?.desc ?? pl.desc}</E></div>
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
-                  }}><E id={`estsoft_plans${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? pl.apps}</E></p>
+                  }}><E id={`estsoft_plans${i}.apps`} editMode={editMode}>{content.estsoft_plans[i]?.apps ?? pl.apps}</E></p>
                   <Link href="/contact" style={{
                     marginTop: 'auto',
                     display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -613,7 +592,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     fontWeight: 700, fontSize: 14,
                     textDecoration: 'none', transition: 'all .2s',
                     textAlign: 'center', justifyContent: 'center',
-                  }}><E id="estsoft_sections.plan_cta" editMode={editMode}>{sections.plan_cta}</E> <span>&rarr;</span></Link>
+                  }}><E id="estsoft_sections.plan_cta" editMode={editMode}>{content.estsoft_sections.plan_cta}</E> <span>&rarr;</span></Link>
                 </div>
               </div>
             ))}
@@ -625,7 +604,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
             flexWrap: 'wrap',
           }}>
             <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-              {trust.map((t: string, i: number) => (
+              {content.estsoft_trust.map((t: string, i: number) => (
                 <span key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: 14, fontWeight: 500, color: 'var(--ink2)',
@@ -636,7 +615,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               ))}
             </div>
             <a href="tel:02-706-8999" style={{ marginLeft: 'auto', fontWeight: 600, fontSize: 14, color: 'var(--ink)', textDecoration: 'none' }}>
-              <E id="estsoft_sections.phone" editMode={editMode}>{sections.phone}</E>
+              <E id="estsoft_sections.phone" editMode={editMode}>{content.estsoft_sections.phone}</E>
             </a>
           </div>
         </Container>
@@ -674,7 +653,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               lineHeight: 1.2,
             }}>
               <E id="estsoft_cta.title" editMode={editMode}>
-                {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.estsoft_cta.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -684,7 +663,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               lineHeight: 1.7, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto',
             }}>
               <E id="estsoft_cta.desc" editMode={editMode}>
-                {stripHtml(cta.desc).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.estsoft_cta.desc).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -695,14 +674,14 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s, box-shadow .2s',
               }}>
-                <E id="estsoft_cta.btn_contact" editMode={editMode}>{cta.btn_contact}</E>
+                <E id="estsoft_cta.btn_contact" editMode={editMode}>{content.estsoft_cta.btn_contact}</E>
               </Link>
               <Link href="/contact" className="btn" style={{
                 padding: '17px 38px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s',
               }}>
-                <E id="estsoft_cta.btn_quote" editMode={editMode}>{cta.btn_quote}</E>
+                <E id="estsoft_cta.btn_quote" editMode={editMode}>{content.estsoft_cta.btn_quote}</E>
               </Link>
             </div>
           </div>

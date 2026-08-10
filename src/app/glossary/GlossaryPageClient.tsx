@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 /* ── 현재 취급 제품/솔루션 기반 실제 용어 ── */
 
@@ -35,28 +35,18 @@ const DEFAULT_GLOSSARY: Term[] = [
   { term: 'MDM', full: 'Mobile Device Management', def: '모바일 기기를 원격으로 관리·보안 정책 적용하는 기술. Microsoft Intune이 해당됩니다.', category: '인프라' },
 ];
 
-export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
+const DEFAULTS = {
+  glossary_terms: DEFAULT_GLOSSARY,
+} as const;
 
-  const [glossary, setGlossary] = useState<Term[]>(() => safeParse(ssrContent.glossary_terms, DEFAULT_GLOSSARY));
+export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
   const [cat, setCat] = useState('전체');
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    if (!editMode) return;
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update' && e.data.section === 'glossary_terms') {
-        setGlossary(e.data.data as Term[]);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const categories = ['전체', ...Array.from(new Set(content.glossary_terms.map((g) => g.category)))];
 
-  const categories = ['전체', ...Array.from(new Set(glossary.map((g) => g.category)))];
-
-  const filtered = glossary.filter((g) => {
+  const filtered = content.glossary_terms.filter((g) => {
     const matchCat = cat === '전체' || g.category === cat;
     const matchSearch =
       !search ||
@@ -67,7 +57,7 @@ export default function GlossaryPageClient({ ssrContent }: { ssrContent: Record<
   });
 
   // glossary 전체 배열에서 filtered 항목의 원래 인덱스를 찾기
-  const getOriginalIndex = (t: Term) => glossary.indexOf(t);
+  const getOriginalIndex = (t: Term) => content.glossary_terms.indexOf(t);
 
   return (
     <>

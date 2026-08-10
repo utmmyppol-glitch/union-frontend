@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -74,38 +74,18 @@ const COLLECTIONS = [
   ]},
 ];
 
+const DEFAULTS = {
+  autodesk_hero: DEFAULT_HERO,
+  autodesk_strengths: DEFAULT_STRENGTHS,
+  autodesk_cta: DEFAULT_CTA,
+  autodesk_products: DEFAULT_PRODUCTS_DATA,
+  autodesk_plans: DEFAULT_PLANS,
+  autodesk_sections: DEFAULT_SECTIONS,
+  autodesk_trust: DEFAULT_TRUST,
+} as const;
+
 export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.autodesk_hero, DEFAULT_HERO));
-  const [strengths, setStrengths] = useState(() => safeParse(ssrContent.autodesk_strengths, DEFAULT_STRENGTHS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.autodesk_cta, DEFAULT_CTA));
-  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.autodesk_products, DEFAULT_PRODUCTS_DATA));
-  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.autodesk_plans, DEFAULT_PLANS));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.autodesk_sections, DEFAULT_SECTIONS));
-  const [trust, setTrust] = useState(() => safeParse(ssrContent.autodesk_trust, DEFAULT_TRUST));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      autodesk_hero: setHero as (v: unknown) => void,
-      autodesk_strengths: setStrengths as (v: unknown) => void,
-      autodesk_cta: setCta as (v: unknown) => void,
-      autodesk_products: setProductsData as (v: unknown) => void,
-      autodesk_plans: setPlansData as (v: unknown) => void,
-      autodesk_sections: setSections as (v: unknown) => void,
-      autodesk_trust: setTrust as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   const [activeCol, setActiveCol] = useState(0);
   const [colFade, setColFade] = useState(true);
@@ -176,29 +156,29 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <p style={{
               fontFamily: MONO, fontWeight: 500, fontSize: 12, letterSpacing: '.14em',
               textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 16px',
-            }}><E id="autodesk_hero.badge" editMode={editMode}>{hero.badge}</E></p>
+            }}><E id="autodesk_hero.badge" editMode={editMode}>{content.autodesk_hero.badge}</E></p>
             <h1 style={{
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
             }}>
-              <E id="autodesk_hero.title1" editMode={editMode}>{hero.title1}</E><br />
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}><E id="autodesk_hero.title2" editMode={editMode}>{hero.title2}</E></span>
+              <E id="autodesk_hero.title1" editMode={editMode}>{content.autodesk_hero.title1}</E><br />
+              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}><E id="autodesk_hero.title2" editMode={editMode}>{content.autodesk_hero.title2}</E></span>
             </h1>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
               maxWidth: 600, margin: '0 0 32px',
             }}>
-              <E id="autodesk_hero.desc" editMode={editMode}>{hero.desc}</E>
+              <E id="autodesk_hero.desc" editMode={editMode}>{content.autodesk_hero.desc}</E>
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}><E id="autodesk_hero.btn1" editMode={editMode}>{hero.btn1}</E></Link>
+              }}><E id="autodesk_hero.btn1" editMode={editMode}>{content.autodesk_hero.btn1}</E></Link>
               <Link href="/contact" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-              }}><E id="autodesk_hero.btn2" editMode={editMode}>{hero.btn2}</E></Link>
+              }}><E id="autodesk_hero.btn2" editMode={editMode}>{content.autodesk_hero.btn2}</E></Link>
             </div>
           </div>
         </div>
@@ -213,7 +193,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}><E id="autodesk_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
+            }}><E id="autodesk_sections.productsTitle" editMode={editMode}>{content.autodesk_sections.productsTitle}</E></h2>
           </div>
 
           {PRODUCTS.map((p, i) => (
@@ -246,8 +226,8 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                 <span className="ad-prod-title" style={{
                   fontWeight: 800, fontSize: 22, color: 'var(--ink)',
                   transition: 'color .2s', letterSpacing: '-.02em',
-                }}><E id={`autodesk_product${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></span>
-                <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '6px 0 0' }}><E id={`autodesk_product${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></div>
+                }}><E id={`autodesk_product${i}.name`} editMode={editMode}>{content.autodesk_products[i]?.name ?? p.name}</E></span>
+                <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '6px 0 0' }}><E id={`autodesk_product${i}.desc`} editMode={editMode}>{content.autodesk_products[i]?.desc ?? p.desc}</E></div>
               </div>
               {/* Arrow */}
               <span className="ad-prod-arrow" style={{
@@ -276,13 +256,13 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}><E id="autodesk_sections.strengthsTitle" editMode={editMode}>{sections.strengthsTitle}</E></h2>
+            }}><E id="autodesk_sections.strengthsTitle" editMode={editMode}>{content.autodesk_sections.strengthsTitle}</E></h2>
           </div>
 
           <div className="ad-str-grid" style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20,
           }}>
-            {strengths.map((s: { num: string; en: string; ko: string; desc: string; accent?: boolean }, i: number) => (
+            {content.autodesk_strengths.map((s: { num: string; en: string; ko: string; desc: string; accent?: boolean }, i: number) => (
               <div
                 key={s.num}
                 className="reveal ad-str-card"
@@ -350,7 +330,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}><E id="autodesk_sections.collectionsTitle" editMode={editMode}>{sections.collectionsTitle}</E></h2>
+            }}><E id="autodesk_sections.collectionsTitle" editMode={editMode}>{content.autodesk_sections.collectionsTitle}</E></h2>
           </div>
 
           {/* Collection tabs */}
@@ -444,9 +424,9 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
-            }}><E id="autodesk_sections.plansTitle" editMode={editMode}>{sections.plansTitle}</E></h2>
+            }}><E id="autodesk_sections.plansTitle" editMode={editMode}>{content.autodesk_sections.plansTitle}</E></h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              <E id="autodesk_sections.plansDesc" editMode={editMode}>{sections.plansDesc}</E>
+              <E id="autodesk_sections.plansDesc" editMode={editMode}>{content.autodesk_sections.plansDesc}</E>
             </p>
           </div>
 
@@ -473,7 +453,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                   }}>{pl.badge}</div>
                 )}
                 <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
-                  <Image src={pl.img} alt={plansData[i]?.name ?? DEFAULT_PLANS[i].name} fill style={{
+                  <Image src={pl.img} alt={content.autodesk_plans[i]?.name ?? DEFAULT_PLANS[i].name} fill style={{
                     objectFit: 'cover',
                     transition: 'transform .5s',
                   }} />
@@ -484,13 +464,13 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     fontSize: 48, fontWeight: 300, lineHeight: 1,
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
-                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`autodesk_plan${i}.name`} editMode={editMode}>{plansData[i]?.name ?? DEFAULT_PLANS[i].name}</E></h3>
-                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`autodesk_plan${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? DEFAULT_PLANS[i].desc}</E></div>
+                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`autodesk_plan${i}.name`} editMode={editMode}>{content.autodesk_plans[i]?.name ?? DEFAULT_PLANS[i].name}</E></h3>
+                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}><E id={`autodesk_plan${i}.desc`} editMode={editMode}>{content.autodesk_plans[i]?.desc ?? DEFAULT_PLANS[i].desc}</E></div>
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
-                  }}><E id={`autodesk_plan${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? DEFAULT_PLANS[i].apps}</E></p>
+                  }}><E id={`autodesk_plan${i}.apps`} editMode={editMode}>{content.autodesk_plans[i]?.apps ?? DEFAULT_PLANS[i].apps}</E></p>
                   <Link href="/contact" style={{
                     marginTop: 'auto',
                     display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -501,7 +481,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     fontWeight: 700, fontSize: 14,
                     textDecoration: 'none', transition: 'all .2s',
                     justifyContent: 'center',
-                  }}><E id="autodesk_sections.plansCta" editMode={editMode}>{sections.plansCta}</E> <span>&rarr;</span></Link>
+                  }}><E id="autodesk_sections.plansCta" editMode={editMode}>{content.autodesk_sections.plansCta}</E> <span>&rarr;</span></Link>
                 </div>
               </div>
             ))}
@@ -511,7 +491,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             marginTop: 40, display: 'flex', alignItems: 'center', gap: 24,
             padding: '20px 28px', border: '1px solid var(--line)', background: 'var(--surface)', flexWrap: 'wrap',
           }}>
-            {trust.map((t: string, i: number) => (
+            {content.autodesk_trust.map((t: string, i: number) => (
               <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500, color: 'var(--ink2)' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <E id={`autodesk_trust.${i}`} editMode={editMode}>{t}</E>
@@ -545,7 +525,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="autodesk_cta.title" editMode={editMode}>
-              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.autodesk_cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -553,17 +533,17 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
           <p className="reveal" style={{
             fontSize: 16, color: 'var(--ink2)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            <E id="autodesk_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="autodesk_cta.desc" editMode={editMode}>{content.autodesk_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}><E id="autodesk_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
+            }}><E id="autodesk_cta.btn1" editMode={editMode}>{content.autodesk_cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}><E id="autodesk_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
+            }}><E id="autodesk_cta.btn2" editMode={editMode}>{content.autodesk_cta.btn2}</E></Link>
           </div>
         </div>
       </section>

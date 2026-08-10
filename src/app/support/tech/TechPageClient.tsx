@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { E, OptImg, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, OptImg, safeParse, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -71,6 +71,20 @@ const DEFAULT_TEAM_INTRO = {
   renewal_name: '리뉴얼 팀',
   renewal_desc: '벤더(개발사)와 긴밀한 연결, 소프트웨어 라이선스 정책 안내, 갱신관리, 성능 향상을 위한 교육, 세미나',
 };
+
+/* ── useEditableContent DEFAULTS ── */
+const DEFAULTS = {
+  tech_hero: DEFAULT_HERO,
+  tech_services: DEFAULT_SERVICES,
+  tech_process: DEFAULT_PROCESS,
+  tech_faq: DEFAULT_FAQ,
+  tech_mid: DEFAULT_MID,
+  tech_cta: DEFAULT_CTA,
+  tech_contact: DEFAULT_CONTACT,
+  tech_team_intro: DEFAULT_TEAM_INTRO,
+  tech_sections: DEFAULT_SECTIONS,
+  tech_labels: DEFAULT_LABELS,
+} as const;
 
 /* 담당자 문자열 "이름 | 직책 | 이메일" 줄 파싱/합치기 */
 function parseMembers(str: string): { name: string; position: string; email: string }[] {
@@ -171,12 +185,9 @@ function TechTeamsTable({ initial, editMode }: { initial: { label: string; membe
 }
 
 export default function TechPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
-  const [hero, setHero] = useState(() => safeParse(ssrContent.tech_hero, DEFAULT_HERO));
-  const [services, setServices] = useState(() => safeParse(ssrContent.tech_services, DEFAULT_SERVICES));
-  const [process, setProcess] = useState(() => safeParse(ssrContent.tech_process, DEFAULT_PROCESS));
-  const [techTeams, setTechTeams] = useState<{ label: string; members: string }[]>(() => {
+  const [techTeams] = useState<{ label: string; members: string }[]>(() => {
     const existing = safeParse<{ label: string; members: string }[] | null>(ssrContent.tech_teams, null);
     if (Array.isArray(existing)) return existing;
     const lbl = safeParse(ssrContent.tech_labels, DEFAULT_LABELS);
@@ -188,42 +199,8 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
     if (Array.isArray(t2) && t2.length) groups.push({ label: lbl.da_team, members: toStr(t2) });
     return groups;
   });
-  const [faq, setFaq] = useState(() => safeParse(ssrContent.tech_faq, DEFAULT_FAQ));
-  const [mid, setMid] = useState(() => safeParse(ssrContent.tech_mid, DEFAULT_MID));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.tech_cta, DEFAULT_CTA));
-  const [contact, setContact] = useState(() => safeParse(ssrContent.tech_contact, DEFAULT_CONTACT));
-  const [teamIntro, setTeamIntro] = useState(() => safeParse(ssrContent.tech_team_intro, DEFAULT_TEAM_INTRO));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.tech_sections, DEFAULT_SECTIONS));
-  const [labels, setLabels] = useState(() => safeParse(ssrContent.tech_labels, DEFAULT_LABELS));
 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  useEditableManifest(editMode);
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      tech_hero: setHero as (v: unknown) => void,
-      tech_services: setServices as (v: unknown) => void,
-      tech_process: setProcess as (v: unknown) => void,
-      tech_teams: setTechTeams as (v: unknown) => void,
-      tech_faq: setFaq as (v: unknown) => void,
-      tech_mid: setMid as (v: unknown) => void,
-      tech_cta: setCta as (v: unknown) => void,
-      tech_contact: setContact as (v: unknown) => void,
-      tech_team_intro: setTeamIntro as (v: unknown) => void,
-      tech_sections: setSections as (v: unknown) => void,
-      tech_labels: setLabels as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
 
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
@@ -276,14 +253,14 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
               fontFamily: MONO, fontSize: 18, letterSpacing: '.1em',
               color: 'rgba(255,255,255,.4)', margin: '0 0 10px',
             }}>
-              <E id="tech_hero.subtitle" editMode={editMode}>{hero.subtitle}</E>
+              <E id="tech_hero.subtitle" editMode={editMode}>{content.tech_hero.subtitle}</E>
             </p>
             <h1 style={{
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: 1.05, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
               <E id="tech_hero.title" editMode={editMode}>
-                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.tech_hero.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -304,9 +281,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 40 }}>
             <p className="eyebrow" style={{ margin: '0 0 10px' }}>OUR TEAMS</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: 0 }}>
-              <E id="tech_team_intro.title" editMode={editMode}>{teamIntro.title}</E>
+              <E id="tech_team_intro.title" editMode={editMode}>{content.tech_team_intro.title}</E>
             </h2>
-            <p style={{ fontSize: 18, color: 'var(--ink2)', marginTop: 8 }}><E id="tech_team_intro.subtitle" editMode={editMode}>{teamIntro.subtitle}</E></p>
+            <p style={{ fontSize: 18, color: 'var(--ink2)', marginTop: 8 }}><E id="tech_team_intro.subtitle" editMode={editMode}>{content.tech_team_intro.subtitle}</E></p>
           </div>
 
           {/* 기술지원팀 */}
@@ -322,9 +299,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             </div>
             <div style={{ padding: 'clamp(26px, 3.5vw, 40px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <p style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, letterSpacing: '.1em', color: 'var(--accent)', margin: '0 0 8px' }}>SUPPORT TEAM</p>
-              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}><E id="tech_team_intro.support_name" editMode={editMode}>{teamIntro.support_name}</E></h3>
+              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}><E id="tech_team_intro.support_name" editMode={editMode}>{content.tech_team_intro.support_name}</E></h3>
               <p style={{ fontSize: 18, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
-                <E id="tech_team_intro.support_desc" editMode={editMode}>{teamIntro.support_desc}</E>
+                <E id="tech_team_intro.support_desc" editMode={editMode}>{content.tech_team_intro.support_desc}</E>
               </p>
             </div>
           </div>
@@ -336,9 +313,9 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
           }}>
             <div style={{ padding: 'clamp(26px, 3.5vw, 40px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <p style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, letterSpacing: '.1em', color: 'var(--accent)', margin: '0 0 8px' }}>RENEWAL TEAM</p>
-              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}><E id="tech_team_intro.renewal_name" editMode={editMode}>{teamIntro.renewal_name}</E></h3>
+              <h3 style={{ fontWeight: 900, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}><E id="tech_team_intro.renewal_name" editMode={editMode}>{content.tech_team_intro.renewal_name}</E></h3>
               <p style={{ fontSize: 18, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
-                <E id="tech_team_intro.renewal_desc" editMode={editMode}>{teamIntro.renewal_desc}</E>
+                <E id="tech_team_intro.renewal_desc" editMode={editMode}>{content.tech_team_intro.renewal_desc}</E>
               </p>
             </div>
             <div style={{ background: 'var(--soft)', minHeight: 280, overflow: 'hidden' }}>
@@ -375,10 +352,10 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
             fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
             lineHeight: 1.15, letterSpacing: '-.04em', color: '#fff', margin: '0 0 12px',
           }}>
-            <E id="tech_mid.title" editMode={editMode}>{mid.title}</E>
+            <E id="tech_mid.title" editMode={editMode}>{content.tech_mid.title}</E>
           </h2>
           <p className="reveal" style={{ fontSize: 18, color: 'rgba(255,255,255,.45)', margin: 0 }}>
-            <E id="tech_mid.subtitle" editMode={editMode}>{mid.subtitle}</E>
+            <E id="tech_mid.subtitle" editMode={editMode}>{content.tech_mid.subtitle}</E>
           </p>
         </div>
       </section>
@@ -393,11 +370,11 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
 
         <div className="wrap">
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 36 }}>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 8px' }}><E id="tech_sections.services_title" editMode={editMode}>{sections.services_title}</E></h2>
-            <p style={{ fontSize: 18, color: 'var(--ink2)', margin: 0 }}><E id="tech_sections.services_desc" editMode={editMode}>{sections.services_desc}</E></p>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 8px' }}><E id="tech_sections.services_title" editMode={editMode}>{content.tech_sections.services_title}</E></h2>
+            <p style={{ fontSize: 18, color: 'var(--ink2)', margin: 0 }}><E id="tech_sections.services_desc" editMode={editMode}>{content.tech_sections.services_desc}</E></p>
           </div>
           <div className="tech-svc" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-            {services.map((s: { title: string; desc: string }, i: number) => (
+            {content.tech_services.map((s: { title: string; desc: string }, i: number) => (
               <div key={s.title} className="reveal" style={{
                 textAlign: 'center', padding: '32px 20px',
                 border: '1px solid var(--line)', background: 'var(--surface)',
@@ -427,10 +404,10 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
         <div className="wrap">
           <div className="reveal" style={{ marginBottom: 32 }}>
             <p className="eyebrow" style={{ margin: '0 0 10px' }}>PROCESS</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: 0 }}><E id="tech_sections.process_title" editMode={editMode}>{sections.process_title}</E></h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: 0 }}><E id="tech_sections.process_title" editMode={editMode}>{content.tech_sections.process_title}</E></h2>
           </div>
           <div className="tech-process" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-            {process.map((s: { num: string; title: string; desc: string }, i: number) => (
+            {content.tech_process.map((s: { num: string; title: string; desc: string }, i: number) => (
               <div key={s.num} className="reveal tech-proc-card" style={{
                 border: '1px solid var(--line)', background: 'var(--surface)',
                 padding: '24px 20px', transition: 'transform .2s, box-shadow .2s',
@@ -465,15 +442,15 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
         <div className="blob blob-graphite" aria-hidden="true" style={{ width: 250, height: 250, left: '5%', bottom: '10%', animationDelay: '6s' }} />
         <div className="wrap" style={{ position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 24 }}>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 12px' }}><E id="tech_sections.contact_title" editMode={editMode}>{sections.contact_title}</E></h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', margin: '0 0 12px' }}><E id="tech_sections.contact_title" editMode={editMode}>{content.tech_sections.contact_title}</E></h2>
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', fontSize: 18, color: 'var(--ink2)' }}>
               <span>
-                <strong style={{ color: 'var(--ink)' }}><E id="tech_labels.tel" editMode={editMode}>{labels.tel}</E></strong>{' '}
-                <E id="tech_contact.tel" editMode={editMode}>{contact.tel}</E>
+                <strong style={{ color: 'var(--ink)' }}><E id="tech_labels.tel" editMode={editMode}>{content.tech_labels.tel}</E></strong>{' '}
+                <E id="tech_contact.tel" editMode={editMode}>{content.tech_contact.tel}</E>
               </span>
               <span>
-                <strong style={{ color: 'var(--ink)' }}><E id="tech_labels.hours" editMode={editMode}>{labels.hours}</E></strong>{' '}
-                <E id="tech_contact.hours" editMode={editMode}>{contact.hours}</E>
+                <strong style={{ color: 'var(--ink)' }}><E id="tech_labels.hours" editMode={editMode}>{content.tech_labels.hours}</E></strong>{' '}
+                <E id="tech_contact.hours" editMode={editMode}>{content.tech_contact.hours}</E>
               </span>
             </div>
           </div>
@@ -498,10 +475,10 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
         <div className="wrap" style={{ position: 'relative', zIndex: 1, maxWidth: 800 }}>
           <div className="reveal" style={{ marginBottom: 28 }}>
             <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 10px' }}>FAQ</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', color: '#fff', margin: 0 }}><E id="tech_sections.faq_title" editMode={editMode}>{sections.faq_title}</E></h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', letterSpacing: '-.03em', color: '#fff', margin: 0 }}><E id="tech_sections.faq_title" editMode={editMode}>{content.tech_sections.faq_title}</E></h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {faq.map((item: { category: string; question: string; answer: string }, idx: number) => (
+            {content.tech_faq.map((item: { category: string; question: string; answer: string }, idx: number) => (
               <div key={idx} style={{ border: '1px solid rgba(255,255,255,.08)', overflow: 'hidden' }}>
                 <button onClick={() => setOpenFaq(openFaq === idx ? null : idx)} style={{
                   width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -546,17 +523,17 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
 
         <div className="wrap" style={{ textAlign: 'center' }}>
           <h2 className="reveal" style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', color: 'var(--ink)', margin: '0 0 16px' }}>
-            <E id="tech_cta.title" editMode={editMode}>{cta.title}</E>
+            <E id="tech_cta.title" editMode={editMode}>{content.tech_cta.title}</E>
           </h2>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="tel:027068999" className="btn" style={{
               padding: '14px 32px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',
-            }}><E id="tech_cta.btn_call" editMode={editMode}>{cta.btn_call}</E> <E id="tech_contact.tel" editMode={editMode}>{contact.tel}</E></a>
+            }}><E id="tech_cta.btn_call" editMode={editMode}>{content.tech_cta.btn_call}</E> <E id="tech_contact.tel" editMode={editMode}>{content.tech_contact.tel}</E></a>
             <Link href="/support/inquiry" style={{
               padding: '14px 32px', border: '1px solid var(--ink)', color: 'var(--ink)',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',
-            }}><E id="tech_cta.btn_inquiry" editMode={editMode}>{cta.btn_inquiry}</E></Link>
+            }}><E id="tech_cta.btn_inquiry" editMode={editMode}>{content.tech_cta.btn_inquiry}</E></Link>
           </div>
         </div>
       </section>

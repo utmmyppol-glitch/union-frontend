@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CtaSection } from '@/features/cta';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, stripHtml, EDITABLE_STYLES } from '@/lib/editable';
 
 const DEFAULT_HERO = {
   eyebrow: 'CONTACT US',
@@ -16,30 +16,15 @@ const DEFAULT_BENEFITS = [
   { num: '03', title: '전문 컨설팅', desc: '20년 경험의 전문 컨설턴트가 최적의 솔루션을 안내합니다.' },
 ];
 
-export default function ContactPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
+const DEFAULTS = {
+  contact_hero: DEFAULT_HERO,
+  contact_benefits: DEFAULT_BENEFITS,
+} as const;
 
-  const [hero, setHero] = useState(() => safeParse(ssrContent.contact_hero, DEFAULT_HERO));
-  const [benefits, setBenefits] = useState(() => safeParse(ssrContent.contact_benefits, DEFAULT_BENEFITS));
+export default function ContactPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   const pageRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      contact_hero: setHero as (v: unknown) => void,
-      contact_benefits: setBenefits as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
 
   useEffect(() => {
     const els = pageRef.current?.querySelectorAll('.reveal');
@@ -90,20 +75,20 @@ export default function ContactPageClient({ ssrContent }: { ssrContent: Record<s
 
         <div className="wrap" style={{ position: 'relative', zIndex: 1, padding: '120px clamp(20px,4vw,52px) 72px', textAlign: 'center' }}>
           <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 16px' }}>
-            <E id="contact_hero.eyebrow" editMode={editMode}>{hero.eyebrow}</E>
+            <E id="contact_hero.eyebrow" editMode={editMode}>{content.contact_hero.eyebrow}</E>
           </p>
           <h1 style={{
             fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
             lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 20px',
           }}>
-            <E id="contact_hero.title" editMode={editMode}>{hero.title}</E>
+            <E id="contact_hero.title" editMode={editMode}>{content.contact_hero.title}</E>
           </h1>
           <p style={{
             fontWeight: 400, fontSize: 18, lineHeight: 1.7,
             color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: '0 auto',
           }}>
             <E id="contact_hero.desc" editMode={editMode}>
-              {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.contact_hero.desc).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -127,7 +112,7 @@ export default function ContactPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="contact-benefits" style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24,
           }}>
-            {benefits.map((b: { num: string; title: string; desc: string }, idx: number) => (
+            {content.contact_benefits.map((b: { num: string; title: string; desc: string }, idx: number) => (
               <div
                 key={idx}
                 className="reveal"

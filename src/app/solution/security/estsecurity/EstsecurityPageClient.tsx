@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -40,29 +40,17 @@ const DEFAULT_SECTIONS = {
   featuresTitle: '주요 기능',
 };
 
+const DEFAULTS = {
+  estsecurity_hero: DEFAULT_HERO,
+  estsecurity_products: DEFAULT_PRODUCTS_DATA,
+  estsecurity_points: DEFAULT_POINTS_DATA,
+  estsecurity_features: DEFAULT_FEATURES_DATA,
+  estsecurity_cta: DEFAULT_CTA,
+  estsecurity_sections: DEFAULT_SECTIONS,
+} as const;
+
 export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-  const [hero, setHero] = useState(() => safeParse(ssrContent.estsecurity_hero, DEFAULT_HERO));
-  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.estsecurity_products, DEFAULT_PRODUCTS_DATA));
-  const [pointsData, setPointsData] = useState(() => safeParse(ssrContent.estsecurity_points, DEFAULT_POINTS_DATA));
-  const [featuresData, setFeaturesData] = useState(() => safeParse(ssrContent.estsecurity_features, DEFAULT_FEATURES_DATA));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.estsecurity_cta, DEFAULT_CTA));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.estsecurity_sections, DEFAULT_SECTIONS));
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      estsecurity_hero: setHero as (v: unknown) => void,
-      estsecurity_products: setProductsData as (v: unknown) => void,
-      estsecurity_points: setPointsData as (v: unknown) => void,
-      estsecurity_features: setFeaturesData as (v: unknown) => void,
-      estsecurity_cta: setCta as (v: unknown) => void,
-      estsecurity_sections: setSections as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
     if (!els.length) return;
@@ -132,14 +120,14 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 16px',
             }}>
-              <E id="estsecurity_hero.title1" editMode={editMode}>{hero.title1}</E><br />
-              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}><E id="estsecurity_hero.title2" editMode={editMode}>{hero.title2}</E></span>
+              <E id="estsecurity_hero.title1" editMode={editMode}>{content.estsecurity_hero.title1}</E><br />
+              <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}><E id="estsecurity_hero.title2" editMode={editMode}>{content.estsecurity_hero.title2}</E></span>
             </h1>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
               maxWidth: 420, margin: '0 0 28px',
             }}>
-              <E id="estsecurity_hero.desc" editMode={editMode}>{hero.desc}</E>
+              <E id="estsecurity_hero.desc" editMode={editMode}>{content.estsecurity_hero.desc}</E>
             </p>
             {/* AI badge */}
             <div style={{
@@ -160,7 +148,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}><E id="estsecurity_hero.btn" editMode={editMode}>{hero.btn}</E></Link>
+              }}><E id="estsecurity_hero.btn" editMode={editMode}>{content.estsecurity_hero.btn}</E></Link>
               <a href="tel:02-706-8999" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
@@ -185,7 +173,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}><E id="estsecurity_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
+            }}><E id="estsecurity_sections.productsTitle" editMode={editMode}>{content.estsecurity_sections.productsTitle}</E></h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -223,10 +211,10 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                   <h3 style={{
                     fontWeight: 900, fontSize: 22, letterSpacing: '-.02em',
                     margin: '0 0 10px',
-                  }}><E id={`estsecurity_products.${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
+                  }}><E id={`estsecurity_products.${i}.name`} editMode={editMode}>{content.estsecurity_products[i]?.name ?? p.name}</E></h3>
                   <div style={{
                     fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0,
-                  }}><E id={`estsecurity_products.${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></div>
+                  }}><E id={`estsecurity_products.${i}.desc`} editMode={editMode}>{content.estsecurity_products[i]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -264,7 +252,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}><E id="estsecurity_sections.whyTitle" editMode={editMode}>{sections.whyTitle}</E></h2>
+            }}><E id="estsecurity_sections.whyTitle" editMode={editMode}>{content.estsecurity_sections.whyTitle}</E></h2>
           </div>
 
           <div className="est-why-grid" style={{
@@ -290,18 +278,18 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                   fontFamily: SERIF, fontStyle: 'italic',
                   fontSize: 40, fontWeight: 400, color: 'var(--accent)',
                   margin: '0 0 4px', lineHeight: 1,
-                }}><E id={`estsecurity_points.${i}.stat`} editMode={editMode}>{pointsData[i]?.stat ?? pt.stat}</E></p>
+                }}><E id={`estsecurity_points.${i}.stat`} editMode={editMode}>{content.estsecurity_points[i]?.stat ?? pt.stat}</E></p>
                 <p style={{
                   fontFamily: MONO, fontSize: 12, fontWeight: 500, letterSpacing: '.08em',
                   color: 'rgba(255,255,255,.5)', margin: '0 0 20px',
-                }}><E id={`estsecurity_points.${i}.statLabel`} editMode={editMode}>{pointsData[i]?.statLabel ?? pt.statLabel}</E></p>
+                }}><E id={`estsecurity_points.${i}.statLabel`} editMode={editMode}>{content.estsecurity_points[i]?.statLabel ?? pt.statLabel}</E></p>
 
                 <h3 style={{
                   fontWeight: 700, fontSize: 18, color: '#fff', margin: '0 0 8px',
-                }}><E id={`estsecurity_points.${i}.title`} editMode={editMode}>{pointsData[i]?.title ?? pt.title}</E></h3>
+                }}><E id={`estsecurity_points.${i}.title`} editMode={editMode}>{content.estsecurity_points[i]?.title ?? pt.title}</E></h3>
                 <div style={{
                   fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.6)', margin: 0,
-                }}><E id={`estsecurity_points.${i}.desc`} editMode={editMode}>{pointsData[i]?.desc ?? pt.desc}</E></div>
+                }}><E id={`estsecurity_points.${i}.desc`} editMode={editMode}>{content.estsecurity_points[i]?.desc ?? pt.desc}</E></div>
               </div>
             ))}
           </div>
@@ -335,7 +323,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}><E id="estsecurity_sections.featuresTitle" editMode={editMode}>{sections.featuresTitle}</E></h2>
+            }}><E id="estsecurity_sections.featuresTitle" editMode={editMode}>{content.estsecurity_sections.featuresTitle}</E></h2>
           </div>
 
           <div className="est-feat-grid" style={{
@@ -364,10 +352,10 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
                 }}>{String(i + 1).padStart(2, '0')}</span>
                 <h3 style={{
                   fontWeight: 700, fontSize: 18, color: '#fff', margin: '0 0 8px',
-                }}><E id={`estsecurity_features.${i}.label`} editMode={editMode}>{featuresData[i]?.label ?? f.label}</E></h3>
+                }}><E id={`estsecurity_features.${i}.label`} editMode={editMode}>{content.estsecurity_features[i]?.label ?? f.label}</E></h3>
                 <div style={{
                   fontSize: 16, lineHeight: 1.6, color: 'rgba(255,255,255,.4)', margin: 0,
-                }}><E id={`estsecurity_features.${i}.desc`} editMode={editMode}>{featuresData[i]?.desc ?? f.desc}</E></div>
+                }}><E id={`estsecurity_features.${i}.desc`} editMode={editMode}>{content.estsecurity_features[i]?.desc ?? f.desc}</E></div>
               </div>
             ))}
           </div>
@@ -403,7 +391,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="estsecurity_cta.title" editMode={editMode}>
-              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.estsecurity_cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -411,17 +399,17 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
           <p className="reveal" style={{
             fontSize: 16, color: 'var(--ink2)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            <E id="estsecurity_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="estsecurity_cta.desc" editMode={editMode}>{content.estsecurity_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}><E id="estsecurity_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
+            }}><E id="estsecurity_cta.btn1" editMode={editMode}>{content.estsecurity_cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}><E id="estsecurity_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
+            }}><E id="estsecurity_cta.btn2" editMode={editMode}>{content.estsecurity_cta.btn2}</E></Link>
           </div>
         </div>
       </section>

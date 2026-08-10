@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 
@@ -73,45 +73,23 @@ const DEFAULT_BUTTONS = {
 };
 const DEFAULT_TRUST = ['Microsoft CSP 파트너', '즉시 활성화', '마이그레이션 지원', '세금계산서'];
 
+const DEFAULTS = {
+  microsoft_hero: DEFAULT_HERO,
+  microsoft_strengths: DEFAULT_STRENGTHS,
+  microsoft_cta: DEFAULT_CTA,
+  microsoft_sections: DEFAULT_SECTIONS,
+  microsoft_accents: DEFAULT_ACCENTS,
+  microsoft_products: DEFAULT_PRODUCTS_DATA,
+  microsoft_plans: DEFAULT_PLANS_DATA,
+  microsoft_buttons: DEFAULT_BUTTONS,
+  microsoft_trust: DEFAULT_TRUST,
+} as const;
+
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
 
 export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.microsoft_hero, DEFAULT_HERO));
-  const [strengths, setStrengths] = useState(() => safeParse(ssrContent.microsoft_strengths, DEFAULT_STRENGTHS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.microsoft_cta, DEFAULT_CTA));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.microsoft_sections, DEFAULT_SECTIONS));
-  const [accents, setAccents] = useState(() => safeParse(ssrContent.microsoft_accents, DEFAULT_ACCENTS));
-  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.microsoft_products, DEFAULT_PRODUCTS_DATA));
-  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.microsoft_plans, DEFAULT_PLANS_DATA));
-  const [buttons, setButtons] = useState(() => safeParse(ssrContent.microsoft_buttons, DEFAULT_BUTTONS));
-  const [trust, setTrust] = useState(() => safeParse(ssrContent.microsoft_trust, DEFAULT_TRUST));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      microsoft_hero: setHero as (v: unknown) => void,
-      microsoft_strengths: setStrengths as (v: unknown) => void,
-      microsoft_cta: setCta as (v: unknown) => void,
-      microsoft_sections: setSections as (v: unknown) => void,
-      microsoft_accents: setAccents as (v: unknown) => void,
-      microsoft_products: setProductsData as (v: unknown) => void,
-      microsoft_plans: setPlansData as (v: unknown) => void,
-      microsoft_buttons: setButtons as (v: unknown) => void,
-      microsoft_trust: setTrust as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   const [activeStrength, setActiveStrength] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
@@ -135,7 +113,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
     return () => io.disconnect();
   }, []);
 
-  const s = strengths[activeStrength];
+  const s = content.microsoft_strengths[activeStrength];
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--ink)' }}>
@@ -172,35 +150,35 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontFamily: MONO, fontWeight: 500, fontSize: 12, letterSpacing: '.14em',
               textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 16px',
             }}>
-              <E id="microsoft_hero.badge" editMode={editMode}>{hero.badge}</E>
+              <E id="microsoft_hero.badge" editMode={editMode}>{content.microsoft_hero.badge}</E>
             </p>
             <h1 style={{
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
             }}>
-              <E id="microsoft_sections.hero_title1" editMode={editMode}>{sections.hero_title1}</E><br />
+              <E id="microsoft_sections.hero_title1" editMode={editMode}>{content.microsoft_sections.hero_title1}</E><br />
               <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, letterSpacing: '-.02em' }}>
-                <E id="microsoft_sections.hero_title2" editMode={editMode}>{sections.hero_title2}</E>
+                <E id="microsoft_sections.hero_title2" editMode={editMode}>{content.microsoft_sections.hero_title2}</E>
               </span>
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 16, lineHeight: 1.7,
               color: 'rgba(255,255,255,.5)', maxWidth: 600, margin: '0 0 32px',
             }}>
-              <E id="microsoft_hero.desc" editMode={editMode}>{hero.desc}</E>
+              <E id="microsoft_hero.desc" editMode={editMode}>{content.microsoft_hero.desc}</E>
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}>
-                <E id="microsoft_buttons.hero_cta" editMode={editMode}>{buttons.hero_cta}</E>
+                <E id="microsoft_buttons.hero_cta" editMode={editMode}>{content.microsoft_buttons.hero_cta}</E>
               </Link>
               <Link href="/contact" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
               }}>
-                <E id="microsoft_buttons.hero_quote" editMode={editMode}>{buttons.hero_quote}</E>
+                <E id="microsoft_buttons.hero_quote" editMode={editMode}>{content.microsoft_buttons.hero_quote}</E>
               </Link>
             </div>
           </div>
@@ -257,7 +235,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
           <div className="ms-stats" style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0,
           }}>
-            {accents.map((stat: { num: string; label: string; sub: string }, i: number) => (
+            {content.microsoft_accents.map((stat: { num: string; label: string; sub: string }, i: number) => (
               <div key={i} style={{
                 textAlign: 'center', padding: '0 20px',
                 borderRight: i < 3 ? '1px solid rgba(255,255,255,.15)' : 'none',
@@ -292,7 +270,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="microsoft_sections.products_title" editMode={editMode}>{sections.products_title}</E>
+              <E id="microsoft_sections.products_title" editMode={editMode}>{content.microsoft_sections.products_title}</E>
             </h2>
           </div>
           <div className="ms-products" style={{
@@ -312,8 +290,8 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                   }} />
                 </div>
                 <div style={{ padding: 20 }}>
-                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}><E id={`microsoft_products.${i}.name`} editMode={editMode}>{productsData[i]?.name ?? p.name}</E></h3>
-                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.5 }}><E id={`microsoft_products.${i}.desc`} editMode={editMode}>{productsData[i]?.desc ?? p.desc}</E></p>
+                  <h3 style={{ fontWeight: 800, fontSize: 18, margin: '0 0 4px' }}><E id={`microsoft_products.${i}.name`} editMode={editMode}>{content.microsoft_products[i]?.name ?? p.name}</E></h3>
+                  <p style={{ fontSize: 16, color: 'var(--ink2)', margin: 0, lineHeight: 1.5 }}><E id={`microsoft_products.${i}.desc`} editMode={editMode}>{content.microsoft_products[i]?.desc ?? p.desc}</E></p>
                 </div>
               </div>
             ))}
@@ -347,13 +325,13 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              <E id="microsoft_sections.strengths_title" editMode={editMode}>{sections.strengths_title}</E>
+              <E id="microsoft_sections.strengths_title" editMode={editMode}>{content.microsoft_sections.strengths_title}</E>
             </h2>
           </div>
 
           {/* Tab buttons */}
           <div className="reveal" style={{ display: 'flex', gap: 0, marginBottom: 40 }}>
-            {strengths.map((st: { num: string; title: string; sub: string }, i: number) => (
+            {content.microsoft_strengths.map((st: { num: string; title: string; sub: string }, i: number) => (
               <button
                 key={st.num}
                 onClick={() => switchStrength(i)}
@@ -434,7 +412,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                 letterSpacing: '.04em', color: 'var(--accent)',
                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8,
               }}>
-                <E id="microsoft_buttons.detail" editMode={editMode}>{buttons.detail}</E> <span>→</span>
+                <E id="microsoft_buttons.detail" editMode={editMode}>{content.microsoft_buttons.detail}</E> <span>→</span>
               </Link>
             </div>
           </div>
@@ -479,10 +457,10 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 12px',
             }}>
-              <E id="microsoft_sections.plans_title" editMode={editMode}>{sections.plans_title}</E>
+              <E id="microsoft_sections.plans_title" editMode={editMode}>{content.microsoft_sections.plans_title}</E>
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              <E id="microsoft_sections.plans_desc" editMode={editMode}>{sections.plans_desc}</E>
+              <E id="microsoft_sections.plans_desc" editMode={editMode}>{content.microsoft_sections.plans_desc}</E>
             </p>
           </div>
 
@@ -525,21 +503,21 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                     color: 'var(--line)', opacity: .4, marginBottom: 12,
                   }}>{String(i + 1).padStart(2, '0')}</div>
 
-                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`microsoft_plans.${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E></h3>
-                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 14px' }}><E id={`microsoft_plans.${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E></div>
+                  <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}><E id={`microsoft_plans.${i}.name`} editMode={editMode}>{content.microsoft_plans[i]?.name ?? pl.name}</E></h3>
+                  <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 14px' }}><E id={`microsoft_plans.${i}.desc`} editMode={editMode}>{content.microsoft_plans[i]?.desc ?? pl.desc}</E></div>
 
                   {/* Apps */}
                   <p style={{
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 8px', lineHeight: 1.5,
-                  }}><E id={`microsoft_plans.${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? pl.apps}</E></p>
+                  }}><E id={`microsoft_plans.${i}.apps`} editMode={editMode}>{content.microsoft_plans[i]?.apps ?? pl.apps}</E></p>
 
                   {/* Price type */}
                   <p style={{
                     fontSize: 13, fontWeight: 600, color: 'var(--ink)',
                     margin: '0 0 20px',
-                  }}><E id={`microsoft_plans.${i}.price`} editMode={editMode}>{plansData[i]?.price ?? pl.price}</E></p>
+                  }}><E id={`microsoft_plans.${i}.price`} editMode={editMode}>{content.microsoft_plans[i]?.price ?? pl.price}</E></p>
 
                   {/* CTA */}
                   <Link href="/contact" style={{
@@ -552,7 +530,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                     fontWeight: 700, fontSize: 14,
                     textDecoration: 'none', transition: 'all .2s',
                   }}>
-                    <E id="microsoft_buttons.plan_quote" editMode={editMode}>{buttons.plan_quote}</E> <span>&rarr;</span>
+                    <E id="microsoft_buttons.plan_quote" editMode={editMode}>{content.microsoft_buttons.plan_quote}</E> <span>&rarr;</span>
                   </Link>
                 </div>
               </div>
@@ -566,7 +544,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
             flexWrap: 'wrap',
           }}>
             <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-              {trust.map((t: string, i: number) => (
+              {content.microsoft_trust.map((t: string, i: number) => (
                 <span key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: 14, fontWeight: 500, color: 'var(--ink2)',
@@ -609,7 +587,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
             lineHeight: 1.3, color: '#fff', margin: '0 0 16px', letterSpacing: '-.01em',
           }}>
             <E id="microsoft_cta.title" editMode={editMode}>
-              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.microsoft_cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -617,20 +595,20 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
           <p className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.45)', margin: '0 0 36px', lineHeight: 1.7,
           }}>
-            <E id="microsoft_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="microsoft_cta.desc" editMode={editMode}>{content.microsoft_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}>
-              <E id="microsoft_buttons.cta_primary" editMode={editMode}>{buttons.cta_primary}</E>
+              <E id="microsoft_buttons.cta_primary" editMode={editMode}>{content.microsoft_buttons.cta_primary}</E>
             </Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid rgba(255,255,255,.45)',
               color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}>
-              <E id="microsoft_buttons.cta_secondary" editMode={editMode}>{buttons.cta_secondary}</E>
+              <E id="microsoft_buttons.cta_secondary" editMode={editMode}>{content.microsoft_buttons.cta_secondary}</E>
             </Link>
           </div>
         </div>

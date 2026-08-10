@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { E, OptImg, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, OptImg, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 // fallback 이미지 경로 (onError 시 사용하지 않음 — next/image가 대체)
 
@@ -44,6 +44,21 @@ const DEFAULT_CTA = { title: '유니온시스템즈와 함께 시작하세요', 
 const DEFAULT_SECTIONS = { strengths_title: '유니온시스템즈가\n선택받는 이유', values_title: '핵심 가치' };
 const DEFAULT_BUTTONS = { cta: '도입문의 하기 →' };
 
+/* ── useEditableContent DEFAULTS ── */
+const DEFAULTS = {
+  company_hero: DEFAULT_HERO,
+  company_overview: DEFAULT_OVERVIEW,
+  company_stats: DEFAULT_STATS,
+  company_strengths: DEFAULT_STRENGTHS,
+  company_values: DEFAULT_VALUES,
+  company_depts: DEFAULT_DEPTS,
+  company_org: DEFAULT_ORG,
+  company_ci: DEFAULT_CI,
+  company_cta: DEFAULT_CTA,
+  company_sections: DEFAULT_SECTIONS,
+  company_buttons: DEFAULT_BUTTONS,
+} as const;
+
 /* 팀 박스 목록: 균일한 칸, 밑으로 '+ 팀 추가'. members(줄바꿈 문자열)로 저장 */
 function DeptTeams({ deptIdx, value, editMode }: { deptIdx: number; value: string; editMode: boolean }) {
   const [teams, setTeams] = useState<string[]>(() => {
@@ -75,51 +90,9 @@ function DeptTeams({ deptIdx, value, editMode }: { deptIdx: number; value: strin
 export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const editMode = useEditMode();
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
   const deptAction = (action: 'add' | 'delete' | 'up' | 'down', idx?: number) =>
     window.parent.postMessage({ type: 'array-action', section: 'company_depts', action, idx }, '*');
-
-  // SSR에서 받은 데이터로 초기화 (hydration 즉시)
-  const [hero, setHero] = useState(() => safeParse(ssrContent.company_hero, DEFAULT_HERO));
-  const [overview, setOverview] = useState(() => safeParse(ssrContent.company_overview, DEFAULT_OVERVIEW));
-  const [stats, setStats] = useState(() => safeParse(ssrContent.company_stats, DEFAULT_STATS));
-  const [strengths, setStrengths] = useState(() => safeParse(ssrContent.company_strengths, DEFAULT_STRENGTHS));
-  const [values, setValues] = useState(() => safeParse(ssrContent.company_values, DEFAULT_VALUES));
-  const [depts, setDepts] = useState(() => safeParse(ssrContent.company_depts, DEFAULT_DEPTS));
-  const [org, setOrg] = useState(() => safeParse(ssrContent.company_org, DEFAULT_ORG));
-  const [ci, setCi] = useState(() => safeParse(ssrContent.company_ci, DEFAULT_CI));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.company_cta, DEFAULT_CTA));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.company_sections, DEFAULT_SECTIONS));
-  const [buttons, setButtons] = useState(() => safeParse(ssrContent.company_buttons, DEFAULT_BUTTONS));
-
-  // 편집모드 매니페스트 전송 (pathname 변화마다 재전송)
-  useEditableManifest(editMode);
-
-  // postMessage 수신 (편집모드에서만)
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      company_hero: setHero as (v: unknown) => void,
-      company_overview: setOverview as (v: unknown) => void,
-      company_stats: setStats as (v: unknown) => void,
-      company_strengths: setStrengths as (v: unknown) => void,
-      company_values: setValues as (v: unknown) => void,
-      company_depts: setDepts as (v: unknown) => void,
-      company_org: setOrg as (v: unknown) => void,
-      company_ci: setCi as (v: unknown) => void,
-      company_cta: setCta as (v: unknown) => void,
-      company_sections: setSections as (v: unknown) => void,
-      company_buttons: setButtons as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
 
   // IntersectionObserver (reveal 애니메이션)
   useEffect(() => {
@@ -150,11 +123,11 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           <div style={{ maxWidth: 640, padding: '120px 0 40px' }}>
             <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 16px' }}>ABOUT US</p>
             <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 20px' }}>
-              <E id="company_hero.title" editMode={editMode}>{hero.title}</E><br />
-              <span style={{ color: 'var(--accent)' }}><E id="company_hero.accent" editMode={editMode}>{hero.accent}</E></span><E id="company_hero.suffix" editMode={editMode}>{hero.suffix ?? '합니다'}</E>
+              <E id="company_hero.title" editMode={editMode}>{content.company_hero.title}</E><br />
+              <span style={{ color: 'var(--accent)' }}><E id="company_hero.accent" editMode={editMode}>{content.company_hero.accent}</E></span><E id="company_hero.suffix" editMode={editMode}>{content.company_hero.suffix ?? '합니다'}</E>
             </h1>
             <div style={{ fontWeight: 400, fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0 }}>
-              <E id="company_hero.desc" editMode={editMode}>{hero.desc}</E>
+              <E id="company_hero.desc" editMode={editMode}>{content.company_hero.desc}</E>
             </div>
             <div style={{ display: 'flex', gap: 4, marginTop: 32 }}>
               {COMPANY_TABS.map((tab) => {
@@ -176,14 +149,14 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>COMPANY OVERVIEW</p>
             <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 16px' }}>
-              <E id="company_overview.title" editMode={editMode}>{overview.title}</E>
+              <E id="company_overview.title" editMode={editMode}>{content.company_overview.title}</E>
             </h2>
             <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 680, margin: 0 }}>
-              <E id="company_overview.text" editMode={editMode}>{overview.text}</E>
+              <E id="company_overview.text" editMode={editMode}>{content.company_overview.text}</E>
             </div>
           </div>
           <div className="reveal about-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, borderTop: '1px solid var(--line)', paddingTop: 40 }}>
-            {stats.map((s, i) => (
+            {content.company_stats.map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <p style={{ fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic', fontSize: 'clamp(36px, 5.5vw, 64px)', fontWeight: 300, color: 'var(--ink)', margin: '0 0 4px', lineHeight: 1 }}>
                   <E id={`company_stats.${i}.num`} editMode={editMode}>{s.num}</E>
@@ -207,10 +180,10 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         <div className="wrap">
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>OUR STRENGTHS</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: 0 }}><E id="company_sections.strengths_title" editMode={editMode}>{stripHtml(sections.strengths_title).split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}</E></h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: 0 }}><E id="company_sections.strengths_title" editMode={editMode}>{stripHtml(content.company_sections.strengths_title).split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}</E></h2>
           </div>
           <div className="about-strengths" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-            {strengths.map((item, idx) => (
+            {content.company_strengths.map((item, idx) => (
               <div key={idx} className="reveal about-str-card" style={{ border: '1px solid var(--line)', background: 'var(--surface)', overflow: 'hidden', transition: 'transform .25s cubic-bezier(.16,.84,.3,1), box-shadow .25s', transitionDelay: `${idx * 0.06}s` }}>
                 <div style={{ width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', position: 'relative' }}>
                   <OptImg id={`company_strengths.${idx}.img`} editMode={editMode} src={item.img} alt={item.title} width={640} height={360} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transition: 'transform .5s' }} />
@@ -235,10 +208,10 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         <div className="wrap" style={{ position: 'relative', zIndex: 1 }}>
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 14px' }}>CORE VALUES</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0 }}><E id="company_sections.values_title" editMode={editMode}>{sections.values_title}</E></h2>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0 }}><E id="company_sections.values_title" editMode={editMode}>{content.company_sections.values_title}</E></h2>
           </div>
           <div className="about-values" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-            {values.map((v, idx) => (
+            {content.company_values.map((v, idx) => (
               <div key={idx} className="reveal about-val-card" style={{ border: '1px solid rgba(255,255,255,.08)', padding: 32, transition: 'border-color .3s, transform .25s', transitionDelay: `${idx * 0.06}s` }}>
                 <span style={{ fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic', fontSize: 32, fontWeight: 300, color: 'rgba(255,255,255,.1)', display: 'block', marginBottom: 20, lineHeight: 1 }}>{v.num}</span>
                 <h3 style={{ fontWeight: 700, fontSize: 17, color: '#fff', margin: '0 0 10px' }}><E id={`company_values.${idx}.title`} editMode={editMode}>{v.title}</E></h3>
@@ -258,8 +231,8 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         <div className="wrap">
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>ORGANIZATION</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_org.title" editMode={editMode}>{org.title}</E></h2>
-            <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{org.text}</E></div>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_org.title" editMode={editMode}>{content.company_org.title}</E></h2>
+            <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', maxWidth: 600, margin: 0 }}><E id="company_org.text" editMode={editMode}>{content.company_org.text}</E></div>
           </div>
           <div className={`reveal org-chart${editMode ? ' editing' : ''}`}>
             <style dangerouslySetInnerHTML={{ __html: `
@@ -312,10 +285,10 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
 .about-depts .editable-field:empty::before{content:'입력';color:#cbd5e1;font-weight:400}
 @media(max-width:768px){.org-dept::before,.org-dept::after{display:none}.org-dept{max-width:none;flex-basis:100%;padding-top:8px}.org-mid{height:auto;padding:10px 0;display:flex;justify-content:center}.org-mid::before{display:none}.org-advisor{position:static;transform:none;margin:0}.org-advisor::after{display:none}}
             ` }} />
-            <div className="org-ceo-wrap"><span className="org-ceo"><E id="company_org.ceo" editMode={editMode}>{org.ceo || 'CEO'}</E></span></div>
-            <div className="org-mid"><span className="org-advisor"><E id="company_org.advisor" editMode={editMode}>{org.advisor || '기술자문'}</E></span></div>
+            <div className="org-ceo-wrap"><span className="org-ceo"><E id="company_org.ceo" editMode={editMode}>{content.company_org.ceo || 'CEO'}</E></span></div>
+            <div className="org-mid"><span className="org-advisor"><E id="company_org.advisor" editMode={editMode}>{content.company_org.advisor || '기술자문'}</E></span></div>
             <div className="org-depts">
-              {depts.map((d, idx) => (
+              {content.company_depts.map((d, idx) => (
                 <div key={idx} className="org-dept">
                   {editMode && (
                     <div className="org-ctrl">
@@ -326,7 +299,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
                   )}
                   <div className="org-dept-head"><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></div>
                   <div className="org-teambox">
-                    <DeptTeams key={`${idx}-${depts.length}-${d.name || ''}`} deptIdx={idx} value={d.members || ''} editMode={editMode} />
+                    <DeptTeams key={`${idx}-${content.company_depts.length}-${d.name || ''}`} deptIdx={idx} value={d.members || ''} editMode={editMode} />
                   </div>
                 </div>
               ))}
@@ -338,7 +311,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
             )}
           </div>
           <div className="about-depts" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginTop: 40 }}>
-            {depts.map((d, idx) => (
+            {content.company_depts.map((d, idx) => (
               <div key={idx} style={{ borderTop: '2px solid var(--accent)', padding: '20px 0 0' }}>
                 <div style={{ fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 6px' }}><E id={`company_depts.${idx}.name`} editMode={editMode}>{d.name}</E></div>
                 {(editMode || d.desc) && (
@@ -359,20 +332,20 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         <div className="wrap" style={{ textAlign: 'center' }}>
           <div className="reveal">
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>CORPORATE IDENTITY</p>
-            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_ci.title" editMode={editMode}>{ci.title}</E></h2>
-            <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '0 0 40px' }}><E id="company_ci.subtitle" editMode={editMode}>{ci.subtitle}</E></div>
+            <h2 style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: .95, letterSpacing: '-.04em', margin: '0 0 12px' }}><E id="company_ci.title" editMode={editMode}>{content.company_ci.title}</E></h2>
+            <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '0 0 40px' }}><E id="company_ci.subtitle" editMode={editMode}>{content.company_ci.subtitle}</E></div>
           </div>
           <div className="reveal" style={{ display: 'inline-block', border: '1px solid var(--line)', background: '#fff', padding: 'clamp(24px, 4vw, 48px)' }}>
-            <OptImg id="company_ci.img" editMode={editMode} src={ci.img} alt="유니온시스템즈 CI" width={480} height={200} style={{ maxWidth: 480, width: '100%', height: 'auto' }} />
+            <OptImg id="company_ci.img" editMode={editMode} src={content.company_ci.img} alt="유니온시스템즈 CI" width={480} height={200} style={{ maxWidth: 480, width: '100%', height: 'auto' }} />
           </div>
           <div className="reveal" style={{ marginTop: 48, maxWidth: 600, margin: '48px auto 0' }}>
             <blockquote style={{ fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic', fontSize: 'clamp(18px, 2.5vw, 24px)', fontWeight: 400, lineHeight: 1.5, color: 'var(--ink)', margin: '0 0 16px' }}>
               <E id="company_ci.quote" editMode={editMode}>
-                &ldquo;{stripHtml(ci.quote).split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}&rdquo;
+                &ldquo;{stripHtml(content.company_ci.quote).split('\n').map((line, i) => (<React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>))}&rdquo;
               </E>
             </blockquote>
             <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 12, fontWeight: 500, letterSpacing: '.1em', color: 'var(--ink2)', margin: 0 }}>
-              <E id="company_ci.ceo" editMode={editMode}>{ci.ceo}</E>
+              <E id="company_ci.ceo" editMode={editMode}>{content.company_ci.ceo}</E>
             </p>
           </div>
         </div>
@@ -386,12 +359,12 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
         <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 50%, rgba(148,53,67,.06) 0%, transparent 50%)', pointerEvents: 'none' }} />
         <div className="wrap" style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
           <h2 className="reveal" style={{ fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)', lineHeight: 1.1, color: '#fff', margin: '0 0 12px', letterSpacing: '-.04em' }}>
-            <E id="company_cta.title" editMode={editMode}>{cta.title}</E>
+            <E id="company_cta.title" editMode={editMode}>{content.company_cta.title}</E>
           </h2>
           <p className="reveal" style={{ fontSize: 16, color: 'rgba(255,255,255,.5)', margin: '0 0 32px' }}>
-            <E id="company_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="company_cta.desc" editMode={editMode}>{content.company_cta.desc}</E>
           </p>
-          <Link href="/contact" className="reveal btn" style={{ display: 'inline-block', padding: '16px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="company_buttons.cta" editMode={editMode}>{buttons.cta}</E></Link>
+          <Link href="/contact" className="reveal btn" style={{ display: 'inline-block', padding: '16px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="company_buttons.cta" editMode={editMode}>{content.company_buttons.cta}</E></Link>
         </div>
       </section>
 

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -39,29 +39,17 @@ const DEFAULT_SECTIONS = {
   featuresTitle: '주요 기능',
 };
 
+const DEFAULTS = {
+  ahnlab_hero: DEFAULT_HERO,
+  ahnlab_products: DEFAULT_PRODUCTS,
+  ahnlab_points: DEFAULT_POINTS,
+  ahnlab_icons: DEFAULT_ICONS,
+  ahnlab_cta: DEFAULT_CTA,
+  ahnlab_sections: DEFAULT_SECTIONS,
+} as const;
+
 export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-  const [hero, setHero] = useState(() => safeParse(ssrContent.ahnlab_hero, DEFAULT_HERO));
-  const [products, setProducts] = useState(() => safeParse(ssrContent.ahnlab_products, DEFAULT_PRODUCTS));
-  const [points, setPoints] = useState(() => safeParse(ssrContent.ahnlab_points, DEFAULT_POINTS));
-  const [icons, setIcons] = useState(() => safeParse(ssrContent.ahnlab_icons, DEFAULT_ICONS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.ahnlab_cta, DEFAULT_CTA));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.ahnlab_sections, DEFAULT_SECTIONS));
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      ahnlab_hero: setHero as (v: unknown) => void,
-      ahnlab_products: setProducts as (v: unknown) => void,
-      ahnlab_points: setPoints as (v: unknown) => void,
-      ahnlab_icons: setIcons as (v: unknown) => void,
-      ahnlab_cta: setCta as (v: unknown) => void,
-      ahnlab_sections: setSections as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
     if (!els.length) return;
@@ -126,7 +114,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 16px',
             }}>
               <E id="ahnlab_hero.title" editMode={editMode}>
-                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.ahnlab_hero.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>
                     {i > 0 && <br />}
                     {i > 0 ? <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>{line}</span> : line}
@@ -138,7 +126,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
               maxWidth: 420, margin: '0 0 28px',
             }}>
-              <E id="ahnlab_hero.desc" editMode={editMode}>{hero.desc}</E>
+              <E id="ahnlab_hero.desc" editMode={editMode}>{content.ahnlab_hero.desc}</E>
             </p>
             {/* 30+ years badge */}
             <div style={{
@@ -159,7 +147,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}><E id="ahnlab_hero.heroBtn" editMode={editMode}>{hero.heroBtn}</E></Link>
+              }}><E id="ahnlab_hero.heroBtn" editMode={editMode}>{content.ahnlab_hero.heroBtn}</E></Link>
               <a href="tel:02-706-8999" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
@@ -183,7 +171,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}><E id="ahnlab_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
+            }}><E id="ahnlab_sections.productsTitle" editMode={editMode}>{content.ahnlab_sections.productsTitle}</E></h2>
           </div>
 
           <div className="ah-prod-grid" style={{
@@ -232,12 +220,12 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                   <h3 style={{
                     fontWeight: 900, fontSize: 22, letterSpacing: '-.02em',
                     color: p.accent ? '#fff' : 'var(--ink)', margin: '0 0 10px',
-                  }}><E id={`ahnlab_products.${i}.name`} editMode={editMode}>{products[i]?.name ?? p.name}</E></h3>
+                  }}><E id={`ahnlab_products.${i}.name`} editMode={editMode}>{content.ahnlab_products[i]?.name ?? p.name}</E></h3>
                   <div style={{
                     fontSize: 16, lineHeight: 1.7,
                     color: p.accent ? 'rgba(255,255,255,.55)' : 'var(--ink2)',
                     margin: 0,
-                  }}><E id={`ahnlab_products.${i}.desc`} editMode={editMode}>{products[i]?.desc ?? p.desc}</E></div>
+                  }}><E id={`ahnlab_products.${i}.desc`} editMode={editMode}>{content.ahnlab_products[i]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -272,7 +260,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
-            }}><E id="ahnlab_sections.whyTitle" editMode={editMode}>{sections.whyTitle}</E></h2>
+            }}><E id="ahnlab_sections.whyTitle" editMode={editMode}>{content.ahnlab_sections.whyTitle}</E></h2>
           </div>
 
           {POINTS.map((pt, i) => (
@@ -302,11 +290,11 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                 <h3 className="ah-point-title" style={{
                   fontWeight: 800, fontSize: 22, color: '#fff',
                   display: 'inline', letterSpacing: '-.02em', transition: 'color .2s',
-                }}><E id={`ahnlab_points.${i}.title`} editMode={editMode}>{points[i]?.title ?? pt.title}</E></h3>
+                }}><E id={`ahnlab_points.${i}.title`} editMode={editMode}>{content.ahnlab_points[i]?.title ?? pt.title}</E></h3>
                 <div style={{
                   fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
                   margin: '10px 0 0',
-                }}><E id={`ahnlab_points.${i}.desc`} editMode={editMode}>{points[i]?.desc ?? pt.desc}</E></div>
+                }}><E id={`ahnlab_points.${i}.desc`} editMode={editMode}>{content.ahnlab_points[i]?.desc ?? pt.desc}</E></div>
               </div>
             </div>
           ))}
@@ -336,7 +324,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}><E id="ahnlab_sections.featuresTitle" editMode={editMode}>{sections.featuresTitle}</E></h2>
+            }}><E id="ahnlab_sections.featuresTitle" editMode={editMode}>{content.ahnlab_sections.featuresTitle}</E></h2>
           </div>
 
           <div className="ah-feat-grid" style={{
@@ -360,7 +348,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
                 <p style={{
                   fontFamily: MONO, fontSize: 13, fontWeight: 600,
                   letterSpacing: '.04em', color: 'var(--ink)', margin: 0,
-                }}><E id={`ahnlab_icons.${i}.label`} editMode={editMode}>{icons[i]?.label ?? ic.label}</E></p>
+                }}><E id={`ahnlab_icons.${i}.label`} editMode={editMode}>{content.ahnlab_icons[i]?.label ?? ic.label}</E></p>
               </div>
             ))}
           </div>
@@ -396,7 +384,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="ahnlab_cta.title" editMode={editMode}>
-              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.ahnlab_cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -404,17 +392,17 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
           <p className="reveal" style={{
             fontSize: 16, color: 'var(--ink2)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            <E id="ahnlab_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="ahnlab_cta.desc" editMode={editMode}>{content.ahnlab_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}><E id="ahnlab_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
+            }}><E id="ahnlab_cta.btn1" editMode={editMode}>{content.ahnlab_cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}><E id="ahnlab_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
+            }}><E id="ahnlab_cta.btn2" editMode={editMode}>{content.ahnlab_cta.btn2}</E></Link>
           </div>
         </div>
       </section>

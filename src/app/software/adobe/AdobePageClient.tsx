@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems/';
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -71,38 +71,18 @@ const DEFAULT_SECTIONS = {
 };
 const DEFAULT_TRUST = ['Adobe 공인 리셀러', '즉시 발급', '세금계산서 발행'];
 
+const DEFAULTS = {
+  adobe_hero: DEFAULT_HERO,
+  adobe_strengths: DEFAULT_STRENGTHS,
+  adobe_cta: DEFAULT_CTA,
+  adobe_products: DEFAULT_PRODUCTS_DATA,
+  adobe_plans: DEFAULT_PLANS_DATA,
+  adobe_sections: DEFAULT_SECTIONS,
+  adobe_trust: DEFAULT_TRUST,
+} as const;
+
 export default function AdobePageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.adobe_hero, DEFAULT_HERO));
-  const [strengths, setStrengths] = useState(() => safeParse(ssrContent.adobe_strengths, DEFAULT_STRENGTHS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.adobe_cta, DEFAULT_CTA));
-  const [productsData, setProductsData] = useState(() => safeParse(ssrContent.adobe_products, DEFAULT_PRODUCTS_DATA));
-  const [plansData, setPlansData] = useState(() => safeParse(ssrContent.adobe_plans, DEFAULT_PLANS_DATA));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.adobe_sections, DEFAULT_SECTIONS));
-  const [trust, setTrust] = useState(() => safeParse(ssrContent.adobe_trust, DEFAULT_TRUST));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      adobe_hero: setHero as (v: unknown) => void,
-      adobe_strengths: setStrengths as (v: unknown) => void,
-      adobe_cta: setCta as (v: unknown) => void,
-      adobe_products: setProductsData as (v: unknown) => void,
-      adobe_plans: setPlansData as (v: unknown) => void,
-      adobe_sections: setSections as (v: unknown) => void,
-      adobe_trust: setTrust as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
@@ -157,13 +137,13 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <p style={{
               fontFamily: MONO, fontWeight: 500, fontSize: 13, letterSpacing: '.14em',
               textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 16px',
-            }}><E id="adobe_hero.badge" editMode={editMode}>{hero.badge}</E></p>
+            }}><E id="adobe_hero.badge" editMode={editMode}>{content.adobe_hero.badge}</E></p>
             <h1 style={{
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 16px',
             }}>
               <E id="adobe_hero.title" editMode={editMode}>
-                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.adobe_hero.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>
                     {i > 0 && <br />}
                     {i > 0 ? <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>{line}</span> : line}
@@ -175,7 +155,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
               maxWidth: 600, margin: '0 0 28px',
             }}>
-              <E id="adobe_hero.desc" editMode={editMode}>{hero.desc}</E>
+              <E id="adobe_hero.desc" editMode={editMode}>{content.adobe_hero.desc}</E>
             </p>
             {/* 20+ apps badge */}
             <div style={{
@@ -196,11 +176,11 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               <Link href="/contact" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              }}><E id="adobe_hero.heroBtn1" editMode={editMode}>{hero.heroBtn1}</E></Link>
+              }}><E id="adobe_hero.heroBtn1" editMode={editMode}>{content.adobe_hero.heroBtn1}</E></Link>
               <Link href="/contact" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-              }}><E id="adobe_hero.heroBtn2" editMode={editMode}>{hero.heroBtn2}</E></Link>
+              }}><E id="adobe_hero.heroBtn2" editMode={editMode}>{content.adobe_hero.heroBtn2}</E></Link>
             </div>
           </div>
         </div>
@@ -214,7 +194,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}><E id="adobe_sections.productsTitle" editMode={editMode}>{sections.productsTitle}</E></h2>
+            }}><E id="adobe_sections.productsTitle" editMode={editMode}>{content.adobe_sections.productsTitle}</E></h2>
           </div>
 
           <div className="ab-bento" style={{
@@ -240,8 +220,8 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                   fontFamily: SERIF, fontStyle: 'italic',
                   fontSize: 18, color: 'var(--accent)', marginRight: 10,
                 }}>01</span>
-                <span style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-.02em' }}><E id="adobe_product0.name" editMode={editMode}>{productsData[0]?.name ?? PRODUCTS[0].name}</E></span>
-                <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '8px 0 0' }}><E id="adobe_product0.desc" editMode={editMode}>{productsData[0]?.desc ?? PRODUCTS[0].desc}</E></div>
+                <span style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-.02em' }}><E id="adobe_product0.name" editMode={editMode}>{content.adobe_products[0]?.name ?? PRODUCTS[0].name}</E></span>
+                <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '8px 0 0' }}><E id="adobe_product0.desc" editMode={editMode}>{content.adobe_products[0]?.desc ?? PRODUCTS[0].desc}</E></div>
               </div>
             </div>
 
@@ -264,8 +244,8 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     fontFamily: SERIF, fontStyle: 'italic',
                     fontSize: 18, color: 'var(--ink2)', marginRight: 8,
                   }}>{String(i + 2).padStart(2, '0')}</span>
-                  <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-.02em' }}><E id={`adobe_product${i + 1}.name`} editMode={editMode}>{productsData[i + 1]?.name ?? p.name}</E></span>
-                  <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '4px 0 0' }}><E id={`adobe_product${i + 1}.desc`} editMode={editMode}>{productsData[i + 1]?.desc ?? p.desc}</E></div>
+                  <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-.02em' }}><E id={`adobe_product${i + 1}.name`} editMode={editMode}>{content.adobe_products[i + 1]?.name ?? p.name}</E></span>
+                  <div style={{ fontSize: 16, color: 'var(--ink2)', margin: '4px 0 0' }}><E id={`adobe_product${i + 1}.desc`} editMode={editMode}>{content.adobe_products[i + 1]?.desc ?? p.desc}</E></div>
                 </div>
               </div>
             ))}
@@ -330,13 +310,13 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
-            }}><E id="adobe_sections.strengthsTitle" editMode={editMode}>{sections.strengthsTitle}</E></h2>
+            }}><E id="adobe_sections.strengthsTitle" editMode={editMode}>{content.adobe_sections.strengthsTitle}</E></h2>
           </div>
 
           <div className="ab-str-grid" style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20,
           }}>
-            {strengths.map((s: { num: string; img: string; en: string; ko: string; desc: string; accent?: boolean }, i: number) => (
+            {content.adobe_strengths.map((s: { num: string; img: string; en: string; ko: string; desc: string; accent?: boolean }, i: number) => (
               <div key={s.num} className="reveal ab-str-card" style={{
                 overflow: 'hidden',
                 background: s.accent ? 'var(--charcoal)' : 'var(--surface)',
@@ -426,10 +406,10 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: 1.05, letterSpacing: '-.04em', margin: '0 0 14px',
             }}>
-              <E id="adobe_sections.plansTitle" editMode={editMode}>{sections.plansTitle}</E>
+              <E id="adobe_sections.plansTitle" editMode={editMode}>{content.adobe_sections.plansTitle}</E>
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0, maxWidth: 640 }}>
-              <E id="adobe_sections.plansDesc" editMode={editMode}>{sections.plansDesc}</E>
+              <E id="adobe_sections.plansDesc" editMode={editMode}>{content.adobe_sections.plansDesc}</E>
             </p>
           </div>
 
@@ -473,10 +453,10 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                   }}>{String(i + 1).padStart(2, '0')}</div>
 
                   <h3 style={{ fontWeight: 900, fontSize: 22, margin: '0 0 8px', letterSpacing: '-.02em' }}>
-                    <E id={`adobe_plan${i}.name`} editMode={editMode}>{plansData[i]?.name ?? pl.name}</E>
+                    <E id={`adobe_plan${i}.name`} editMode={editMode}>{content.adobe_plans[i]?.name ?? pl.name}</E>
                   </h3>
                   <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink2)', margin: '0 0 16px' }}>
-                    <E id={`adobe_plan${i}.desc`} editMode={editMode}>{plansData[i]?.desc ?? pl.desc}</E>
+                    <E id={`adobe_plan${i}.desc`} editMode={editMode}>{content.adobe_plans[i]?.desc ?? pl.desc}</E>
                   </p>
 
                   {/* Apps included */}
@@ -484,7 +464,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     fontFamily: MONO, fontSize: 12, fontWeight: 500,
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
-                  }}><E id={`adobe_plan${i}.apps`} editMode={editMode}>{plansData[i]?.apps ?? pl.apps}</E></p>
+                  }}><E id={`adobe_plan${i}.apps`} editMode={editMode}>{content.adobe_plans[i]?.apps ?? pl.apps}</E></p>
 
                   {/* CTA */}
                   <Link href="/contact" style={{
@@ -498,7 +478,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                     textDecoration: 'none', transition: 'all .2s',
                     textAlign: 'center', justifyContent: 'center',
                   }}>
-                    <E id={`adobe_sections.plansCta`} editMode={editMode}>{sections.plansCta}</E> <span>&rarr;</span>
+                    <E id={`adobe_sections.plansCta`} editMode={editMode}>{content.adobe_sections.plansCta}</E> <span>&rarr;</span>
                   </Link>
                 </div>
               </div>
@@ -512,7 +492,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             flexWrap: 'wrap',
           }}>
             <div style={{ display: 'flex', gap: 20 }}>
-              {trust.map((t: string, i: number) => (
+              {content.adobe_trust.map((t: string, i: number) => (
                 <span key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   fontSize: 14, fontWeight: 500, color: 'var(--ink2)',
@@ -527,7 +507,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                 fontWeight: 600, fontSize: 14, color: 'var(--ink)',
                 textDecoration: 'none',
               }}>
-                <E id="adobe_sections.phone" editMode={editMode}>{sections.phone}</E>
+                <E id="adobe_sections.phone" editMode={editMode}>{content.adobe_sections.phone}</E>
               </a>
             </div>
           </div>
@@ -562,7 +542,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="adobe_cta.title" editMode={editMode}>
-              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.adobe_cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -570,17 +550,17 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
           <p className="reveal" style={{
             fontSize: 16, color: 'var(--ink2)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            <E id="adobe_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="adobe_cta.desc" editMode={editMode}>{content.adobe_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
-            }}><E id="adobe_cta.btn1" editMode={editMode}>{cta.btn1}</E></Link>
+            }}><E id="adobe_cta.btn1" editMode={editMode}>{content.adobe_cta.btn1}</E></Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
-            }}><E id="adobe_cta.btn2" editMode={editMode}>{cta.btn2}</E></Link>
+            }}><E id="adobe_cta.btn2" editMode={editMode}>{content.adobe_cta.btn2}</E></Link>
           </div>
         </div>
       </section>

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import React from 'react';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -27,32 +27,15 @@ const DEFAULT_OFFICER = {
 
 const DEFAULT_DATE = { text: '2022년 07월 08일' };
 
+const DEFAULTS = {
+  privacy_hero: DEFAULT_HERO,
+  privacy_intro: DEFAULT_INTRO,
+  privacy_officer: DEFAULT_OFFICER,
+  privacy_date: DEFAULT_DATE,
+} as const;
+
 export default function PrivacyPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.privacy_hero, DEFAULT_HERO));
-  const [intro, setIntro] = useState(() => safeParse(ssrContent.privacy_intro, DEFAULT_INTRO));
-  const [officer, setOfficer] = useState(() => safeParse(ssrContent.privacy_officer, DEFAULT_OFFICER));
-  const [date, setDate] = useState(() => safeParse(ssrContent.privacy_date, DEFAULT_DATE));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      privacy_hero: setHero as (v: unknown) => void,
-      privacy_intro: setIntro as (v: unknown) => void,
-      privacy_officer: setOfficer as (v: unknown) => void,
-      privacy_date: setDate as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
@@ -92,14 +75,14 @@ export default function PrivacyPageClient({ ssrContent }: { ssrContent: Record<s
           }}>
             유니온시스템즈의{' '}
             <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>
-              <E id="privacy_hero.title_word" editMode={editMode}>{hero.title_word}</E>
+              <E id="privacy_hero.title_word" editMode={editMode}>{content.privacy_hero.title_word}</E>
             </span>을<br />알려드립니다.
           </h1>
           <p style={{
             fontSize: 17, lineHeight: 1.7, color: 'rgba(255,255,255,.5)',
             maxWidth: 560, margin: 0,
           }}>
-            <E id="privacy_hero.subtitle" editMode={editMode}>{hero.subtitle}</E>
+            <E id="privacy_hero.subtitle" editMode={editMode}>{content.privacy_hero.subtitle}</E>
           </p>
         </div>
       </section>
@@ -118,13 +101,13 @@ export default function PrivacyPageClient({ ssrContent }: { ssrContent: Record<s
             padding: 'clamp(28px, 4vw, 40px)', marginBottom: 48,
           }}>
             <div style={{ fontSize: 17, lineHeight: 1.85, color: 'var(--ink)', margin: '0 0 16px', fontWeight: 500 }}>
-              <E id="privacy_intro.p1" editMode={editMode}>{intro.p1}</E>
+              <E id="privacy_intro.p1" editMode={editMode}>{content.privacy_intro.p1}</E>
             </div>
             <div style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--ink2)', margin: '0 0 12px' }}>
-              <E id="privacy_intro.p2" editMode={editMode}>{intro.p2}</E>
+              <E id="privacy_intro.p2" editMode={editMode}>{content.privacy_intro.p2}</E>
             </div>
             <div style={{ fontSize: 15, color: 'var(--ink2)', margin: 0 }}>
-              <E id="privacy_intro.p3" editMode={editMode}>{intro.p3}</E>
+              <E id="privacy_intro.p3" editMode={editMode}>{content.privacy_intro.p3}</E>
             </div>
             <div style={{
               marginTop: 20, paddingTop: 16,
@@ -132,7 +115,7 @@ export default function PrivacyPageClient({ ssrContent }: { ssrContent: Record<s
               fontFamily: MONO, fontSize: 13, fontWeight: 600,
               color: 'var(--accent)', letterSpacing: '.04em',
             }}>
-              시행일자 : <E id="privacy_date.text" editMode={editMode}>{date.text}</E>
+              시행일자 : <E id="privacy_date.text" editMode={editMode}>{content.privacy_date.text}</E>
             </div>
           </div>
         </div>
@@ -285,25 +268,25 @@ export default function PrivacyPageClient({ ssrContent }: { ssrContent: Record<s
                 <div>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,.35)', margin: '0 0 2px' }}>이 름</p>
                   <p style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
-                    <E id="privacy_officer.name" editMode={editMode}>{officer.name}</E>
+                    <E id="privacy_officer.name" editMode={editMode}>{content.privacy_officer.name}</E>
                   </p>
                 </div>
                 <div>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,.35)', margin: '0 0 2px' }}>전 화</p>
                   <p style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
-                    <E id="privacy_officer.tel" editMode={editMode}>{officer.tel}</E>
+                    <E id="privacy_officer.tel" editMode={editMode}>{content.privacy_officer.tel}</E>
                   </p>
                 </div>
                 <div>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,.35)', margin: '0 0 2px' }}>팩 스</p>
                   <p style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
-                    <E id="privacy_officer.fax" editMode={editMode}>{officer.fax}</E>
+                    <E id="privacy_officer.fax" editMode={editMode}>{content.privacy_officer.fax}</E>
                   </p>
                 </div>
                 <div>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,.35)', margin: '0 0 2px' }}>이메일</p>
                   <p style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
-                    <E id="privacy_officer.email" editMode={editMode}>{officer.email}</E>
+                    <E id="privacy_officer.email" editMode={editMode}>{content.privacy_officer.email}</E>
                   </p>
                 </div>
               </div>
@@ -337,7 +320,7 @@ export default function PrivacyPageClient({ ssrContent }: { ssrContent: Record<s
               background: 'var(--accent)', color: '#fff',
               display: 'inline-block',
             }}>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>시행일자 : <E id="privacy_date.text" editMode={editMode}>{date.text}</E></p>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>시행일자 : <E id="privacy_date.text" editMode={editMode}>{content.privacy_date.text}</E></p>
             </div>
           </PolicySection>
 

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api';
 import PrivacyConsent from '@/components/ui/PrivacyConsent';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const PRODUCTS = ['Microsoft 365', 'Adobe Creative Cloud', 'Autodesk', 'AhnLab', 'ESTsecurity', 'OfficeKeeper', 'NetClient', '알툴즈', '기타'];
 
@@ -71,37 +71,17 @@ const DEFAULT_LABELS = {
   samBenefits: 'SAM 상담을 받으면',
 };
 
+const DEFAULTS = {
+  licensealert_hero: DEFAULT_HERO,
+  licensealert_benefits: DEFAULT_BENEFITS,
+  licensealert_sam: DEFAULT_SAM_BOX,
+  licensealert_form: DEFAULT_FORM,
+  licensealert_done: DEFAULT_DONE,
+  licensealert_labels: DEFAULT_LABELS,
+} as const;
+
 export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.licensealert_hero, DEFAULT_HERO));
-  const [benefits, setBenefits] = useState(() => safeParse(ssrContent.licensealert_benefits, DEFAULT_BENEFITS));
-  const [samBox, setSamBox] = useState(() => safeParse(ssrContent.licensealert_sam, DEFAULT_SAM_BOX));
-  const [form, setForm] = useState(() => safeParse(ssrContent.licensealert_form, DEFAULT_FORM));
-  const [done, setDone] = useState(() => safeParse(ssrContent.licensealert_done, DEFAULT_DONE));
-  const [labels, setLabels] = useState(() => safeParse(ssrContent.licensealert_labels, DEFAULT_LABELS));
-
-  /* content-update 수신 */
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      licensealert_hero: setHero as (v: unknown) => void,
-      licensealert_benefits: setBenefits as (v: unknown) => void,
-      licensealert_sam: setSamBox as (v: unknown) => void,
-      licensealert_form: setForm as (v: unknown) => void,
-      licensealert_done: setDone as (v: unknown) => void,
-      licensealert_labels: setLabels as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   /* 폼 상태 */
   const [company, setCompany] = useState('');
@@ -179,12 +159,12 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
         <div style={{ position: 'relative' }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>&#10003;</div>
           <h1 style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 'clamp(28px,4.5vw,42px)', lineHeight: 1.2, marginBottom: 12 }}>
-            <E id="licensealert_done.title" editMode={editMode}>{done.title}</E>
+            <E id="licensealert_done.title" editMode={editMode}>{content.licensealert_done.title}</E>
           </h1>
           <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 16, opacity: .85 }}>
-            <E id="licensealert_done.subtitle_prefix" editMode={editMode}>{done.subtitle_prefix}</E>
+            <E id="licensealert_done.subtitle_prefix" editMode={editMode}>{content.licensealert_done.subtitle_prefix}</E>
             {' '}{email}{' '}
-            <E id="licensealert_done.subtitle_suffix" editMode={editMode}>{done.subtitle_suffix}</E>
+            <E id="licensealert_done.subtitle_suffix" editMode={editMode}>{content.licensealert_done.subtitle_suffix}</E>
           </p>
         </div>
       </section>
@@ -192,7 +172,7 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', overflow: 'hidden', marginBottom: 24 }}>
             <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--line)', fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 16, color: 'var(--ink)' }}>
-              <E id="licensealert_done.listTitle" editMode={editMode}>{done.listTitle}</E>
+              <E id="licensealert_done.listTitle" editMode={editMode}>{content.licensealert_done.listTitle}</E>
             </div>
             {licenses.filter(l => l.product).map((l, i, arr) => (
               <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 24px', borderBottom: i < arr.length - 1 ? '1px solid var(--line)' : 'none' }}>
@@ -207,11 +187,11 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
           <div style={{ display: 'flex', gap: 12 }}>
             <Link href="/estimate"
               style={{ flex: 1, padding: '14px', background: 'var(--accent)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, textDecoration: 'none', textAlign: 'center' }}>
-              <E id="licensealert_done.link_estimate" editMode={editMode}>{done.link_estimate}</E>
+              <E id="licensealert_done.link_estimate" editMode={editMode}>{content.licensealert_done.link_estimate}</E>
             </Link>
             <Link href="/"
               style={{ flex: 1, padding: '14px', border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, textDecoration: 'none', textAlign: 'center' }}>
-              <E id="licensealert_done.link_home" editMode={editMode}>{done.link_home}</E>
+              <E id="licensealert_done.link_home" editMode={editMode}>{content.licensealert_done.link_home}</E>
             </Link>
           </div>
         </div>
@@ -227,13 +207,13 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,.06) 0.5px, transparent 0.5px)', backgroundSize: '40px 40px', pointerEvents: 'none' }} />
       <div style={{ position: 'relative' }}>
         <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontWeight: 800, letterSpacing: '.18em', fontSize: 12, color: 'var(--accent)', background: 'rgba(255,255,255,.08)', padding: '5px 12px' }}>
-          <E id="licensealert_hero.badge" editMode={editMode}>{hero.badge}</E>
+          <E id="licensealert_hero.badge" editMode={editMode}>{content.licensealert_hero.badge}</E>
         </span>
         <h1 style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 'clamp(28px,4.5vw,48px)', lineHeight: 1.2, letterSpacing: '-.03em', marginTop: 16, marginBottom: 12 }}>
-          <E id="licensealert_hero.title" editMode={editMode}>{hero.title}</E>
+          <E id="licensealert_hero.title" editMode={editMode}>{content.licensealert_hero.title}</E>
         </h1>
         <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 16, opacity: .75, maxWidth: 500, margin: '0 auto', lineHeight: 1.7 }}>
-          <E id="licensealert_hero.subtitle" editMode={editMode}>{hero.subtitle}</E>
+          <E id="licensealert_hero.subtitle" editMode={editMode}>{content.licensealert_hero.subtitle}</E>
         </p>
         <div style={{ display: 'flex', gap: 'clamp(28px,5vw,48px)', marginTop: 28, justifyContent: 'center', flexWrap: 'wrap' }}>
           <div>
@@ -241,23 +221,23 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
               {String(PRODUCTS.length - 1)}<span style={{ fontSize: 14, color: 'var(--accent)', marginLeft: 2 }}>개</span>
             </div>
             <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginTop: 3 }}>
-              <E id="licensealert_hero.stat_products_label" editMode={editMode}>{hero.stat_products_label}</E>
+              <E id="licensealert_hero.stat_products_label" editMode={editMode}>{content.licensealert_hero.stat_products_label}</E>
             </div>
           </div>
           <div>
             <div style={{ color: '#fff', fontSize: 28, fontWeight: 900, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>
-              <E id="licensealert_hero.stat_reply_num" editMode={editMode}>{hero.stat_reply_num}</E>
+              <E id="licensealert_hero.stat_reply_num" editMode={editMode}>{content.licensealert_hero.stat_reply_num}</E>
             </div>
             <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginTop: 3 }}>
-              <E id="licensealert_hero.stat_reply_label" editMode={editMode}>{hero.stat_reply_label}</E>
+              <E id="licensealert_hero.stat_reply_label" editMode={editMode}>{content.licensealert_hero.stat_reply_label}</E>
             </div>
           </div>
           <div>
             <div style={{ color: '#fff', fontSize: 28, fontWeight: 900, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>
-              <E id="licensealert_hero.stat_clients_num" editMode={editMode}>{hero.stat_clients_num}</E>
+              <E id="licensealert_hero.stat_clients_num" editMode={editMode}>{content.licensealert_hero.stat_clients_num}</E>
             </div>
             <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 12, marginTop: 3 }}>
-              <E id="licensealert_hero.stat_clients_label" editMode={editMode}>{hero.stat_clients_label}</E>
+              <E id="licensealert_hero.stat_clients_label" editMode={editMode}>{content.licensealert_hero.stat_clients_label}</E>
             </div>
           </div>
         </div>
@@ -271,25 +251,25 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
         {/* Form */}
         <div style={{ flex: 2 }}>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: 'clamp(24px,4vw,36px)', marginBottom: 24 }}>
-            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)', marginBottom: 24 }}><E id="licensealert_labels.basicInfo" editMode={editMode}>{labels.basicInfo}</E></h2>
+            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)', marginBottom: 24 }}><E id="licensealert_labels.basicInfo" editMode={editMode}>{content.licensealert_labels.basicInfo}</E></h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }} className="la-form-grid">
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.company" editMode={editMode}>{labels.company}</E></label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.company" editMode={editMode}>{content.licensealert_labels.company}</E></label>
                 <input value={company} onChange={e => setCompany(e.target.value)} placeholder="주식회사 유니온시스템즈" style={inputStyle(errors.company)} />
                 {errors.company && <span style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginTop: 4, display: 'block' }}>{errors.company}</span>}
               </div>
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.manager" editMode={editMode}>{labels.manager}</E></label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.manager" editMode={editMode}>{content.licensealert_labels.manager}</E></label>
                 <input value={name} onChange={e => setName(e.target.value)} placeholder="홍길동" style={inputStyle(errors.name)} />
                 {errors.name && <span style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginTop: 4, display: 'block' }}>{errors.name}</span>}
               </div>
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.email" editMode={editMode}>{labels.email}</E></label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.email" editMode={editMode}>{content.licensealert_labels.email}</E></label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@company.com" style={inputStyle(errors.email)} />
                 {errors.email && <span style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginTop: 4, display: 'block' }}>{errors.email}</span>}
               </div>
               <div>
-                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.phone" editMode={editMode}>{labels.phone}</E></label>
+                <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 14, color: 'var(--ink)', display: 'block', marginBottom: 6 }}><E id="licensealert_labels.phone" editMode={editMode}>{content.licensealert_labels.phone}</E></label>
                 <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="010-0000-0000" style={inputStyle()} />
               </div>
             </div>
@@ -298,9 +278,9 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
           {/* Licenses */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: 'clamp(24px,4vw,36px)', marginBottom: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)' }}><E id="licensealert_labels.licenses" editMode={editMode}>{labels.licenses}</E></h2>
+              <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 20, color: 'var(--ink)' }}><E id="licensealert_labels.licenses" editMode={editMode}>{content.licensealert_labels.licenses}</E></h2>
               <button onClick={addLicense}
-                style={{ padding: '8px 16px', background: '#11121410', color: 'var(--accent)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}><E id="licensealert_labels.addBtn" editMode={editMode}>{labels.addBtn}</E></button>
+                style={{ padding: '8px 16px', background: '#11121410', color: 'var(--accent)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}><E id="licensealert_labels.addBtn" editMode={editMode}>{content.licensealert_labels.addBtn}</E></button>
             </div>
             {errors.license && <p style={{ fontFamily: "'Pretendard'", fontSize: 13, color: '#F5333F', marginBottom: 12 }}>{errors.license}</p>}
 
@@ -308,7 +288,7 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
               <div key={l.id} style={{ padding: '16px 0', borderTop: i > 0 ? '1px solid var(--line)' : 'none' }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
                   <div style={{ flex: 2, minWidth: 160 }}>
-                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.product`} editMode={editMode}>{labels.product}</E></label>
+                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.product`} editMode={editMode}>{content.licensealert_labels.product}</E></label>
                     <select value={l.product} onChange={e => updateLicense(l.id, 'product', e.target.value)}
                       style={{ ...inputStyle(), appearance: 'auto' }}>
                       {PRODUCTS.map(p => <option key={p} value={p}>{p}</option>)}
@@ -316,16 +296,16 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
                   </div>
                   {l.product === '기타' && (
                     <div style={{ flex: 2, minWidth: 140 }}>
-                      <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.productName`} editMode={editMode}>{labels.productName}</E></label>
+                      <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.productName`} editMode={editMode}>{content.licensealert_labels.productName}</E></label>
                       <input value={l.customProduct} onChange={e => updateLicense(l.id, 'customProduct', e.target.value)} placeholder="제품명 입력" style={inputStyle()} />
                     </div>
                   )}
                   <div style={{ width: 80 }}>
-                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.qty`} editMode={editMode}>{labels.qty}</E></label>
+                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.qty`} editMode={editMode}>{content.licensealert_labels.qty}</E></label>
                     <input type="number" min={1} value={l.qty} onChange={e => updateLicense(l.id, 'qty', Number(e.target.value))} style={{ ...inputStyle(), textAlign: 'center' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 150 }}>
-                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.expiry`} editMode={editMode}>{labels.expiry}</E></label>
+                    <label style={{ fontFamily: "'Pretendard'", fontWeight: 600, fontSize: 13, color: 'var(--ink2)', display: 'block', marginBottom: 4 }}><E id={`licensealert_labels.expiry`} editMode={editMode}>{content.licensealert_labels.expiry}</E></label>
                     <input type="date" value={l.expiry} onChange={e => updateLicense(l.id, 'expiry', e.target.value)} style={inputStyle()} />
                   </div>
                   {licenses.length > 1 && (
@@ -342,8 +322,8 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
 
           <button onClick={handleSubmit} disabled={submitting}
             style={{ width: '100%', padding: '16px', background: submitting ? 'var(--ink2)' : 'var(--accent)', color: '#fff', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, border: 'none', cursor: submitting ? 'default' : 'pointer' }}>
-            <E id="licensealert_form.submit_label" editMode={editMode}>
-              {submitting ? form.submitting_label : form.submit_label}
+            <E id="licensealert_content.licensealert_form.submit_label" editMode={editMode}>
+              {submitting ? content.licensealert_form.submitting_label : content.licensealert_form.submit_label}
             </E>
           </button>
         </div>
@@ -351,9 +331,9 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
         {/* Benefits sidebar */}
         <div style={{ flex: 1, minWidth: 280, position: 'sticky', top: 100 }} className="la-sidebar">
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: 'clamp(24px,3vw,32px)', marginBottom: 16 }}>
-            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 16, color: 'var(--ink)', marginBottom: 20 }}><E id="licensealert_labels.samBenefits" editMode={editMode}>{labels.samBenefits}</E></h3>
-            {benefits.map((b: { title: string; desc: string }, i: number) => (
-              <div key={i} style={{ marginBottom: i < benefits.length - 1 ? 18 : 0, paddingBottom: i < benefits.length - 1 ? 18 : 0, borderBottom: i < benefits.length - 1 ? '1px solid var(--line)' : 'none' }}>
+            <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 16, color: 'var(--ink)', marginBottom: 20 }}><E id="licensealert_labels.samBenefits" editMode={editMode}>{content.licensealert_labels.samBenefits}</E></h3>
+            {content.licensealert_benefits.map((b: { title: string; desc: string }, i: number) => (
+              <div key={i} style={{ marginBottom: i < content.licensealert_benefits.length - 1 ? 18 : 0, paddingBottom: i < content.licensealert_benefits.length - 1 ? 18 : 0, borderBottom: i < content.licensealert_benefits.length - 1 ? '1px solid var(--line)' : 'none' }}>
                 <h4 style={{ fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 15, color: 'var(--ink)', marginBottom: 4 }}>
                   <E id={`licensealert_benefits.${i}.title`} editMode={editMode}>{b.title}</E>
                 </h4>
@@ -365,10 +345,10 @@ export default function LicenseAlertPageClient({ ssrContent }: { ssrContent: Rec
           </div>
           <div style={{ background: '#111214', color: '#fff', padding: 'clamp(20px,3vw,28px)' }}>
             <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 800, letterSpacing: '.12em', color: 'var(--accent)', marginBottom: 8 }}>
-              <E id="licensealert_sam.label" editMode={editMode}>{samBox.label}</E>
+              <E id="licensealert_sam.label" editMode={editMode}>{content.licensealert_sam.label}</E>
             </p>
             <div style={{ fontFamily: "'Pretendard'", fontSize: 13, color: 'rgba(255,255,255,.7)', lineHeight: 1.7 }}>
-              <E id="licensealert_sam.desc" editMode={editMode}>{samBox.desc}</E>
+              <E id="licensealert_sam.desc" editMode={editMode}>{content.licensealert_sam.desc}</E>
             </div>
           </div>
         </div>

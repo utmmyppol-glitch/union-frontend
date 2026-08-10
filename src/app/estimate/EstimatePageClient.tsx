@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 /* ── 실제 취급 제품 기반 데이터 ── */
 
@@ -121,40 +121,20 @@ const DEFAULT_UI = {
   builder_note: '당일 내 담당 컨설턴트가 연락드립니다.',
 };
 
+const DEFAULTS = {
+  estimate_hero: DEFAULT_HERO,
+  estimate_sample: DEFAULT_SAMPLE,
+  estimate_configs: DEFAULT_CONFIGS,
+  estimate_cta: DEFAULT_CTA,
+  estimate_ui: DEFAULT_UI,
+} as const;
+
 export default function EstimatePageClient({
   ssrContent,
 }: {
   ssrContent: Record<string, string>;
 }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  /* ── 편집 가능 state ── */
-  const [hero, setHero] = useState(() => safeParse(ssrContent.estimate_hero, DEFAULT_HERO));
-  const [sample, setSample] = useState(() => safeParse(ssrContent.estimate_sample, DEFAULT_SAMPLE));
-  const [configs, setConfigs] = useState(() => safeParse(ssrContent.estimate_configs, DEFAULT_CONFIGS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.estimate_cta, DEFAULT_CTA));
-  const [ui, setUi] = useState(() => safeParse(ssrContent.estimate_ui, DEFAULT_UI));
-
-  /* ── content-update 메시지 수신 ── */
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      estimate_hero: setHero as (v: unknown) => void,
-      estimate_sample: setSample as (v: unknown) => void,
-      estimate_configs: setConfigs as (v: unknown) => void,
-      estimate_cta: setCta as (v: unknown) => void,
-      estimate_ui: setUi as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   /* ── 견적 빌더 로컬 상태 ── */
   const [size, setSize] = useState<string | null>(null);
@@ -242,7 +222,7 @@ export default function EstimatePageClient({
               padding: '5px 12px',
             }}
           >
-            <E id="estimate_hero.badge" editMode={editMode}>{hero.badge}</E>
+            <E id="estimate_hero.badge" editMode={editMode}>{content.estimate_hero.badge}</E>
           </span>
           <h1
             style={{
@@ -255,7 +235,7 @@ export default function EstimatePageClient({
               fontFamily: "'Pretendard', sans-serif",
             }}
           >
-            <E id="estimate_hero.title" editMode={editMode}>{hero.title}</E>
+            <E id="estimate_hero.title" editMode={editMode}>{content.estimate_hero.title}</E>
             <span style={{ color: 'var(--accent)' }}>.</span>
           </h1>
           <p
@@ -268,7 +248,7 @@ export default function EstimatePageClient({
               fontFamily: "'Pretendard', sans-serif",
             }}
           >
-            <E id="estimate_hero.desc" editMode={editMode}>{hero.desc}</E>
+            <E id="estimate_hero.desc" editMode={editMode}>{content.estimate_hero.desc}</E>
           </p>
           <div
             style={{
@@ -288,13 +268,13 @@ export default function EstimatePageClient({
                   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                 }}
               >
-                <E id="estimate_hero.stat1_num" editMode={editMode}>{hero.stat1_num}</E>
+                <E id="estimate_hero.stat1_num" editMode={editMode}>{content.estimate_hero.stat1_num}</E>
                 <span style={{ fontSize: 15, color: 'var(--accent)', marginLeft: 2 }}>
-                  <E id="estimate_hero.stat1_unit" editMode={editMode}>{hero.stat1_unit}</E>
+                  <E id="estimate_hero.stat1_unit" editMode={editMode}>{content.estimate_hero.stat1_unit}</E>
                 </span>
               </div>
               <div style={{ color: 'rgba(255,255,255,.45)', fontSize: 12, marginTop: 4 }}>
-                <E id="estimate_hero.stat1_sub" editMode={editMode}>{hero.stat1_sub}</E>
+                <E id="estimate_hero.stat1_sub" editMode={editMode}>{content.estimate_hero.stat1_sub}</E>
               </div>
             </div>
             {/* stat2 */}
@@ -309,11 +289,11 @@ export default function EstimatePageClient({
               >
                 {String(AREA_OPTIONS.length)}
                 <span style={{ fontSize: 15, color: 'var(--accent)', marginLeft: 2 }}>
-                  <E id="estimate_hero.stat2_unit" editMode={editMode}>{hero.stat2_unit}</E>
+                  <E id="estimate_hero.stat2_unit" editMode={editMode}>{content.estimate_hero.stat2_unit}</E>
                 </span>
               </div>
               <div style={{ color: 'rgba(255,255,255,.45)', fontSize: 12, marginTop: 4 }}>
-                <E id="estimate_hero.stat2_sub" editMode={editMode}>{hero.stat2_sub}</E>
+                <E id="estimate_hero.stat2_sub" editMode={editMode}>{content.estimate_hero.stat2_sub}</E>
               </div>
             </div>
             {/* stat3 */}
@@ -326,13 +306,13 @@ export default function EstimatePageClient({
                   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                 }}
               >
-                <E id="estimate_hero.stat3_num" editMode={editMode}>{hero.stat3_num}</E>
+                <E id="estimate_hero.stat3_num" editMode={editMode}>{content.estimate_hero.stat3_num}</E>
                 <span style={{ fontSize: 15, color: 'var(--accent)', marginLeft: 2 }}>
-                  <E id="estimate_hero.stat3_unit" editMode={editMode}>{hero.stat3_unit}</E>
+                  <E id="estimate_hero.stat3_unit" editMode={editMode}>{content.estimate_hero.stat3_unit}</E>
                 </span>
               </div>
               <div style={{ color: 'rgba(255,255,255,.45)', fontSize: 12, marginTop: 4 }}>
-                <E id="estimate_hero.stat3_sub" editMode={editMode}>{hero.stat3_sub}</E>
+                <E id="estimate_hero.stat3_sub" editMode={editMode}>{content.estimate_hero.stat3_sub}</E>
               </div>
             </div>
           </div>
@@ -376,7 +356,7 @@ export default function EstimatePageClient({
                   STEP 01
                 </span>
                 <p style={{ fontSize: 16, fontWeight: 800, fontFamily: "'Pretendard', sans-serif" }}>
-                  <E id="estimate_ui.step1_label" editMode={editMode}>{ui.step1_label}</E>
+                  <E id="estimate_ui.step1_label" editMode={editMode}>{content.estimate_ui.step1_label}</E>
                 </p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 8 }}>
@@ -403,9 +383,9 @@ export default function EstimatePageClient({
                   STEP 02
                 </span>
                 <p style={{ fontSize: 16, fontWeight: 800, fontFamily: "'Pretendard', sans-serif" }}>
-                  <E id="estimate_ui.step2_label" editMode={editMode}>{ui.step2_label}</E>{' '}
+                  <E id="estimate_ui.step2_label" editMode={editMode}>{content.estimate_ui.step2_label}</E>{' '}
                   <span style={{ fontSize: 13, color: 'var(--ink2)', fontWeight: 500 }}>
-                    <E id="estimate_ui.step2_hint" editMode={editMode}>{ui.step2_hint}</E>
+                    <E id="estimate_ui.step2_hint" editMode={editMode}>{content.estimate_ui.step2_hint}</E>
                   </span>
                 </p>
               </div>
@@ -433,7 +413,7 @@ export default function EstimatePageClient({
                   STEP 03
                 </span>
                 <p style={{ fontSize: 16, fontWeight: 800, fontFamily: "'Pretendard', sans-serif" }}>
-                  <E id="estimate_ui.step3_label" editMode={editMode}>{ui.step3_label}</E>
+                  <E id="estimate_ui.step3_label" editMode={editMode}>{content.estimate_ui.step3_label}</E>
                 </p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
@@ -544,7 +524,7 @@ export default function EstimatePageClient({
                   textAlign: 'center',
                 }}
               >
-                <E id="estimate_ui.builder_btn" editMode={editMode}>{ui.builder_btn}</E>
+                <E id="estimate_ui.builder_btn" editMode={editMode}>{content.estimate_ui.builder_btn}</E>
               </Link>
               <span
                 style={{
@@ -554,7 +534,7 @@ export default function EstimatePageClient({
                   fontFamily: "'Pretendard', sans-serif",
                 }}
               >
-                <E id="estimate_ui.builder_note" editMode={editMode}>{ui.builder_note}</E>
+                <E id="estimate_ui.builder_note" editMode={editMode}>{content.estimate_ui.builder_note}</E>
               </span>
             </div>
           </div>
@@ -572,7 +552,7 @@ export default function EstimatePageClient({
             color: 'var(--accent)',
           }}
         >
-          <E id="estimate_sample.badge" editMode={editMode}>{sample.badge}</E>
+          <E id="estimate_sample.badge" editMode={editMode}>{content.estimate_sample.badge}</E>
         </span>
         <h2
           style={{
@@ -583,7 +563,7 @@ export default function EstimatePageClient({
             fontFamily: "'Pretendard', sans-serif",
           }}
         >
-          <E id="estimate_sample.title" editMode={editMode}>{sample.title}</E>
+          <E id="estimate_sample.title" editMode={editMode}>{content.estimate_sample.title}</E>
         </h2>
         <p
           style={{
@@ -595,7 +575,7 @@ export default function EstimatePageClient({
             fontFamily: "'Pretendard', sans-serif",
           }}
         >
-          <E id="estimate_sample.desc" editMode={editMode}>{sample.desc}</E>
+          <E id="estimate_sample.desc" editMode={editMode}>{content.estimate_sample.desc}</E>
         </p>
         <div
           className="est-configs"
@@ -606,7 +586,7 @@ export default function EstimatePageClient({
             marginTop: 28,
           }}
         >
-          {configs.map((c: { tag: string; scale: string; title: string; items: string[]; note: string }, ci: number) => (
+          {content.estimate_configs.map((c: { tag: string; scale: string; title: string; items: string[]; note: string }, ci: number) => (
             <div
               key={c.tag}
               style={{
@@ -719,7 +699,7 @@ export default function EstimatePageClient({
                 fontFamily: "'Pretendard', sans-serif",
               }}
             >
-              <E id="estimate_cta.title" editMode={editMode}>{cta.title}</E>
+              <E id="estimate_cta.title" editMode={editMode}>{content.estimate_cta.title}</E>
             </h3>
             <div
               style={{
@@ -729,7 +709,7 @@ export default function EstimatePageClient({
                 fontFamily: "'Pretendard', sans-serif",
               }}
             >
-              <E id="estimate_cta.desc" editMode={editMode}>{cta.desc}</E>
+              <E id="estimate_cta.desc" editMode={editMode}>{content.estimate_cta.desc}</E>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 12 }}>
@@ -745,10 +725,10 @@ export default function EstimatePageClient({
                 textDecoration: 'none',
               }}
             >
-              <E id="estimate_cta.btn_contact" editMode={editMode}>{cta.btn_contact}</E>
+              <E id="estimate_cta.btn_contact" editMode={editMode}>{content.estimate_cta.btn_contact}</E>
             </Link>
             <a
-              href={`tel:${cta.btn_tel.replace(/-/g, '')}`}
+              href={`tel:${content.estimate_cta.btn_tel.replace(/-/g, '')}`}
               style={{
                 padding: '14px 28px',
                 border: '1px solid rgba(255,255,255,.2)',
@@ -759,7 +739,7 @@ export default function EstimatePageClient({
                 textDecoration: 'none',
               }}
             >
-              <E id="estimate_cta.btn_tel" editMode={editMode}>{cta.btn_tel}</E>
+              <E id="estimate_content.estimate_cta.btn_tel" editMode={editMode}>{content.estimate_cta.btn_tel}</E>
             </a>
           </div>
         </div>

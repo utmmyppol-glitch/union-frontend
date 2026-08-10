@@ -3,12 +3,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, safeParse, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const DEFAULT_UI = {
   empty: '등록된 인사이트가 없습니다.',
   detail: '자세히 보기',
 };
+
+/* ── useEditableContent DEFAULTS ── */
+const DEFAULTS = {
+  insights_ui: DEFAULT_UI,
+} as const;
 import type { Insight, Page } from '@/types';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -25,16 +30,7 @@ export default function InsightsPageClient({
   const [page, setPage] = useState(0);
   const [data, setData] = useState<InsightPage>(initialData);
   const pageRef = useRef<HTMLDivElement>(null);
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-  const [ui, setUi] = useState(() => safeParse(ssrContent?.['insights_ui'], DEFAULT_UI));
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = { insights_ui: setUi as (v: unknown) => void };
-    const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent ?? {});
 
   useEffect(() => {
     if (page === 0) { setData(initialData); return; }
@@ -100,7 +96,7 @@ export default function InsightsPageClient({
         <div className="wrap">
           {items.length === 0 ? (
             <div style={{ padding: '80px 0', textAlign: 'center', color: 'var(--ink2)', fontSize: 16 }}>
-              <E id="insights_ui.empty" editMode={editMode}>{ui.empty}</E>
+              <E id="insights_ui.empty" editMode={editMode}>{content.insights_ui.empty}</E>
             </div>
           ) : (
             <div className="ins-grid" style={{
@@ -189,7 +185,7 @@ export default function InsightsPageClient({
                       letterSpacing: '.04em', color: 'var(--accent)',
                       display: 'flex', alignItems: 'center', gap: 4,
                     }}>
-                      <E id="insights_ui.detail" editMode={editMode}>{ui.detail}</E>
+                      <E id="insights_ui.detail" editMode={editMode}>{content.insights_ui.detail}</E>
                       <span className="ins-card-arrow" style={{ transition: 'transform .2s' }}>→</span>
                     </div>
                   </div>

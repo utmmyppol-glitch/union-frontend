@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { CustomerStory } from '@/types';
-import { E, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -16,9 +16,10 @@ interface PageData {
   last: boolean;
 }
 
+const DEFAULTS = {} as const;
+
 export default function CasesPageClient({ initialData }: { initialData: PageData }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
+  const [, editMode] = useEditableContent(DEFAULTS, {});
   const [industry, setIndustry] = useState('전체');
   const [page, setPage] = useState(0);
   const [data, setData] = useState<PageData>(initialData);

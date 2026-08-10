@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, stripHtml, EDITABLE_STYLES } from '@/lib/editable';
 import { apiClient } from '@/lib/api';
 
 const QUESTIONS = [
@@ -30,28 +30,13 @@ const DEFAULT_RESULT = {
   title: '보안 점검 결과',
 };
 
+const DEFAULTS = {
+  securitycheck_hero: DEFAULT_HERO,
+  securitycheck_result: DEFAULT_RESULT,
+} as const;
+
 export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.securitycheck_hero, DEFAULT_HERO));
-  const [result, setResult] = useState(() => safeParse(ssrContent.securitycheck_result, DEFAULT_RESULT));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      securitycheck_hero: setHero as (v: unknown) => void,
-      securitycheck_result: setResult as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>(Array(10).fill(null));
@@ -101,13 +86,13 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
         </svg>
         <h1 style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 'clamp(28px,4.5vw,48px)', lineHeight: 1.2, letterSpacing: '-.03em', marginBottom: 12 }}>
           <E id="securitycheck_hero.title" editMode={editMode}>
-            {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+            {stripHtml(content.securitycheck_hero.title).split('\n').map((line: string, i: number) => (
               <span key={i}>{i > 0 && <br />}{line}</span>
             ))}
           </E>
         </h1>
         <p style={{ fontFamily: "'Pretendard'", fontWeight: 400, fontSize: 18, opacity: .7 }}>
-          <E id="securitycheck_hero.subtitle" editMode={editMode}>{hero.subtitle}</E>
+          <E id="securitycheck_hero.subtitle" editMode={editMode}>{content.securitycheck_hero.subtitle}</E>
         </p>
       </section>
 
@@ -168,7 +153,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'rgba(255,255,255,.06)' }} />
 
       <h1 style={{ fontFamily: "'Pretendard'", fontWeight: 900, fontSize: 'clamp(28px,4.5vw,48px)', lineHeight: 1.2, letterSpacing: '-.03em' }}>
-        <E id="securitycheck_result.title" editMode={editMode}>{result.title}</E>
+        <E id="securitycheck_result.title" editMode={editMode}>{content.securitycheck_result.title}</E>
       </h1>
     </section>
 

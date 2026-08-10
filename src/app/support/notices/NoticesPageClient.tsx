@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { E, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const UP = '/images/uploads/';
@@ -18,9 +18,10 @@ interface PageData {
 
 const PER_PAGE = 6;
 
+const DEFAULTS = {} as const;
+
 export default function NoticesPageClient({ initialData }: { initialData: PageData }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
+  const [, editMode] = useEditableContent(DEFAULTS, {});
   const [page, setPage] = useState(0);
   const [data, setData] = useState<PageData>(initialData);
 

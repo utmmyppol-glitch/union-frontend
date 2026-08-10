@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -45,38 +45,19 @@ const DEFAULT_CTA = {
   btn2: '견적 요청하기',
 };
 
-export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
+const DEFAULTS = {
+  software_hero: DEFAULT_HERO,
+  software_process: DEFAULT_PROCESS,
+  software_stats: DEFAULT_STATS,
+  software_cta: DEFAULT_CTA,
+  software_lineup: DEFAULT_LINEUP,
+  software_processTitle: DEFAULT_PROCESS_TITLE,
+} as const;
 
-  const [hero, setHero] = useState(() => safeParse(ssrContent.software_hero, DEFAULT_HERO));
-  const [process, setProcess] = useState(() => safeParse(ssrContent.software_process, DEFAULT_PROCESS));
-  const [stats, setStats] = useState(() => safeParse(ssrContent.software_stats, DEFAULT_STATS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.software_cta, DEFAULT_CTA));
-  const [lineup, setLineup] = useState(() => safeParse(ssrContent.software_lineup, DEFAULT_LINEUP));
-  const [processTitle, setProcessTitle] = useState(() => safeParse(ssrContent.software_processTitle, DEFAULT_PROCESS_TITLE));
+export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   const pageRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      software_hero: setHero as (v: unknown) => void,
-      software_process: setProcess as (v: unknown) => void,
-      software_stats: setStats as (v: unknown) => void,
-      software_cta: setCta as (v: unknown) => void,
-      software_lineup: setLineup as (v: unknown) => void,
-      software_processTitle: setProcessTitle as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
 
   useEffect(() => {
     const els = pageRef.current?.querySelectorAll('.reveal');
@@ -126,14 +107,14 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
 
         <div className="wrap" style={{ position: 'relative', zIndex: 1, padding: '120px clamp(20px,4vw,52px) 64px' }}>
           <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 16px' }}>
-            <E id="software_hero.eyebrow" editMode={editMode}>{hero.eyebrow}</E>
+            <E id="software_hero.eyebrow" editMode={editMode}>{content.software_hero.eyebrow}</E>
           </p>
           <h1 style={{
             fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
             lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
           }}>
             <E id="software_hero.title" editMode={editMode}>
-              {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.software_hero.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>
                   {i > 0 && <br />}
                   {i > 0 ? <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, letterSpacing: '-.02em' }}>{line}</span> : line}
@@ -146,7 +127,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
             color: 'rgba(255,255,255,.45)', maxWidth: 440, margin: 0,
           }}>
             <E id="software_hero.desc" editMode={editMode}>
-              {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.software_hero.desc).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -201,7 +182,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="software_lineup.title" editMode={editMode}>{lineup.title}</E>
+              <E id="software_lineup.title" editMode={editMode}>{content.software_lineup.title}</E>
             </h2>
           </div>
 
@@ -416,7 +397,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              <E id="software_processTitle.title" editMode={editMode}>{processTitle.title}</E>
+              <E id="software_processTitle.title" editMode={editMode}>{content.software_processTitle.title}</E>
             </h2>
           </div>
 
@@ -432,7 +413,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               zIndex: 0,
             }} />
 
-            {process.map((step: { num: string; title: string; desc: string }, i: number) => (
+            {content.software_process.map((step: { num: string; title: string; desc: string }, i: number) => (
               <div key={step.num} className="reveal" style={{
                 textAlign: 'center', position: 'relative', zIndex: 1,
                 transitionDelay: `${i * 0.1}s`,
@@ -477,7 +458,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
           <div className="sw-stats" style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24,
           }}>
-            {stats.map((s: { num: string; label: string }, si: number) => (
+            {content.software_stats.map((s: { num: string; label: string }, si: number) => (
               <div key={si} style={{ textAlign: 'center' }}>
                 <p style={{
                   fontFamily: SERIF, fontStyle: 'italic',
@@ -529,7 +510,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
             lineHeight: 1.35, color: 'var(--ink)', margin: '0 0 12px',
           }}>
             <E id="software_cta.title" editMode={editMode}>
-              {stripHtml(cta.title).split('\n').map((line: string, i: number) => (
+              {stripHtml(content.software_cta.title).split('\n').map((line: string, i: number) => (
                 <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
               ))}
             </E>
@@ -537,7 +518,7 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
           <p className="reveal" style={{
             fontSize: 16, color: 'var(--ink2)', margin: '0 0 36px', lineHeight: 1.7,
           }}>
-            <E id="software_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="software_cta.desc" editMode={editMode}>{content.software_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
             <Link href="/contact" className="btn" style={{
@@ -545,14 +526,14 @@ export default function SoftwarePageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
               display: 'inline-flex', alignItems: 'center', gap: 6,
             }}>
-              <E id="software_cta.btn1" editMode={editMode}>{cta.btn1}</E> <span>&rarr;</span>
+              <E id="software_cta.btn1" editMode={editMode}>{content.software_cta.btn1}</E> <span>&rarr;</span>
             </Link>
             <Link href="/contact" style={{
               padding: '16px 40px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
               display: 'inline-flex', alignItems: 'center',
             }}>
-              <E id="software_cta.btn2" editMode={editMode}>{cta.btn2}</E>
+              <E id="software_cta.btn2" editMode={editMode}>{content.software_cta.btn2}</E>
             </Link>
           </div>
         </div>

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, stripHtml, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, stripHtml, EDITABLE_STYLES } from '@/lib/editable';
 
 const CRAWL = '/images/crawl/unionsystems';
 
@@ -55,29 +55,17 @@ const DEFAULT_ICONS_DATA = ICONS.map(ic => ({ label: ic.label }));
 const DEFAULT_SECTIONS = { modules_title: '주요 모듈', why_title: '도입 효과', features_title: '주요 기능' };
 const DEFAULT_CTA = { title: 'NetClient 도입 상담', desc: '전문 컨설턴트가 귀사 환경에 맞는 최적의 구성을 안내합니다.', btn_contact: '도입 문의하기 →' };
 
+const DEFAULTS = {
+  netclient_hero: DEFAULT_HERO,
+  netclient_modules: DEFAULT_MODULES_DATA,
+  netclient_points: DEFAULT_POINTS_DATA,
+  netclient_icons: DEFAULT_ICONS_DATA,
+  netclient_sections: DEFAULT_SECTIONS,
+  netclient_cta: DEFAULT_CTA,
+} as const;
+
 export default function NetclientPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-  const [hero, setHero] = useState(() => safeParse(ssrContent.netclient_hero, DEFAULT_HERO));
-  const [modulesData, setModulesData] = useState(() => safeParse(ssrContent.netclient_modules, DEFAULT_MODULES_DATA));
-  const [pointsData, setPointsData] = useState(() => safeParse(ssrContent.netclient_points, DEFAULT_POINTS_DATA));
-  const [iconsData, setIconsData] = useState(() => safeParse(ssrContent.netclient_icons, DEFAULT_ICONS_DATA));
-  const [sectionsData, setSectionsData] = useState(() => safeParse(ssrContent.netclient_sections, DEFAULT_SECTIONS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.netclient_cta, DEFAULT_CTA));
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      netclient_hero: setHero as (v: unknown) => void,
-      netclient_modules: setModulesData as (v: unknown) => void,
-      netclient_points: setPointsData as (v: unknown) => void,
-      netclient_icons: setIconsData as (v: unknown) => void,
-      netclient_sections: setSectionsData as (v: unknown) => void,
-      netclient_cta: setCta as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => { if (e.data?.type === 'content-update') { const fn = setters[e.data.section]; if (fn) fn(e.data.data); } };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
   const pageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -142,7 +130,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 20px',
             }}>
               <E id="netclient_hero.title" editMode={editMode}>
-                {stripHtml(hero.title).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.netclient_hero.title).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -152,7 +140,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               color: 'rgba(255,255,255,.5)', maxWidth: 620, margin: '0 0 12px',
             }}>
               <E id="netclient_hero.desc" editMode={editMode}>
-                {stripHtml(hero.desc).split('\n').map((line: string, i: number) => (
+                {stripHtml(content.netclient_hero.desc).split('\n').map((line: string, i: number) => (
                   <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
                 ))}
               </E>
@@ -174,7 +162,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}>
-                <E id="netclient_hero.btn_contact" editMode={editMode}>{hero.btn_contact}</E>
+                <E id="netclient_hero.btn_contact" editMode={editMode}>{content.netclient_hero.btn_contact}</E>
               </Link>
               <a href="tel:02-706-8999" style={{
                 padding: '16px 32px', background: 'transparent',
@@ -214,7 +202,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="netclient_sections.modules_title" editMode={editMode}>{sectionsData.modules_title}</E>
+              <E id="netclient_sections.modules_title" editMode={editMode}>{content.netclient_sections.modules_title}</E>
             </h2>
           </div>
 
@@ -256,10 +244,10 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                     {m.num}
                   </span>
                   <h3 style={{ fontWeight: 800, fontSize: 22, color: 'var(--ink)', margin: '0 0 12px' }}>
-                    <E id={`netclient_modules.${i}.name`} editMode={editMode}>{modulesData[i]?.name ?? m.name}</E>
+                    <E id={`netclient_modules.${i}.name`} editMode={editMode}>{content.netclient_modules[i]?.name ?? m.name}</E>
                   </h3>
                   <div style={{ fontSize: 16, lineHeight: 1.7, color: 'var(--ink2)', margin: 0 }}>
-                    <E id={`netclient_modules.${i}.desc`} editMode={editMode}>{modulesData[i]?.desc ?? m.desc}</E>
+                    <E id={`netclient_modules.${i}.desc`} editMode={editMode}>{content.netclient_modules[i]?.desc ?? m.desc}</E>
                   </div>
                 </div>
               </div>
@@ -297,7 +285,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              <E id="netclient_sections.why_title" editMode={editMode}>{sectionsData.why_title}</E>
+              <E id="netclient_sections.why_title" editMode={editMode}>{content.netclient_sections.why_title}</E>
             </h2>
           </div>
 
@@ -320,10 +308,10 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <h3 style={{ fontWeight: 700, fontSize: 22, color: '#fff', margin: '0 0 12px' }}>
-                  <E id={`netclient_points.${i}.title`} editMode={editMode}>{pointsData[i]?.title ?? pt.title}</E>
+                  <E id={`netclient_points.${i}.title`} editMode={editMode}>{content.netclient_points[i]?.title ?? pt.title}</E>
                 </h3>
                 <div style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', margin: 0 }}>
-                  <E id={`netclient_points.${i}.desc`} editMode={editMode}>{pointsData[i]?.desc ?? pt.desc}</E>
+                  <E id={`netclient_points.${i}.desc`} editMode={editMode}>{content.netclient_points[i]?.desc ?? pt.desc}</E>
                 </div>
               </div>
             ))}
@@ -351,7 +339,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="netclient_sections.features_title" editMode={editMode}>{sectionsData.features_title}</E>
+              <E id="netclient_sections.features_title" editMode={editMode}>{content.netclient_sections.features_title}</E>
             </h2>
           </div>
 
@@ -382,7 +370,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
                   fontSize: 13, fontWeight: 500, letterSpacing: '.04em',
                   color: 'var(--ink)', margin: 0,
                 }}>
-                  <E id={`netclient_icons.${i}.label`} editMode={editMode}>{iconsData[i]?.label ?? ic.label}</E>
+                  <E id={`netclient_icons.${i}.label`} editMode={editMode}>{content.netclient_icons[i]?.label ?? ic.label}</E>
                 </p>
               </div>
             ))}
@@ -412,12 +400,12 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
             fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
             lineHeight: 1.1, color: '#fff', margin: '0 0 16px', letterSpacing: '-.04em',
           }}>
-            <E id="netclient_cta.title" editMode={editMode}>{cta.title}</E>
+            <E id="netclient_cta.title" editMode={editMode}>{content.netclient_cta.title}</E>
           </h2>
           <p className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.5)', margin: '0 0 32px',
           }}>
-            <E id="netclient_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="netclient_cta.desc" editMode={editMode}>{content.netclient_cta.desc}</E>
           </p>
           <Link
             href="/contact"
@@ -428,7 +416,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}
           >
-            <E id="netclient_cta.btn_contact" editMode={editMode}>{cta.btn_contact}</E>
+            <E id="netclient_cta.btn_contact" editMode={editMode}>{content.netclient_cta.btn_contact}</E>
           </Link>
         </div>
       </section>

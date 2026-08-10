@@ -81,6 +81,47 @@ export function useEditableManifest(editMode: boolean) {
   }, [editMode, pathname]); // ← pathname 변화마다 재전송
 }
 
+/* ── 편집 콘텐츠 통합 훅 ──
+ *  safeParse 초기화 + useEditMode + useEditableManifest + postMessage 리스너를 한 줄로.
+ *
+ *  사용법:
+ *    const DEFAULTS = { adobe_hero: DEFAULT_HERO, adobe_cta: DEFAULT_CTA } as const;
+ *    const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
+ *    // content.adobe_hero — typeof DEFAULT_HERO 타입 유지
+ */
+export function useEditableContent<D extends Record<string, unknown>>(
+  defaults: D,
+  ssrContent: Record<string, string>,
+): [D, boolean] {
+  const editMode = useEditMode();
+  useEditableManifest(editMode);
+
+  const [values, setValues] = useState<D>(() => {
+    const parsed = {} as Record<string, unknown>;
+    for (const key of Object.keys(defaults)) {
+      parsed[key] = safeParse(ssrContent[key], defaults[key]);
+    }
+    return parsed as D;
+  });
+
+  useEffect(() => {
+    if (!editMode) return;
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === 'content-update') {
+        const section = e.data.section as string;
+        if (section in defaults) {
+          setValues(prev => ({ ...prev, [section]: e.data.data }));
+        }
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editMode]);
+
+  return [values, editMode];
+}
+
 /* ── HTML 태그 제거 (RichEditor 편집값 → 텍스트 변환) ── */
 export function stripHtml(s: string): string {
   if (!/<[a-z][\s\S]*?>/i.test(s)) return s;

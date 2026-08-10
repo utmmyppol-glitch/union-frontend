@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SITE } from '@/lib/constants';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const COMPANY_TABS = [
   { label: '기업소개', href: '/company' },
@@ -41,48 +41,22 @@ const DEFAULT_SECTIONS = {
 };
 const DEFAULT_BUTTONS = { tel: '전화하기', inquiry: '1:1 문의하기' };
 
+const DEFAULTS = {
+  location_hero: DEFAULT_HERO,
+  location_address: DEFAULT_ADDRESS,
+  location_contact: DEFAULT_CONTACT,
+  location_subway: DEFAULT_SUBWAY,
+  location_bus: DEFAULT_BUS,
+  location_parking: DEFAULT_PARKING,
+  location_cta: DEFAULT_CTA,
+  location_sections: DEFAULT_SECTIONS,
+  location_buttons: DEFAULT_BUTTONS,
+} as const;
+
 export default function LocationPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const editMode = useEditMode();
-
-  // SSR에서 받은 데이터로 초기화
-  const [hero, setHero] = useState(() => safeParse(ssrContent.location_hero, DEFAULT_HERO));
-  const [address, setAddress] = useState(() => safeParse(ssrContent.location_address, DEFAULT_ADDRESS));
-  const [contact, setContact] = useState(() => safeParse(ssrContent.location_contact, DEFAULT_CONTACT));
-  const [subway, setSubway] = useState(() => safeParse(ssrContent.location_subway, DEFAULT_SUBWAY));
-  const [bus, setBus] = useState(() => safeParse(ssrContent.location_bus, DEFAULT_BUS));
-  const [parking, setParking] = useState(() => safeParse(ssrContent.location_parking, DEFAULT_PARKING));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.location_cta, DEFAULT_CTA));
-  const [sections, setSections] = useState(() => safeParse(ssrContent.location_sections, DEFAULT_SECTIONS));
-  const [buttons, setButtons] = useState(() => safeParse(ssrContent.location_buttons, DEFAULT_BUTTONS));
-
-  // 편집모드 매니페스트 전송 (pathname 변화마다 재전송)
-  useEditableManifest(editMode);
-
-  // postMessage 수신 (편집모드에서만)
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      location_hero: setHero as (v: unknown) => void,
-      location_address: setAddress as (v: unknown) => void,
-      location_contact: setContact as (v: unknown) => void,
-      location_subway: setSubway as (v: unknown) => void,
-      location_bus: setBus as (v: unknown) => void,
-      location_parking: setParking as (v: unknown) => void,
-      location_cta: setCta as (v: unknown) => void,
-      location_sections: setSections as (v: unknown) => void,
-      location_buttons: setButtons as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   // IntersectionObserver (reveal 애니메이션)
   useEffect(() => {
@@ -132,13 +106,13 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
             fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
             lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 16px',
           }}>
-            <E id="location_hero.title" editMode={editMode}>{hero.title}</E>
+            <E id="location_hero.title" editMode={editMode}>{content.location_hero.title}</E>
           </h1>
           <p style={{
             fontWeight: 400, fontSize: 18, lineHeight: 1.7,
             color: 'rgba(255,255,255,.5)', maxWidth: 620, margin: 0,
           }}>
-            <E id="location_hero.subtitle" editMode={editMode}>{hero.subtitle}</E>
+            <E id="location_hero.subtitle" editMode={editMode}>{content.location_hero.subtitle}</E>
           </p>
 
           <div style={{ display: 'flex', gap: 4, marginTop: 32 }}>
@@ -192,12 +166,12 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                 fontWeight: 700, fontSize: 'clamp(18px, 2.5vw, 26px)',
                 lineHeight: 1.4, color: '#fff', margin: '0 0 8px', letterSpacing: '-.02em',
               }}>
-                <E id="location_address.line1" editMode={editMode}>{address.line1}</E>
+                <E id="location_address.line1" editMode={editMode}>{content.location_address.line1}</E>
               </p>
               <p style={{
                 fontSize: 18, lineHeight: 1.6, color: 'rgba(255,255,255,.4)', margin: 0,
               }}>
-                <E id="location_address.line2" editMode={editMode}>{address.line2}</E>
+                <E id="location_address.line2" editMode={editMode}>{content.location_address.line2}</E>
               </p>
             </div>
 
@@ -211,7 +185,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                 <p style={{
                   fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic',
                   fontSize: 22, fontWeight: 400, color: '#fff', margin: 0,
-                }}><E id="location_contact.tel" editMode={editMode}>{contact.tel}</E></p>
+                }}><E id="location_contact.tel" editMode={editMode}>{content.location_contact.tel}</E></p>
               </div>
               <div>
                 <p style={{
@@ -222,7 +196,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                 <p style={{
                   fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic',
                   fontSize: 22, fontWeight: 400, color: 'rgba(255,255,255,.5)', margin: 0,
-                }}><E id="location_contact.fax" editMode={editMode}>{contact.fax}</E></p>
+                }}><E id="location_contact.fax" editMode={editMode}>{content.location_contact.fax}</E></p>
               </div>
             </div>
           </div>
@@ -257,15 +231,15 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               flexWrap: 'wrap', gap: 10,
             }}>
               <span style={{ fontSize: 14, color: 'var(--ink2)' }}>
-                <E id="location_address.mapNote" editMode={editMode}>{address.mapNote}</E>
+                <E id="location_address.mapNote" editMode={editMode}>{content.location_address.mapNote}</E>
               </span>
               <div style={{ display: 'flex', gap: 16 }}>
                 <a href="https://map.kakao.com/link/to/유니온시스템즈,37.5447,127.0566" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}><E id="location_sections.kakaomap" editMode={editMode}>{sections.kakaomap}</E></a>
+                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}><E id="location_sections.kakaomap" editMode={editMode}>{content.location_sections.kakaomap}</E></a>
                 <a href="https://map.naver.com/p/search/서울시 성동구 아차산로17길 49" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}><E id="location_sections.navermap" editMode={editMode}>{sections.navermap}</E></a>
+                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink2)', textDecoration: 'none' }}><E id="location_sections.navermap" editMode={editMode}>{content.location_sections.navermap}</E></a>
                 <a href="https://www.google.com/maps/search/서울시+성동구+아차산로17길+49" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textDecoration: 'none' }}><E id="location_sections.googlemap" editMode={editMode}>{sections.googlemap}</E></a>
+                  style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textDecoration: 'none' }}><E id="location_sections.googlemap" editMode={editMode}>{content.location_sections.googlemap}</E></a>
               </div>
             </div>
           </div>
@@ -286,7 +260,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="location_sections.transport_title" editMode={editMode}>{sections.transport_title}</E>
+              <E id="location_sections.transport_title" editMode={editMode}>{content.location_sections.transport_title}</E>
             </h2>
           </div>
 
@@ -314,10 +288,10 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 18, fontWeight: 700, color: '#fff',
                   }}>2</span>
-                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.subway_label" editMode={editMode}>{sections.subway_label}</E></span>
+                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.subway_label" editMode={editMode}>{content.location_sections.subway_label}</E></span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {subway.map((item: { line: string; desc: string }, idx: number) => (
+                  {content.location_subway.map((item: { line: string; desc: string }, idx: number) => (
                     <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                       <span style={{ width: 16, height: 1, background: idx === 0 ? '#33A23D' : '#F5A623', flexShrink: 0, marginTop: 10 }} />
                       <div>
@@ -359,10 +333,10 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 18, fontWeight: 700, color: '#fff',
                   }}>B</span>
-                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.bus_label" editMode={editMode}>{sections.bus_label}</E></span>
+                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.bus_label" editMode={editMode}>{content.location_sections.bus_label}</E></span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {bus.map((item: { type: string; routes: string }, idx: number) => (
+                  {content.location_bus.map((item: { type: string; routes: string }, idx: number) => (
                     <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                       <span style={{ width: 16, height: 1, background: idx === 0 ? '#3B82F6' : '#33A23D', flexShrink: 0, marginTop: 10 }} />
                       <div>
@@ -404,19 +378,19 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
                     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 18, fontWeight: 700, color: '#fff',
                   }}>P</span>
-                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.parking_label" editMode={editMode}>{sections.parking_label}</E></span>
+                  <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}><E id="location_sections.parking_label" editMode={editMode}>{content.location_sections.parking_label}</E></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   <span style={{ width: 16, height: 1, background: 'var(--graphite)', flexShrink: 0, marginTop: 10 }} />
                   <div>
                     <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink)', margin: '0 0 2px' }}>
-                      <E id="location_parking.title" editMode={editMode}>{parking.title}</E>
+                      <E id="location_parking.title" editMode={editMode}>{content.location_parking.title}</E>
                     </p>
                     <p style={{
                       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                       fontSize: 18, color: 'var(--ink2)', margin: 0,
                     }}>
-                      <E id="location_parking.desc" editMode={editMode}>{parking.desc}</E>
+                      <E id="location_parking.desc" editMode={editMode}>{content.location_parking.desc}</E>
                     </p>
                   </div>
                 </div>
@@ -447,7 +421,7 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', color: '#fff', margin: 0,
             }}>
-              <E id="location_sections.contact_title" editMode={editMode}>{sections.contact_title}</E>
+              <E id="location_sections.contact_title" editMode={editMode}>{content.location_sections.contact_title}</E>
             </h2>
           </div>
 
@@ -455,10 +429,10 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20,
           }}>
             {[
-              { label: 'TEL', id: 'location_contact.tel', value: contact.tel, big: true },
-              { label: 'FAX', id: 'location_contact.fax', value: contact.fax, big: false },
-              { label: 'SALES', id: 'location_contact.emailSales', value: contact.emailSales, big: false },
-              { label: 'GENERAL', id: 'location_contact.emailGeneral', value: contact.emailGeneral, big: false },
+              { label: 'TEL', id: 'location_contact.tel', value: content.location_contact.tel, big: true },
+              { label: 'FAX', id: 'location_contact.fax', value: content.location_contact.fax, big: false },
+              { label: 'SALES', id: 'location_contact.emailSales', value: content.location_contact.emailSales, big: false },
+              { label: 'GENERAL', id: 'location_contact.emailGeneral', value: content.location_contact.emailGeneral, big: false },
             ].map((item, idx) => (
               <div key={item.label} className="reveal" style={{
                 border: '1px solid rgba(255,255,255,.08)',
@@ -494,13 +468,13 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
               <p style={{
                 fontFamily: "'Newsreader', Georgia, serif", fontStyle: 'italic',
                 fontSize: 24, fontWeight: 400, color: '#fff', margin: 0,
-              }}><E id="location_contact.hours" editMode={editMode}>{contact.hours}</E></p>
+              }}><E id="location_contact.hours" editMode={editMode}>{content.location_contact.hours}</E></p>
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20 }}>
               <span style={{
                 fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                 fontSize: 18, color: 'rgba(255,255,255,.35)', letterSpacing: '.04em',
-              }}><E id="location_contact.hoursNote" editMode={editMode}>{contact.hoursNote}</E></span>
+              }}><E id="location_contact.hoursNote" editMode={editMode}>{content.location_contact.hoursNote}</E></span>
             </div>
           </div>
         </div>
@@ -519,22 +493,22 @@ export default function LocationPageClient({ ssrContent }: { ssrContent: Record<
 
         <div className="wrap" style={{ textAlign: 'center' }}>
           <p className="reveal" style={{ fontSize: 18, color: 'var(--ink2)', margin: '0 0 20px' }}>
-            <E id="location_cta.text" editMode={editMode}>{cta.text}</E>
+            <E id="location_cta.text" editMode={editMode}>{content.location_cta.text}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={`tel:${contact.tel.replace(/-/g, '')}`} className="btn" style={{
+            <a href={`tel:${content.location_contact.tel.replace(/-/g, '')}`} className="btn" style={{
               display: 'inline-block', padding: '14px 32px',
               background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 18, textDecoration: 'none',
             }}>
-              <E id="location_buttons.tel" editMode={editMode}>{buttons.tel}</E> {contact.tel}
+              <E id="location_buttons.tel" editMode={editMode}>{content.location_buttons.tel}</E> {content.location_contact.tel}
             </a>
             <Link href="/support/inquiry" className="btn" style={{
               display: 'inline-block', padding: '14px 32px',
               background: 'transparent', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 700, fontSize: 18, textDecoration: 'none',
             }}>
-              <E id="location_buttons.inquiry" editMode={editMode}>{buttons.inquiry}</E>
+              <E id="location_buttons.inquiry" editMode={editMode}>{content.location_buttons.inquiry}</E>
             </Link>
           </div>
         </div>

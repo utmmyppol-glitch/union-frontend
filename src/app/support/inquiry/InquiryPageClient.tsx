@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { SITE } from '@/lib/constants';
 import { InquiryForm } from '@/features/cta';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -22,28 +22,13 @@ const DEFAULT_CONTACT = {
   privacy: '수집항목: 이름, 회사명, 연락처, 이메일 · 수집목적: 상담 및 이벤트 안내 · 보유기간: 상담 완료 후 1년',
 };
 
+const DEFAULTS = {
+  inquiry_hero: DEFAULT_HERO,
+  inquiry_contact: DEFAULT_CONTACT,
+} as const;
+
 export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.inquiry_hero, DEFAULT_HERO));
-  const [contact, setContact] = useState(() => safeParse(ssrContent.inquiry_contact, DEFAULT_CONTACT));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      inquiry_hero: setHero as (v: unknown) => void,
-      inquiry_contact: setContact as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
@@ -87,16 +72,16 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
             fontFamily: MONO, fontWeight: 500, fontSize: 18, letterSpacing: '.14em',
             textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 12px',
           }}>
-            <E id="inquiry_hero.eyebrow" editMode={editMode}>{hero.eyebrow}</E>
+            <E id="inquiry_hero.eyebrow" editMode={editMode}>{content.inquiry_hero.eyebrow}</E>
           </p>
           <h1 style={{
             fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
             lineHeight: 1.05, letterSpacing: '-.04em', color: 'var(--ink)', margin: '0 0 10px',
           }}>
-            <E id="inquiry_hero.title" editMode={editMode}>{hero.title}</E>
+            <E id="inquiry_hero.title" editMode={editMode}>{content.inquiry_hero.title}</E>
           </h1>
           <div style={{ fontSize: 18, color: 'var(--ink2)', margin: '0 0 24px' }}>
-            <E id="inquiry_hero.desc" editMode={editMode}>{hero.desc}</E>
+            <E id="inquiry_hero.desc" editMode={editMode}>{content.inquiry_hero.desc}</E>
           </div>
           <a href={`tel:${SITE.tel.replace(/-/g, '')}`} style={{
             display: 'inline-flex', alignItems: 'center', gap: 14,
@@ -105,7 +90,7 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
           }}>
             <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 24, color: 'var(--ink)' }}>{SITE.tel}</span>
             <span style={{ fontSize: 18, color: 'var(--ink2)' }}>
-              <E id="inquiry_hero.hours" editMode={editMode}>{hero.hours}</E>
+              <E id="inquiry_hero.hours" editMode={editMode}>{content.inquiry_hero.hours}</E>
             </span>
           </a>
         </div>
@@ -156,10 +141,10 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               letterSpacing: '-.03em', color: '#fff', margin: '0 0 8px',
             }}>
-              <E id="inquiry_contact.title" editMode={editMode}>{contact.title}</E>
+              <E id="inquiry_contact.title" editMode={editMode}>{content.inquiry_contact.title}</E>
             </h2>
             <p style={{ fontSize: 18, color: 'rgba(255,255,255,.4)', margin: 0 }}>
-              <E id="inquiry_contact.desc" editMode={editMode}>{contact.desc}</E>
+              <E id="inquiry_contact.desc" editMode={editMode}>{content.inquiry_contact.desc}</E>
             </p>
           </div>
 
@@ -207,7 +192,7 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
               padding: '14px 32px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 18, textDecoration: 'none', flexShrink: 0,
             }}>
-              <E id="inquiry_contact.btn" editMode={editMode}>{contact.btn}</E>
+              <E id="inquiry_contact.btn" editMode={editMode}>{content.inquiry_contact.btn}</E>
             </a>
           </div>
 
@@ -216,7 +201,7 @@ export default function InquiryPageClient({ ssrContent }: { ssrContent: Record<s
             fontSize: 18, color: 'rgba(255,255,255,.45)',
             margin: '20px 0 0', textAlign: 'center', lineHeight: 1.7,
           }}>
-            <E id="inquiry_contact.privacy" editMode={editMode}>{contact.privacy}</E>
+            <E id="inquiry_contact.privacy" editMode={editMode}>{content.inquiry_contact.privacy}</E>
           </p>
         </div>
       </section>

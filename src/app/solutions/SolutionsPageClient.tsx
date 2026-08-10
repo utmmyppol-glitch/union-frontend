@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -86,32 +86,15 @@ const DEFAULT_LINEUP = {
   title: '솔루션 라인업',
 };
 
+const DEFAULTS = {
+  solutions_hero: DEFAULT_HERO,
+  solutions_stats: DEFAULT_STATS,
+  solutions_cta: DEFAULT_CTA,
+  solutions_lineup: DEFAULT_LINEUP,
+} as const;
+
 export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.solutions_hero, DEFAULT_HERO));
-  const [stats, setStats] = useState(() => safeParse(ssrContent.solutions_stats, DEFAULT_STATS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.solutions_cta, DEFAULT_CTA));
-  const [lineup, setLineup] = useState(() => safeParse(ssrContent.solutions_lineup, DEFAULT_LINEUP));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      solutions_hero: setHero as (v: unknown) => void,
-      solutions_stats: setStats as (v: unknown) => void,
-      solutions_cta: setCta as (v: unknown) => void,
-      solutions_lineup: setLineup as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
@@ -161,29 +144,29 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
 
         <div className="wrap" style={{ position: 'relative', zIndex: 1, padding: '120px clamp(20px,4vw,52px) 64px' }}>
           <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 16px' }}>
-            <E id="solutions_hero.eyebrow" editMode={editMode}>{hero.eyebrow}</E>
+            <E id="solutions_hero.eyebrow" editMode={editMode}>{content.solutions_hero.eyebrow}</E>
           </p>
           <h1 style={{
             fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
             lineHeight: .88, letterSpacing: '-.05em', color: '#fff', margin: '0 0 20px',
           }}>
-            <E id="solutions_hero.title_line1" editMode={editMode}>{hero.title_line1}</E><br />
+            <E id="solutions_hero.title_line1" editMode={editMode}>{content.solutions_hero.title_line1}</E><br />
             <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400 }}>
-              <E id="solutions_hero.title_line2" editMode={editMode}>{hero.title_line2}</E>
+              <E id="solutions_hero.title_line2" editMode={editMode}>{content.solutions_hero.title_line2}</E>
             </span>
           </h1>
           <div style={{
             fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,.45)',
             maxWidth: 620, margin: '0 0 32px', whiteSpace: 'pre-line',
           }}>
-            <E id="solutions_hero.desc" editMode={editMode}>{hero.desc}</E>
+            <E id="solutions_hero.desc" editMode={editMode}>{content.solutions_hero.desc}</E>
           </div>
           <Link href="/contact" className="btn" style={{
             display: 'inline-block', padding: '16px 36px',
             background: 'var(--accent)', color: '#fff',
             fontWeight: 700, fontSize: 15, textDecoration: 'none',
           }}>
-            <E id="solutions_hero.btn" editMode={editMode}>{hero.btn}</E>
+            <E id="solutions_hero.btn" editMode={editMode}>{content.solutions_hero.btn}</E>
           </Link>
         </div>
       </section>
@@ -202,7 +185,7 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
           <div className="sol-stats" style={{
             display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24,
           }}>
-            {stats.map((s: { num: string; label: string }, i: number) => (
+            {content.solutions_stats.map((s: { num: string; label: string }, i: number) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <p style={{
                   fontFamily: SERIF, fontStyle: 'italic',
@@ -235,13 +218,13 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
         <div className="wrap">
           <div className="reveal" style={{ marginBottom: 48 }}>
             <p className="eyebrow" style={{ margin: '0 0 14px' }}>
-              <E id="solutions_lineup.eyebrow" editMode={editMode}>{lineup.eyebrow}</E>
+              <E id="solutions_lineup.eyebrow" editMode={editMode}>{content.solutions_lineup.eyebrow}</E>
             </p>
             <h2 style={{
               fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
               lineHeight: .95, letterSpacing: '-.04em', margin: 0,
             }}>
-              <E id="solutions_lineup.title" editMode={editMode}>{lineup.title}</E>
+              <E id="solutions_lineup.title" editMode={editMode}>{content.solutions_lineup.title}</E>
             </h2>
           </div>
 
@@ -371,25 +354,25 @@ export default function SolutionsPageClient({ ssrContent }: { ssrContent: Record
             lineHeight: 1.35, color: '#fff', margin: '0 0 12px',
             whiteSpace: 'pre-line',
           }}>
-            <E id="solutions_cta.title" editMode={editMode}>{cta.title}</E>
+            <E id="solutions_cta.title" editMode={editMode}>{content.solutions_cta.title}</E>
           </h2>
           <div className="reveal" style={{
             fontSize: 16, color: 'rgba(255,255,255,.45)', margin: '0 0 32px', lineHeight: 1.7,
           }}>
-            <E id="solutions_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="solutions_cta.desc" editMode={editMode}>{content.solutions_cta.desc}</E>
           </div>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/contact" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}>
-              <E id="solutions_cta.btn1" editMode={editMode}>{cta.btn1}</E>
+              <E id="solutions_cta.btn1" editMode={editMode}>{content.solutions_cta.btn1}</E>
             </Link>
             <Link href="/contact" style={{
               padding: '16px 36px', border: '1px solid rgba(255,255,255,.45)',
               color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}>
-              <E id="solutions_cta.btn2" editMode={editMode}>{cta.btn2}</E>
+              <E id="solutions_cta.btn2" editMode={editMode}>{content.solutions_cta.btn2}</E>
             </Link>
           </div>
         </div>

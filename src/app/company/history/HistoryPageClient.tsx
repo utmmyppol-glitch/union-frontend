@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { E, safeParse, useEditMode, useEditableManifest, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const COMPANY_TABS = [
   { label: '기업소개', href: '/company' },
@@ -96,32 +96,16 @@ const DEFAULT_HERO = { eyebrow: 'HISTORY', title: '주요연혁', desc: '10여�
 const DEFAULT_ITEMS = MILESTONES.map(m => ({ year: m.year, title: m.title, events: m.events }));
 const DEFAULT_CTA = { eyebrow: 'SINCE 2010', title: '앞으로도 함께하겠습니다', desc: '유니온시스템즈와 함께 IT 환경을 혁신하세요.', btn: '도입문의 하기 →' };
 
+const DEFAULTS = {
+  history_hero: DEFAULT_HERO,
+  history_items: DEFAULT_ITEMS,
+  history_cta: DEFAULT_CTA,
+} as const;
+
 export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<string, string> }) {
   const pageRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const editMode = useEditMode();
-  useEditableManifest(editMode);
-
-  const [hero, setHero] = useState(() => safeParse(ssrContent.history_hero, DEFAULT_HERO));
-  const [items, setItems] = useState(() => safeParse(ssrContent.history_items, DEFAULT_ITEMS));
-  const [cta, setCta] = useState(() => safeParse(ssrContent.history_cta, DEFAULT_CTA));
-
-  useEffect(() => {
-    if (!editMode) return;
-    const setters: Record<string, (v: unknown) => void> = {
-      history_hero: setHero as (v: unknown) => void,
-      history_items: setItems as (v: unknown) => void,
-      history_cta: setCta as (v: unknown) => void,
-    };
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'content-update') {
-        const fn = setters[e.data.section];
-        if (fn) fn(e.data.data);
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [editMode]);
+  const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
 
   useEffect(() => {
     const els = pageRef.current?.querySelectorAll('.tl-card');
@@ -194,19 +178,19 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
         <div className="wrap" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ maxWidth: 640, padding: '120px 0 40px' }}>
             <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 16px' }}>
-              <E id="history_hero.eyebrow" editMode={editMode}>{hero.eyebrow}</E>
+              <E id="history_hero.eyebrow" editMode={editMode}>{content.history_hero.eyebrow}</E>
             </p>
             <h1 style={{
               fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)',
               lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 16px',
             }}>
-              <E id="history_hero.title" editMode={editMode}>{hero.title}</E>
+              <E id="history_hero.title" editMode={editMode}>{content.history_hero.title}</E>
             </h1>
             <p style={{
               fontWeight: 400, fontSize: 18, lineHeight: 1.7,
               color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0,
             }}>
-              <E id="history_hero.desc" editMode={editMode}>{hero.desc}</E>
+              <E id="history_hero.desc" editMode={editMode}>{content.history_hero.desc}</E>
             </p>
 
             <div style={{ display: 'flex', gap: 4, marginTop: 32 }}>
@@ -257,7 +241,7 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
           {MILESTONES.map((m, idx) => {
             const isLeft = idx % 2 === 0;
             // yearBg(장식용 큰 숫자)는 실제 표시 연도에서 자동 파생 → year 편집 시 항상 동기화
-            const displayYear = String(items[idx]?.year ?? m.year);
+            const displayYear = String(content.history_items[idx]?.year ?? m.year);
             const yearBg = displayYear.slice(-2);
 
             return (
@@ -345,7 +329,7 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
                         fontSize: 32, fontWeight: 400, lineHeight: 1,
                         color: m.accent ? 'var(--accent)' : 'var(--ink)',
                       }}>
-                        <E id={`history_items.${idx}.year`} editMode={editMode}>{items[idx]?.year ?? m.year}</E>
+                        <E id={`history_items.${idx}.year`} editMode={editMode}>{content.history_items[idx]?.year ?? m.year}</E>
                       </span>
                       <span style={{
                         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
@@ -353,12 +337,12 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
                         color: m.accent ? 'rgba(255,255,255,.35)' : 'var(--ink2)',
                         textTransform: 'uppercase',
                       }}>
-                        <E id={`history_items.${idx}.title`} editMode={editMode}>{items[idx]?.title ?? m.title}</E>
+                        <E id={`history_items.${idx}.title`} editMode={editMode}>{content.history_items[idx]?.title ?? m.title}</E>
                       </span>
                     </div>
 
                     {/* Events */}
-                    {(items[idx]?.events ?? m.events).map((evt: string, ei: number) => (
+                    {(content.history_items[idx]?.events ?? m.events).map((evt: string, ei: number) => (
                       <div key={ei} style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '6px 0',
@@ -403,23 +387,23 @@ export default function HistoryPageClient({ ssrContent }: { ssrContent: Record<s
         }} />
         <div className="wrap" style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
           <p className="eyebrow reveal" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 14px' }}>
-            <E id="history_cta.eyebrow" editMode={editMode}>{cta.eyebrow}</E>
+            <E id="history_cta.eyebrow" editMode={editMode}>{content.history_cta.eyebrow}</E>
           </p>
           <h2 className="reveal" style={{
             fontWeight: 900, fontSize: 'clamp(26px, 3.5vw, 40px)',
             lineHeight: 1.1, color: '#fff', margin: '0 0 12px', letterSpacing: '-.04em',
           }}>
-            <E id="history_cta.title" editMode={editMode}>{cta.title}</E>
+            <E id="history_cta.title" editMode={editMode}>{content.history_cta.title}</E>
           </h2>
           <p className="reveal" style={{ fontSize: 18, color: 'rgba(255,255,255,.5)', margin: '0 0 32px' }}>
-            <E id="history_cta.desc" editMode={editMode}>{cta.desc}</E>
+            <E id="history_cta.desc" editMode={editMode}>{content.history_cta.desc}</E>
           </p>
           <Link href="/contact" className="reveal btn" style={{
             display: 'inline-block', padding: '16px 40px',
             background: 'var(--accent)', color: '#fff',
             fontWeight: 700, fontSize: 18, textDecoration: 'none',
           }}>
-            <E id="history_cta.btn" editMode={editMode}>{cta.btn}</E>
+            <E id="history_cta.btn" editMode={editMode}>{content.history_cta.btn}</E>
           </Link>
         </div>
       </section>
