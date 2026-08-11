@@ -41,7 +41,7 @@ export function useEditableManifest(editMode: boolean) {
 
     const sendManifest = () => {
       const fields = Array.from(document.querySelectorAll('[data-editable]')).map(el => ({
-        id: el.getAttribute('data-editable')!,
+        id: (el as HTMLElement).dataset.editable!,
         type: el.classList.contains('editable-image') ? 'image' as const : 'text' as const,
         value: el.classList.contains('editable-image')
           ? (el as HTMLImageElement).src
@@ -129,19 +129,14 @@ export function useEditableContent<D extends Record<string, unknown>>(
 
 /* ── HTML 태그 제거 (RichEditor 편집값 → 텍스트 변환) ── */
 export function stripHtml(s: string): string {
-  if (!/<[a-z][\s\S]*?>/i.test(s)) return s;
-  return s
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n')
-    .replace(/<[^>]*>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\n{2,}/g, '\n')
-    .trim();
+  if (!s.includes('<')) return s;
+  const d = new DOMParser().parseFromString(s, 'text/html');
+  return (d.body.textContent || '').trim();
 }
 
 /* ── HTML 태그 포함 여부 판별 ── */
 function containsHtml(v: React.ReactNode): v is string {
-  return typeof v === 'string' && /<[a-z][\s\S]*>/i.test(v);
+  return typeof v === 'string' && v.includes('<') && v.includes('>');
 }
 
 /* ── 블록 레벨 HTML 태그 포함 여부 (hydration 안전 래퍼 선택용) ── */
@@ -151,7 +146,7 @@ function hasBlockHtml(html: string): boolean {
 }
 
 /* ── EditableText (HTML 서식 지원) ── */
-export function E({ id, editMode, children }: { id: string; editMode: boolean; children: React.ReactNode }) {
+export function E({ id, editMode, children }: Readonly<{ id: string; editMode: boolean; children: React.ReactNode }>) {
   const sanitized = useMemo(
     () => (containsHtml(children) ? DOMPurify.sanitize(children) : null),
     [children],
@@ -168,38 +163,40 @@ export function E({ id, editMode, children }: { id: string; editMode: boolean; c
     return <span style={{ whiteSpace: 'pre-wrap' }}>{children}</span>;
   }
 
+  const handleFieldClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const value = (e.currentTarget as HTMLElement).innerHTML || '';
+    window.parent.postMessage({ type: 'field-click', id, fieldType: 'text', value }, BACKOFFICE_ORIGIN);
+  };
+
+  const btnReset: React.CSSProperties = {
+    all: 'unset', cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap',
+    display: useDiv ? 'block' : 'inline', textAlign: 'inherit', font: 'inherit', color: 'inherit',
+  };
+
   if (sanitized !== null) {
-    const Tag = useDiv ? 'div' : 'span';
     return (
-      <Tag data-editable={id} className="editable-field rich-html" style={{ cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap' }}
-        suppressHydrationWarning dangerouslySetInnerHTML={{ __html: sanitized }}
-        onClick={(e) => {
-          e.stopPropagation();
-          const value = (e.currentTarget as HTMLElement).innerHTML || '';
-          window.parent.postMessage({ type: 'field-click', id, fieldType: 'text', value }, BACKOFFICE_ORIGIN);
-        }}
+      <button type="button" data-editable={id} className="editable-field rich-html"
+        style={btnReset} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: sanitized }}
+        onClick={handleFieldClick}
       />
     );
   }
 
   return (
-    <span data-editable={id} className="editable-field" style={{ cursor: 'pointer', position: 'relative', whiteSpace: 'pre-wrap' }}
-      onClick={(e) => {
-        e.stopPropagation();
-        const value = (e.currentTarget as HTMLElement).innerHTML || '';
-        window.parent.postMessage({ type: 'field-click', id, fieldType: 'text', value }, BACKOFFICE_ORIGIN);
-      }}>
+    <button type="button" data-editable={id} className="editable-field"
+      style={btnReset} onClick={handleFieldClick}>
       {children}
-    </span>
+    </button>
   );
 }
 
 /* ── EditableImage (next/image 최적화 포함) ── */
-export function OptImg({ id, editMode, src, alt, width, height, fill, className, style, priority }: {
+export function OptImg({ id, editMode, src, alt, width, height, fill, className, style, priority }: Readonly<{
   id?: string; editMode: boolean; src: string; alt: string;
   width?: number; height?: number; fill?: boolean; className?: string;
   style?: React.CSSProperties; priority?: boolean;
-}) {
+}>) {
   const isLocal = src.startsWith('/');
   const editProps = editMode && id ? {
     'data-editable': id,
