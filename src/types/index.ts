@@ -53,17 +53,6 @@ export interface InquiryResponse {
   updatedAt: string;
 }
 
-// Download (brochure gate) types
-export interface DownloadRequest {
-  name: string;
-  company: string;
-  phone: string;
-  email: string;
-  fileType?: string;
-  consentPrivacy: boolean;
-  consentMarketing?: boolean;
-}
-
 // ClientLogo types
 export interface ClientLogo {
   id: number;

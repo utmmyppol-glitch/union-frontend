@@ -124,19 +124,13 @@ export default function UniMascot() {
     if (!validate()) return;
     setStatus('loading');
     try {
-      if (view === 'brochure') {
-        await apiClient.submitDownload({
-          name: form.name.trim(), company: form.company.trim(),
-          phone: form.phone.trim(), email: form.email.trim(),
-          fileType: '회사소개서', consentPrivacy: true,
-        });
-      } else {
-        await apiClient.submitInquiry({
-          name: form.name.trim(), company: form.company.trim(),
-          phone: form.phone.trim(), email: form.email.trim(),
-          message: form.message.trim(), consentPrivacy: true,
-        });
-      }
+      await apiClient.submitInquiry({
+        name: form.name.trim(), company: form.company.trim(),
+        phone: form.phone.trim(), email: form.email.trim(),
+        message: form.message.trim(),
+        product: view === 'brochure' ? '소개서' : undefined,
+        consentPrivacy: true,
+      });
       setStatus('success');
     } catch { setStatus('error'); }
   }, [validate, view, form]);

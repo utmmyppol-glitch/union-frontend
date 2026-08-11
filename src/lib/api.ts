@@ -3,7 +3,6 @@ import type {
   CustomerStory,
   InquiryRequest,
   InquiryResponse,
-  DownloadRequest,
   ClientLogo,
   Page,
 } from '@/types';
@@ -128,17 +127,6 @@ class ApiClient {
     }
 
     return this.request<InquiryResponse>('/inquiries', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  // ── Downloads (Brochure Gate) ─────────────────────────
-
-  async submitDownload(
-    data: DownloadRequest,
-  ): Promise<{ message: string; id: number }> {
-    return this.request<{ message: string; id: number }>('/downloads', {
       method: 'POST',
       body: JSON.stringify(data),
     });

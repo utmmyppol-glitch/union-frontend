@@ -189,12 +189,12 @@ function DetailPanel({ solution, onClose, onExplorer }: {
     setSubmitting(true);
     setSubmitError('');
     try {
-      await apiClient.submitDownload({
+      await apiClient.submitInquiry({
         name: brochureName || '(소개서 요청)',
         company: brochureCompany || '(미입력)',
         email: brochureEmail,
         phone: '',
-        fileType: solution.area,
+        product: `소개서 - ${solution.area}`,
         consentPrivacy: brochureConsent,
       });
       setBrochureStep(3);
@@ -724,7 +724,6 @@ function DetailPanel({ solution, onClose, onExplorer }: {
                 />
                 {errors.brochureEmail && <div style={errorStyle}>{errors.brochureEmail}</div>}
               </div>
-              {/* 개인정보 수집 안내 스크롤 박스 */}
               <div style={{
                 border: '1px solid var(--line)', padding: '12px 14px', marginTop: 14,
                 background: 'var(--soft, #f9fafb)', maxHeight: 110, overflowY: 'auto',
@@ -817,17 +816,6 @@ function DetailPanel({ solution, onClose, onExplorer }: {
                   {submitting ? '전송 중...' : '소개서 신청 완료'}
                 </button>
               </div>
-              <button
-                onClick={() => handleBrochureSubmit()}
-                disabled={submitting}
-                style={{
-                  background: 'none', border: 'none', padding: 0,
-                  fontSize: 13, color: 'var(--ink2)', cursor: 'pointer',
-                  marginTop: 10, textDecoration: 'underline',
-                }}
-              >
-                건너뛰고 바로 받기
-              </button>
             </div>
           )}
 
@@ -872,6 +860,7 @@ function DetailPanel({ solution, onClose, onExplorer }: {
           )}
         </div>
       )}
+
     </div>
   );
 }

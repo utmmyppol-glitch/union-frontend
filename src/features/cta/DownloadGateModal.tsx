@@ -88,29 +88,16 @@ const DownloadGateModal: React.FC<DownloadGateModalProps> = ({
 
     setStatus('loading');
     try {
-      await apiClient.submitDownload({
+      await apiClient.submitInquiry({
         name: form.name.trim(),
         company: form.company.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
-        fileType: 'BROCHURE',
+        product: '소개서',
         consentPrivacy: form.consentPrivacy,
       });
 
       setStatus('success');
-
-      // Trigger file download
-      const downloadUrl =
-        process.env.NEXT_PUBLIC_API_URL
-          ? `${process.env.NEXT_PUBLIC_API_URL}/downloads/brochure`
-          : '/api/union/downloads/brochure';
-
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = 'UnionSystems_소개서.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
 
       // Close after short delay so user sees success
       setTimeout(handleClose, 1500);

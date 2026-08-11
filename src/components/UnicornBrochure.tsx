@@ -61,13 +61,13 @@ export default function UnicornBrochure() {
     if (!consentPrivacy) {
       return;
     }
-    // API 호출
-    apiClient.submitDownload({
-      name: '(유니콘 소개서 요청)',
+    // API 호출 — inquiries로 통합 (product: '소개서')
+    apiClient.submitInquiry({
+      name: '(소개서 요청)',
       company: '(미입력)',
       email,
       phone: '',
-      fileType: '회사소개서',
+      product: '소개서',
       consentPrivacy: true,
     }).catch(() => {});
 
