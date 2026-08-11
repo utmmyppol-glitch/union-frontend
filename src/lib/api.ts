@@ -4,7 +4,6 @@ import type {
   InquiryRequest,
   InquiryResponse,
   DownloadRequest,
-  Banner,
   ClientLogo,
   Page,
 } from '@/types';
@@ -143,16 +142,6 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(data),
     });
-  }
-
-  // ── Banners ───────────────────────────────────────────
-
-  async getBanners(position?: Banner['position']): Promise<Banner[]> {
-    const params = new URLSearchParams();
-    if (position) params.set('position', position);
-    const query = params.toString();
-
-    return this.request<Banner[]>(`/banners${query ? `?${query}` : ''}`);
   }
 
   // ── Client Logos ──────────────────────────────────────

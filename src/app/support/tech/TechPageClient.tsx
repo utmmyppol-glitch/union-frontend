@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { E, OptImg, safeParse, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
+import { E, OptImg, safeParse, stripHtml, useEditableContent, EDITABLE_STYLES, BACKOFFICE_ORIGIN } from '@/lib/editable';
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 const SERIF = "'Newsreader', Georgia, serif";
@@ -102,7 +102,7 @@ function TechTeamsTable({ initial, editMode }: { initial: { label: string; membe
   const [groups, setGroups] = useState(initial);
   const commit = (g: { label: string; members: string }[]) => {
     setGroups(g);
-    window.parent.postMessage({ type: 'field-set', id: 'tech_teams', value: g }, '*');
+    window.parent.postMessage({ type: 'field-set', id: 'tech_teams', value: g }, BACKOFFICE_ORIGIN);
   };
   const addTeam = () => commit([...groups, { label: '', members: '' }]);
   const delTeam = (gi: number) => commit(groups.filter((_, i) => i !== gi));
@@ -216,7 +216,7 @@ export default function TechPageClient({ ssrContent }: { ssrContent: Record<stri
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       {editMode && <style>{EDITABLE_STYLES}</style>}
       {editMode && (
-        <button type="button" onClick={() => window.parent.postMessage({ type: 'save-all' }, '*')}
+        <button type="button" onClick={() => window.parent.postMessage({ type: 'save-all' }, BACKOFFICE_ORIGIN)}
           style={{ position: 'fixed', right: 20, bottom: 20, zIndex: 99999, background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 26px', fontSize: 15, fontWeight: 800, cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.28)' }}>
           💾 저장하기
         </button>

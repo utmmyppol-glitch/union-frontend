@@ -739,7 +739,7 @@ export default function EstimatePageClient({
                 textDecoration: 'none',
               }}
             >
-              <E id="estimate_content.estimate_cta.btn_tel" editMode={editMode}>{content.estimate_cta.btn_tel}</E>
+              <E id="estimate_cta.btn_tel" editMode={editMode}>{content.estimate_cta.btn_tel}</E>
             </a>
           </div>
         </div>

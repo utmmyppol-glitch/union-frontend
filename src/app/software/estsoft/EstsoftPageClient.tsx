@@ -65,6 +65,9 @@ const DEFAULT_SECTIONS = {
 };
 const DEFAULT_TRUST = ['ESTsoft 공인 리셀러', '즉시 발급', '세금계산서 발행', '볼륨 라이선스 전문'];
 
+const DEFAULT_BADGE = { hero_0: '랜섬웨어차단', hero_1: '압축해제', hero_2: '스마트폰호환' };
+const DEFAULT_UI = { detail_link: '자세히 보기' };
+
 const DEFAULTS = {
   estsoft_hero: DEFAULT_HERO,
   estsoft_strengths: DEFAULT_STRENGTHS,
@@ -74,6 +77,8 @@ const DEFAULTS = {
   estsoft_plans: DEFAULT_PLANS_DATA,
   estsoft_sections: DEFAULT_SECTIONS,
   estsoft_trust: DEFAULT_TRUST,
+  estsoft_badge: DEFAULT_BADGE,
+  estsoft_ui: DEFAULT_UI,
 } as const;
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';

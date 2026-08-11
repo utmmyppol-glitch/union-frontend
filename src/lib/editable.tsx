@@ -5,6 +5,9 @@ import Image from 'next/image';
 import DOMPurify from 'isomorphic-dompurify';
 import { usePathname } from 'next/navigation';
 
+/* ── postMessage origin (보안: "*" 대신 명시) ── */
+export const BACKOFFICE_ORIGIN = process.env.NEXT_PUBLIC_BACKOFFICE_URL || 'http://localhost:3002';
+
 /* ── JSON 안전 파싱 ── */
 export function safeParse<T>(json: string | undefined, fallback: T): T {
   if (!json) return fallback;
@@ -49,12 +52,13 @@ export function useEditableManifest(editMode: boolean) {
         type: 'editable-manifest',
         fields,
         path: pathname,
-      }, '*');
+      }, BACKOFFICE_ORIGIN);
     };
 
     // DOM이 안정화된 후 전송 (페이지 전환 직후 렌더링 대기)
     const timer = setTimeout(sendManifest, 400);
     const handler = (e: MessageEvent) => {
+      if (e.origin !== BACKOFFICE_ORIGIN) return;
       if (e.data?.type === 'request-manifest') sendManifest();
       if (e.data?.type === 'highlight-field') {
         const el = document.querySelector(`[data-editable="${e.data.id}"]`) as HTMLElement | null;
@@ -107,6 +111,7 @@ export function useEditableContent<D extends Record<string, unknown>>(
   useEffect(() => {
     if (!editMode) return;
     const handler = (e: MessageEvent) => {
+      if (e.origin !== BACKOFFICE_ORIGIN) return;
       if (e.data?.type === 'content-update') {
         const section = e.data.section as string;
         if (section in defaults) {
@@ -171,7 +176,7 @@ export function E({ id, editMode, children }: { id: string; editMode: boolean; c
         onClick={(e) => {
           e.stopPropagation();
           const value = (e.currentTarget as HTMLElement).innerHTML || '';
-          window.parent.postMessage({ type: 'field-click', id, fieldType: 'text', value }, '*');
+          window.parent.postMessage({ type: 'field-click', id, fieldType: 'text', value }, BACKOFFICE_ORIGIN);
         }}
       />
     );
@@ -182,7 +187,7 @@ export function E({ id, editMode, children }: { id: string; editMode: boolean; c
       onClick={(e) => {
         e.stopPropagation();
         const value = (e.currentTarget as HTMLElement).innerHTML || '';
-        window.parent.postMessage({ type: 'field-click', id, fieldType: 'text', value }, '*');
+        window.parent.postMessage({ type: 'field-click', id, fieldType: 'text', value }, BACKOFFICE_ORIGIN);
       }}>
       {children}
     </span>
@@ -201,7 +206,7 @@ export function OptImg({ id, editMode, src, alt, width, height, fill, className,
     className: `${className || ''} editable-field editable-image`.trim(),
     onClick: (e: React.MouseEvent) => {
       e.stopPropagation();
-      window.parent.postMessage({ type: 'field-click', id, fieldType: 'image', value: src }, '*');
+      window.parent.postMessage({ type: 'field-click', id, fieldType: 'image', value: src }, BACKOFFICE_ORIGIN);
     },
   } : { className };
 

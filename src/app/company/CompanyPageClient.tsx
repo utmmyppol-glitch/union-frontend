@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { E, OptImg, stripHtml, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
+import { E, OptImg, stripHtml, useEditableContent, EDITABLE_STYLES, BACKOFFICE_ORIGIN } from '@/lib/editable';
 
 // fallback 이미지 경로 (onError 시 사용하지 않음 — next/image가 대체)
 
@@ -66,7 +66,7 @@ function DeptTeams({ deptIdx, value, editMode }: { deptIdx: number; value: strin
     return arr.length ? arr : (editMode ? [''] : []);
   });
   const sync = (arr: string[]) =>
-    window.parent.postMessage({ type: 'field-set', id: `company_depts.${deptIdx}.members`, value: arr.join('\n') }, '*');
+    window.parent.postMessage({ type: 'field-set', id: `company_depts.${deptIdx}.members`, value: arr.join('\n') }, BACKOFFICE_ORIGIN);
   const update = (i: number, v: string) => { const n = teams.slice(); n[i] = v; setTeams(n); sync(n); };
   const add = () => { const n = [...teams, '']; setTeams(n); sync(n); };
   const del = (i: number) => { const n = teams.filter((_, j) => j !== i); setTeams(n.length ? n : ['']); sync(n); };
@@ -92,7 +92,7 @@ export default function CompanyPageClient({ ssrContent }: { ssrContent: Record<s
   const pathname = usePathname();
   const [content, editMode] = useEditableContent(DEFAULTS, ssrContent);
   const deptAction = (action: 'add' | 'delete' | 'up' | 'down', idx?: number) =>
-    window.parent.postMessage({ type: 'array-action', section: 'company_depts', action, idx }, '*');
+    window.parent.postMessage({ type: 'array-action', section: 'company_depts', action, idx }, BACKOFFICE_ORIGIN);
 
   // IntersectionObserver (reveal 애니메이션)
   useEffect(() => {

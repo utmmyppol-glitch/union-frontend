@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { E, safeParse, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
+import { E, useEditableContent, EDITABLE_STYLES } from '@/lib/editable';
 
 const DEFAULT_UI = {
   empty: '등록된 인사이트가 없습니다.',
@@ -12,6 +12,8 @@ const DEFAULT_UI = {
 
 /* ── useEditableContent DEFAULTS ── */
 const DEFAULTS = {
+  insights_hero_title: '인사이트',
+  insights_hero_desc: 'IT 업계 최신 뉴스와 트렌드를 한눈에 확인하세요',
   insights_ui: DEFAULT_UI,
 } as const;
 import type { Insight, Page } from '@/types';
@@ -78,10 +80,10 @@ export default function InsightsPageClient({
         <div className="wrap" style={{ position: 'relative', zIndex: 1, padding: '120px clamp(20px,4vw,52px) 64px' }}>
           <p className="eyebrow" style={{ color: 'rgba(255,255,255,.4)', margin: '0 0 16px' }}>INSIGHTS</p>
           <h1 style={{ fontWeight: 900, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: .92, letterSpacing: '-.045em', color: '#fff', margin: '0 0 16px' }}>
-            <E id="insights_hero_title" editMode={editMode}>{safeParse(ssrContent?.['insights_hero_title'], '인사이트')}</E>
+            <E id="insights_hero_title" editMode={editMode}>{content.insights_hero_title}</E>
           </h1>
           <div style={{ fontWeight: 400, fontSize: 18, lineHeight: 1.7, color: 'rgba(255,255,255,.5)', maxWidth: 640, margin: 0 }}>
-            <E id="insights_hero_desc" editMode={editMode}>{safeParse(ssrContent?.['insights_hero_desc'], 'IT 업계 최신 뉴스와 트렌드를 한눈에 확인하세요')}</E>
+            <E id="insights_hero_desc" editMode={editMode}>{content.insights_hero_desc}</E>
           </div>
         </div>
       </section>

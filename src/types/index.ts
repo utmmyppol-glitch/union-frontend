@@ -64,18 +64,6 @@ export interface DownloadRequest {
   consentMarketing?: boolean;
 }
 
-// Banner types
-export interface Banner {
-  id: number;
-  title: string;
-  imageUrl: string | null;
-  linkUrl: string | null;
-  position: 'HERO' | 'POPUP' | 'PROMOTION';
-  isActive: boolean;
-  sortOrder: number;
-  createdAt: string;
-}
-
 // ClientLogo types
 export interface ClientLogo {
   id: number;
