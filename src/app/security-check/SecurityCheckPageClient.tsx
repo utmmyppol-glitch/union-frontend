@@ -239,9 +239,11 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
 
     {/* Email modal */}
     {showEmailModal && (
-      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
-        onClick={() => setShowEmailModal(false)}>
-        <div onClick={e => e.stopPropagation()}
+      <div role="button" tabIndex={0} aria-label="모달 닫기"
+        style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+        onClick={() => setShowEmailModal(false)}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setShowEmailModal(false); }}>
+        <div role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}
           style={{ background: 'var(--surface)', borderRadius: 0, padding: 32, maxWidth: 400, width: '100%' }}>
           {!emailSent ? (<>
             <h3 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 22, color: 'var(--ink)', marginBottom: 8 }}><E id="securitycheck_modal.title" editMode={editMode}>보안 점검 결과 PDF</E></h3>
