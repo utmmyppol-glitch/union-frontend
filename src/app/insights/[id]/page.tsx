@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import InsightDetailClient from './InsightDetailClient';
 import type { Insight, Page } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
 
 type InsightPage = Pick<Page<Insight>, 'content' | 'totalPages'>;
 

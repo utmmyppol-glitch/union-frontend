@@ -29,7 +29,7 @@ export default function CasesPageClient({ initialData }: { initialData: PageData
       setData(initialData);
       return;
     }
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
     const params = new URLSearchParams({ page: String(page), size: '9' });
     if (industry !== '전체') params.set('industry', industry);
     fetch(`${apiUrl}/customer-stories?${params}`)

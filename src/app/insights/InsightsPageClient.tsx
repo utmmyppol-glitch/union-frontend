@@ -36,7 +36,7 @@ export default function InsightsPageClient({
 
   useEffect(() => {
     if (page === 0) { setData(initialData); return; }
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
     fetch(`${apiUrl}/insights?page=${page}&size=12`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setData(d); })

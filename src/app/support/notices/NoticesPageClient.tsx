@@ -30,7 +30,7 @@ export default function NoticesPageClient({ initialData }: { initialData: PageDa
       setData(initialData);
       return;
     }
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
     fetch(`${apiUrl}/posts?category=NOTICE&page=${page}&size=${PER_PAGE}`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setData(d); })

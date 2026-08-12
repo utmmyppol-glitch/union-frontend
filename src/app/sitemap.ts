@@ -31,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamically add insight posts
   let insightPages: MetadataRoute.Sitemap = [];
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
     const res = await fetch(`${apiUrl}/posts?category=INSIGHT&page=0&size=100`, {
       next: { revalidate: 3600 },
     });

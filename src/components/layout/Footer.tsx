@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { NAV_ITEMS } from '@/lib/constants';
 import type { NavItem } from '@/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
 
 /** 설정값 가져오기 (ISR 60초) */
 async function fetchConfig(): Promise<Record<string, string>> {

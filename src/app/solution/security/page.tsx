@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
 const CONTENT_KEYS = ['security_hero', 'security_products', 'security_cta'];
 
 async function getContent(): Promise<Record<string, string>> {

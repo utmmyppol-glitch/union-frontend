@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
 const UP = '/images/uploads/';
 const PER_PAGE = 6;
 

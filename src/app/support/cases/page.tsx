@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/union';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api/union';
 
 const FALLBACK_STORIES: CustomerStory[] = [
   { id: 1, company: 'SSG닷컴', industry: '유통', title: 'NetClient 도입으로 22% 라이선스 비용 절감', content: 'NetClient DMS를 도입하여 전사 소프트웨어 라이선스를 중앙 관리하고, 미사용 라이선스 회수 및 역할별 플랜 차등 적용으로 연간 22%의 비용을 절감했습니다.', thumbnailUrl: null, logoUrl: null, published: true, createdAt: '2026-01-15T00:00:00', updatedAt: '' },
