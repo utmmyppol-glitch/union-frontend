@@ -3,7 +3,7 @@ const nextConfig = {
   output: 'standalone',
   images: {
     remotePatterns: [
-      { protocol: 'http', hostname: 'localhost', port: '8080' },
+      { protocol: 'http', hostname: 'localhost', port: '8081' },
       { protocol: 'https', hostname: '*.unionsystems.co.kr' },
       { protocol: 'https', hostname: 'imgnews.pstatic.net' },
       { protocol: 'https', hostname: 'mimgnews.pstatic.net' },
@@ -23,7 +23,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors 'self' http://localhost:3002 https://admin.unionsystems.co.kr",
+            value: "frame-ancestors 'self' http://localhost:3002 http://43.203.100.180:3002 https://admin.unionsystems.co.kr",
           },
         ],
       },
