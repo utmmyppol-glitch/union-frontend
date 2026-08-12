@@ -161,7 +161,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
                 <E id="officekeeper_hero.desc" editMode={editMode}>{content.officekeeper_hero.desc}</E>
               </p>
               <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
-                <Link href="/contact" style={{ padding: '16px 36px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="officekeeper_hero.btn" editMode={editMode}>{content.officekeeper_hero.btn}</E></Link>
+                <Link href="/contact?product=OfficeKeeper" style={{ padding: '16px 36px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="officekeeper_hero.btn" editMode={editMode}>{content.officekeeper_hero.btn}</E></Link>
                 <a href="tel:02-706-8999" style={{ padding: '16px 28px', border: '1px solid rgba(255,255,255,.2)', color: 'rgba(255,255,255,.7)', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>02-706-8999</a>
               </div>
               {/* Trust strip */}
@@ -500,7 +500,7 @@ export default function OfficekeeperPageClient({ ssrContent }: { ssrContent: Rec
             <E id="officekeeper_cta.desc" editMode={editMode}>{content.officekeeper_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 32 }}>
-            <Link href="/contact" style={{ padding: '18px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="officekeeper_cta.btn" editMode={editMode}>{content.officekeeper_cta.btn}</E></Link>
+            <Link href="/contact?product=OfficeKeeper" style={{ padding: '18px 40px', background: 'var(--accent)', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}><E id="officekeeper_cta.btn" editMode={editMode}>{content.officekeeper_cta.btn}</E></Link>
             <a href="tel:02-706-8999" style={{ padding: '18px 36px', border: '1px solid rgba(255,255,255,.2)', color: 'rgba(255,255,255,.7)', fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>02-706-8999</a>
           </div>
           <div className="reveal" style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>

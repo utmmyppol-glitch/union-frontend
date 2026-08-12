@@ -145,7 +145,7 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
               }}>POWERED SECURITY</span>
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=ESTsecurity" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}><E id="estsecurity_hero.btn" editMode={editMode}>{content.estsecurity_hero.btn}</E></Link>
@@ -402,11 +402,11 @@ export default function EstsecurityPageClient({ ssrContent }: { ssrContent: Reco
             <E id="estsecurity_cta.desc" editMode={editMode}>{content.estsecurity_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="btn" style={{
+            <Link href="/contact?product=ESTsecurity" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}><E id="estsecurity_cta.btn1" editMode={editMode}>{content.estsecurity_cta.btn1}</E></Link>
-            <Link href="/contact" style={{
+            <Link href="/contact?product=ESTsecurity" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}><E id="estsecurity_cta.btn2" editMode={editMode}>{content.estsecurity_cta.btn2}</E></Link>

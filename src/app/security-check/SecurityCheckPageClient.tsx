@@ -51,7 +51,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
     next[current] = val;
     setAnswers(next);
     if (current < 9) {
-      setTimeout(() => setCurrent(c => c + 1), 300);
+      setTimeout(() => setCurrent(c => Math.min(c + 1, QUESTIONS.length - 1)), 300);
     } else {
       setTimeout(() => setDone(true), 400);
     }
@@ -71,6 +71,7 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
 
   if (!done) {
     const progress = ((current + (answers[current] !== null ? 1 : 0)) / 10) * 100;
+    const q = QUESTIONS[Math.min(current, QUESTIONS.length - 1)];
     return (<>
       {editMode && <style>{EDITABLE_STYLES}</style>}
 
@@ -117,8 +118,8 @@ export default function SecurityCheckPageClient({ ssrContent }: { ssrContent: Re
 
           {/* Question card */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 0, padding: 'clamp(28px,4vw,40px)', textAlign: 'center' }}>
-            <span style={{ display: 'inline-block', padding: '4px 12px', borderRadius: 0, background: '#11121410', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, marginBottom: 20 }}>{QUESTIONS[current].cat}</span>
-            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 'clamp(18px,3vw,24px)', lineHeight: 1.4, color: 'var(--ink)', marginBottom: 32, minHeight: 60 }}>{QUESTIONS[current].q}</h2>
+            <span style={{ display: 'inline-block', padding: '4px 12px', borderRadius: 0, background: '#11121410', color: 'var(--ink2)', fontFamily: "'Pretendard'", fontWeight: 700, fontSize: 18, marginBottom: 20 }}>{q.cat}</span>
+            <h2 style={{ fontFamily: "'Pretendard'", fontWeight: 800, fontSize: 'clamp(18px,3vw,24px)', lineHeight: 1.4, color: 'var(--ink)', marginBottom: 32, minHeight: 60 }}>{q.q}</h2>
 
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               {([['예', 10, '#059669'], ['부분적으로', 5, '#D97706'], ['아니요', 0, '#F5333F']] as [string, Answer, string][]).map(([label, val, color]) => (

@@ -144,7 +144,7 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
               }}>YEARS OF SECURITY</span>
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=AhnLab" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}><E id="ahnlab_hero.heroBtn" editMode={editMode}>{content.ahnlab_hero.heroBtn}</E></Link>
@@ -395,11 +395,11 @@ export default function AhnlabPageClient({ ssrContent }: { ssrContent: Record<st
             <E id="ahnlab_cta.desc" editMode={editMode}>{content.ahnlab_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="btn" style={{
+            <Link href="/contact?product=AhnLab" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}><E id="ahnlab_cta.btn1" editMode={editMode}>{content.ahnlab_cta.btn1}</E></Link>
-            <Link href="/contact" style={{
+            <Link href="/contact?product=AhnLab" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}><E id="ahnlab_cta.btn2" editMode={editMode}>{content.ahnlab_cta.btn2}</E></Link>

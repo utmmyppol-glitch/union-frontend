@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { Container } from '@/components/ui';
 import { apiClient } from '@/lib/api';
 import PrivacyConsent from '@/components/ui/PrivacyConsent';
@@ -8,12 +8,21 @@ import PrivacyConsent from '@/components/ui/PrivacyConsent';
 const CtaSection: React.FC = () => {
   const [company, setCompany] = useState('');
   const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [product, setProduct] = useState('');
   const [consentPrivacy, setConsentPrivacy] = useState(false);
   const [consentError, setConsentError] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search).get('product');
+      if (p) setProduct(p);
+    } catch { /* noop */ }
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -29,14 +38,16 @@ const CtaSection: React.FC = () => {
       await apiClient.submitInquiry({
         name,
         company,
-        phone: contact.includes('@') ? '-' : contact,
-        email: contact.includes('@') ? contact : `${contact}@no-email.local`,
+        phone,
+        email,
+        ...(product ? { product } : {}),
         consentPrivacy,
       });
       setSubmitted(true);
       setCompany('');
       setName('');
-      setContact('');
+      setPhone('');
+      setEmail('');
       setConsentPrivacy(false);
       setTimeout(() => setSubmitted(false), 3000);
     } catch {
@@ -166,6 +177,11 @@ const CtaSection: React.FC = () => {
               >
                 도입 문의하기
               </h3>
+              {product && (
+                <div style={{ marginBottom: 16, padding: '10px 14px', background: 'var(--soft, #f5f5f5)', border: '1px solid var(--line)', fontFamily: "'Pretendard', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>
+                  관심 제품: {product}
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <input
@@ -185,10 +201,18 @@ const CtaSection: React.FC = () => {
                   style={inputStyle}
                 />
                 <input
-                  type="text"
-                  placeholder="이메일 또는 연락처"
-                  value={contact}
-                  onChange={(e) => setContact(e.target.value)}
+                  type="tel"
+                  placeholder="연락처"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  style={inputStyle}
+                />
+                <input
+                  type="email"
+                  placeholder="이메일"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   style={inputStyle}
                 />

@@ -173,11 +173,11 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
               }}>CREATIVE APPS</span>
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=Adobe" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}><E id="adobe_hero.heroBtn1" editMode={editMode}>{content.adobe_hero.heroBtn1}</E></Link>
-              <Link href="/contact" style={{
+              <Link href="/contact?product=Adobe" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
               }}><E id="adobe_hero.heroBtn2" editMode={editMode}>{content.adobe_hero.heroBtn2}</E></Link>
@@ -467,7 +467,7 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
                   }}><E id={`adobe_plan${i}.apps`} editMode={editMode}>{content.adobe_plans[i]?.apps ?? pl.apps}</E></p>
 
                   {/* CTA */}
-                  <Link href="/contact" style={{
+                  <Link href="/contact?product=Adobe" style={{
                     marginTop: 'auto',
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '14px 24px',
@@ -553,11 +553,11 @@ export default function AdobePageClient({ ssrContent }: { ssrContent: Record<str
             <E id="adobe_cta.desc" editMode={editMode}>{content.adobe_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="btn" style={{
+            <Link href="/contact?product=Adobe" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}><E id="adobe_cta.btn1" editMode={editMode}>{content.adobe_cta.btn1}</E></Link>
-            <Link href="/contact" style={{
+            <Link href="/contact?product=Adobe" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}><E id="adobe_cta.btn2" editMode={editMode}>{content.adobe_cta.btn2}</E></Link>

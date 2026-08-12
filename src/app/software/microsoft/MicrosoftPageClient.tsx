@@ -168,13 +168,13 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               <E id="microsoft_hero.desc" editMode={editMode}>{content.microsoft_hero.desc}</E>
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=Microsoft%20365" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}>
                 <E id="microsoft_buttons.hero_cta" editMode={editMode}>{content.microsoft_buttons.hero_cta}</E>
               </Link>
-              <Link href="/contact" style={{
+              <Link href="/contact?product=Microsoft%20365" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
               }}>
@@ -407,7 +407,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
               }}>
                 <E id={`microsoft_strengths[${activeStrength}].desc`} editMode={editMode}>{s.desc}</E>
               </div>
-              <Link href="/contact" style={{
+              <Link href="/contact?product=Microsoft%20365" style={{
                 fontFamily: MONO, fontSize: 13, fontWeight: 600,
                 letterSpacing: '.04em', color: 'var(--accent)',
                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -520,7 +520,7 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
                   }}><E id={`microsoft_plans.${i}.price`} editMode={editMode}>{content.microsoft_plans[i]?.price ?? pl.price}</E></p>
 
                   {/* CTA */}
-                  <Link href="/contact" style={{
+                  <Link href="/contact?product=Microsoft%20365" style={{
                     marginTop: 'auto',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     padding: '14px 24px',
@@ -598,13 +598,13 @@ export default function MicrosoftPageClient({ ssrContent }: { ssrContent: Record
             <E id="microsoft_cta.desc" editMode={editMode}>{content.microsoft_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="btn" style={{
+            <Link href="/contact?product=Microsoft%20365" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}>
               <E id="microsoft_buttons.cta_primary" editMode={editMode}>{content.microsoft_buttons.cta_primary}</E>
             </Link>
-            <Link href="/contact" style={{
+            <Link href="/contact?product=Microsoft%20365" style={{
               padding: '16px 36px', border: '1px solid rgba(255,255,255,.45)',
               color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}>

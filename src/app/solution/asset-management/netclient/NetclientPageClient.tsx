@@ -158,7 +158,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
               ))}
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/contact" style={{
+              <Link href="/contact?product=NetClient" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}>
@@ -408,7 +408,7 @@ export default function NetclientPageClient({ ssrContent }: { ssrContent: Record
             <E id="netclient_cta.desc" editMode={editMode}>{content.netclient_cta.desc}</E>
           </p>
           <Link
-            href="/contact"
+            href="/contact?product=NetClient"
             className="reveal btn"
             style={{
               display: 'inline-block', padding: '16px 40px',

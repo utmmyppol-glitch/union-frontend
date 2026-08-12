@@ -197,14 +197,14 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
             </div>
 
             <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=ESTsoft" className="btn" style={{
                 padding: '16px 34px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s, box-shadow .2s',
               }}>
                 <E id="estsoft_hero.btn_contact" editMode={editMode}>{content.estsoft_hero.btn_contact}</E>
               </Link>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=ESTsoft" className="btn" style={{
                 padding: '16px 34px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s',
@@ -417,7 +417,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                   }}>
                     <E id={`estsoft_strengths[${i}].desc`} editMode={editMode}>{s.desc}</E>
                   </p>
-                  <Link href="/contact" style={{
+                  <Link href="/contact?product=ESTsoft" style={{
                     fontFamily: MONO, fontSize: 13, fontWeight: 600,
                     letterSpacing: '.08em', textTransform: 'uppercase',
                     color: 'var(--ink)', textDecoration: 'none',
@@ -587,7 +587,7 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
                   }}><E id={`estsoft_plans${i}.apps`} editMode={editMode}>{content.estsoft_plans[i]?.apps ?? pl.apps}</E></p>
-                  <Link href="/contact" style={{
+                  <Link href="/contact?product=ESTsoft" style={{
                     marginTop: 'auto',
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '14px 24px',
@@ -674,14 +674,14 @@ export default function EstsoftPageClient({ ssrContent }: { ssrContent: Record<s
               </E>
             </p>
             <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=ESTsoft" className="btn" style={{
                 padding: '17px 38px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s, box-shadow .2s',
               }}>
                 <E id="estsoft_cta.btn_contact" editMode={editMode}>{content.estsoft_cta.btn_contact}</E>
               </Link>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=ESTsoft" className="btn" style={{
                 padding: '17px 38px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
                 transition: 'transform .2s',

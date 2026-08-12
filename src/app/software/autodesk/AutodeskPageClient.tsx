@@ -171,11 +171,11 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
               <E id="autodesk_hero.desc" editMode={editMode}>{content.autodesk_hero.desc}</E>
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/contact" className="btn" style={{
+              <Link href="/contact?product=Autodesk" className="btn" style={{
                 padding: '16px 32px', background: 'var(--accent)', color: '#fff',
                 fontWeight: 700, fontSize: 15, textDecoration: 'none',
               }}><E id="autodesk_hero.btn1" editMode={editMode}>{content.autodesk_hero.btn1}</E></Link>
-              <Link href="/contact" style={{
+              <Link href="/contact?product=Autodesk" style={{
                 padding: '16px 32px', border: '1px solid rgba(255,255,255,.45)',
                 color: '#fff', fontWeight: 600, fontSize: 15, textDecoration: 'none',
               }}><E id="autodesk_hero.btn2" editMode={editMode}>{content.autodesk_hero.btn2}</E></Link>
@@ -199,7 +199,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
           {PRODUCTS.map((p, i) => (
             <Link
               key={p.name}
-              href="/contact"
+              href="/contact?product=Autodesk"
               className="reveal ad-prod-row"
               style={{
                 display: 'grid', gridTemplateColumns: '200px 1fr auto',
@@ -471,7 +471,7 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
                     letterSpacing: '.03em', color: 'var(--ink2)', opacity: .7,
                     margin: '0 0 20px', lineHeight: 1.5,
                   }}><E id={`autodesk_plan${i}.apps`} editMode={editMode}>{content.autodesk_plans[i]?.apps ?? DEFAULT_PLANS[i].apps}</E></p>
-                  <Link href="/contact" style={{
+                  <Link href="/contact?product=Autodesk" style={{
                     marginTop: 'auto',
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '14px 24px',
@@ -536,11 +536,11 @@ export default function AutodeskPageClient({ ssrContent }: { ssrContent: Record<
             <E id="autodesk_cta.desc" editMode={editMode}>{content.autodesk_cta.desc}</E>
           </p>
           <div className="reveal" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/contact" className="btn" style={{
+            <Link href="/contact?product=Autodesk" className="btn" style={{
               padding: '16px 36px', background: 'var(--accent)', color: '#fff',
               fontWeight: 700, fontSize: 15, textDecoration: 'none',
             }}><E id="autodesk_cta.btn1" editMode={editMode}>{content.autodesk_cta.btn1}</E></Link>
-            <Link href="/contact" style={{
+            <Link href="/contact?product=Autodesk" style={{
               padding: '16px 36px', border: '1px solid var(--ink)',
               color: 'var(--ink)', fontWeight: 600, fontSize: 15, textDecoration: 'none',
             }}><E id="autodesk_cta.btn2" editMode={editMode}>{content.autodesk_cta.btn2}</E></Link>
