@@ -6,7 +6,11 @@ import DOMPurify from 'isomorphic-dompurify';
 import { usePathname } from 'next/navigation';
 
 /* ── postMessage origin (보안: "*" 대신 명시) ── */
-export const BACKOFFICE_ORIGIN = process.env.NEXT_PUBLIC_BACKOFFICE_URL || 'http://localhost:3002';
+export const BACKOFFICE_ORIGIN =
+  process.env.NEXT_PUBLIC_BACKOFFICE_URL ||
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? `${window.location.protocol}//${window.location.hostname}:3002`
+    : 'http://localhost:3002');
 
 /* ── JSON 안전 파싱 ── */
 export function safeParse<T>(json: string | undefined, fallback: T): T {
